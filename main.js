@@ -4,7 +4,7 @@ import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
 import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
 import { UpdateSystem } from 'engine/systems/UpdateSystem.js';
 import { UnlitRenderer } from 'engine/renderers/UnlitRenderer.js';
-import {FirstPersonController} from "./engine/controllers/FirstPersonController.js";
+import { ThirdPersonController } from "./engine/controllers/ThirdPersonController.js";
 
 // renderer je edini, ki se ukvarja z webgpu
 const canvas = document.querySelector('canvas');
@@ -18,26 +18,21 @@ const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // scena je vozlisce, na katero so vezane neke komponenete
 const player = scene.find(node => node.getComponentOfType(Model))
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
+player.addComponent(camera)
 
 // model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
-
-const model = scene.find(node => node.getComponentOfType(Model));
-model.addComponent({
+player.addComponent({
     update(t, dt) {
-        // const transform = model.getComponentOfType(Transform);
-        // const scale = 1;
-        // transform.scale = [scale, scale, scale];
-        // const x = Math.sin(t);
-        // transform.translation = [x, 0, 0];
     }
 });
 
-model.addComponent(new FirstPersonController(model, canvas))
+player.addComponent(new ThirdPersonController(player, canvas));
+
 
 const light = new Node();
 light.addComponent(new Transform());
 light.addComponent(new Light({
-    color: [1, 0, 0],
+    color: [255, 255, 255],
 }));
 light.addComponent(new Transform({
     translation: [0, 5, 0],

@@ -1,8 +1,9 @@
 import { quat, vec3, mat4 } from 'glm';
 
 import { Transform } from '../core/Transform.js';
+import {Camera} from "../core/Camera.js";
 
-export class FirstPersonController {
+export class ThirdPersonController {
 
     constructor(node, domElement, {
         pitch = 0,
@@ -94,9 +95,18 @@ export class FirstPersonController {
 
         const transform = this.node.getComponentOfType(Transform);
         if (transform) {
+
             // Update translation based on velocity.
             vec3.scaleAndAdd(transform.translation,
                 transform.translation, this.velocity, dt);
+
+            // const cameraTranslation = this.node.find(node => node.getComponentOfType(Camera)).getComponentOfType(Transform)
+
+            const cameraTranslation = this.node.components[2].getComponentOfType(Transform);
+
+            vec3.scaleAndAdd(cameraTranslation.translation,
+                cameraTranslation.translation, this.velocity, dt);
+
 
             // Update rotation based on the Euler angles.
             const rotation = quat.create();
