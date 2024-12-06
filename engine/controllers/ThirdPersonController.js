@@ -28,6 +28,11 @@ export class ThirdPersonController {
         this.decay = decay;
         this.pointerSensitivity = pointerSensitivity;
 
+        this.jumpVelocity = 0;
+        this.jumpForce = 4;
+        this.isJumping = false;
+        this.gravity = -10;
+
         this.initHandlers();
     }
 
@@ -73,6 +78,14 @@ export class ThirdPersonController {
         if (this.keys['KeyA']) {
             vec3.sub(acc, acc, right);
         }
+        if (this.keys['Space'] && ! this.isJumping) {
+            this.isJumping = true;
+            this.jumpVelocity = this.jumpForce;
+        }
+
+        if(this.isJumping) {
+            this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
+        }
 
         // Update velocity based on acceleration.
         vec3.scaleAndAdd(this.velocity, this.velocity, acc, dt * this.acceleration);
@@ -97,8 +110,8 @@ export class ThirdPersonController {
         if (transform) {
 
             // Update translation based on velocity.
-            vec3.scaleAndAdd(transform.translation,
-                transform.translation, this.velocity, dt);
+            vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
+            vec3.scaleAndAdd(transform.translation, transform.translation, [0, this.jumpVelocity, 0], dt);
 
             // const cameraTranslation = this.node.find(node => node.getComponentOfType(Camera)).getComponentOfType(Transform)
 
@@ -113,6 +126,11 @@ export class ThirdPersonController {
             quat.rotateY(rotation, rotation, this.yaw);
             quat.rotateX(rotation, rotation, this.pitch);
             transform.rotation = rotation;
+
+            if(transform.translation[1] < 1) {
+                transform.translation[1] = 1;
+                this.isJumping = false;
+            }
         }
     }
 
