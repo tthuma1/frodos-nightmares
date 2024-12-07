@@ -34,6 +34,9 @@ const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // scena je vozlisce, na katero so vezane neke komponenete
 const player = scene.find(node => node.getComponentOfType(Model))
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
+camera.addComponent(new Transform({
+    translation: [0, 0, 20],
+}));
 player.addComponent(camera)
 
 // model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
@@ -48,16 +51,16 @@ player.addComponent(new ThirdPersonController(player, canvas));
 const light = new Node();
 light.addComponent(new Transform());
 light.addComponent(new Light({
-    color: [1, 1, 1],
+    color: [0.5, 0.5, 0.5],
 }));
 light.addComponent(new Transform({
-    translation: [0, 4, 0],
+    translation: [0, 5, 0],
 }));
 light.addComponent({
     update(t, dt) {
         const lightComponent = light.getComponentOfType(Light);
-        const red = (Math.sin(t) ** 2) * 5;
-        lightComponent.color = [red, 1, 1];
+        const red = (Math.sin(t) ** 2);
+        lightComponent.color = [red, 0.1, 0.1];
     }
 })
 scene.addChild( light )
