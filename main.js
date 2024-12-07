@@ -15,6 +15,7 @@ import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
 import { UpdateSystem } from 'engine/systems/UpdateSystem.js';
 import { UnlitRenderer } from 'engine/renderers/UnlitRenderer.js';
 import { ThirdPersonController } from "./engine/controllers/ThirdPersonController.js";
+import { TouchController } from "./engine/controllers/TouchController.js";
 import { loadResources } from 'engine/loaders/resources.js';
 
 // renderer je edini, ki se ukvarja z webgpu
@@ -35,8 +36,13 @@ const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 const player = scene.find(node => node.getComponentOfType(Model))
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 camera.addComponent(new Transform({
-    translation: [0, 0, 20],
+    translation: [
+        0,0,20
+    ],
 }));
+
+
+// camera.addComponent(new TouchController(camera, canvas));
 player.addComponent(camera)
 
 // model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
