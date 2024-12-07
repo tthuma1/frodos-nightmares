@@ -1,10 +1,21 @@
 import { quat } from 'glm';
-import { Camera, Model, Transform, Node, Light } from 'engine/core.js';
+import {
+    Camera,
+    Material,
+    Model,
+    Node,
+    Primitive,
+    Sampler,
+    Texture,
+    Transform,
+    Light
+} from 'engine/core.js';
 import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
 import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
 import { UpdateSystem } from 'engine/systems/UpdateSystem.js';
 import { UnlitRenderer } from 'engine/renderers/UnlitRenderer.js';
 import { ThirdPersonController } from "./engine/controllers/ThirdPersonController.js";
+import { loadResources } from 'engine/loaders/resources.js';
 
 // renderer je edini, ki se ukvarja z webgpu
 const canvas = document.querySelector('canvas');
@@ -13,6 +24,11 @@ await renderer.initialize();
 
 const gltfLoader = new GLTFLoader();
 await gltfLoader.load(new URL('./models/player/player.gltf', import.meta.url));
+
+const resources = await loadResources({
+    'mesh': new URL('./models/floor/floor.json', import.meta.url),
+    'image': new URL('./models/floor/grass.png', import.meta.url),
+});
 
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // scena je vozlisce, na katero so vezane neke komponenete
@@ -32,10 +48,10 @@ player.addComponent(new ThirdPersonController(player, canvas));
 const light = new Node();
 light.addComponent(new Transform());
 light.addComponent(new Light({
-    color: [255, 255, 255],
+    color: [1, 1, 1],
 }));
 light.addComponent(new Transform({
-    translation: [0, 5, 0],
+    translation: [0, 4, 0],
 }));
 light.addComponent({
     update(t, dt) {
@@ -45,6 +61,30 @@ light.addComponent({
     }
 })
 scene.addChild( light )
+
+const floor = new Node();
+floor.addComponent(new Transform({
+    scale: [10, 1, 10],
+}));
+floor.addComponent(new Model({
+    primitives: [
+        new Primitive({
+            mesh: resources.mesh,
+            material: new Material({
+                baseTexture: new Texture({
+                    image: resources.image,
+                    sampler: new Sampler({
+                        minFilter: 'nearest',
+                        magFilter: 'nearest',
+                        addressModeU: 'repeat',
+                        addressModeV: 'repeat',
+                    }),
+                }),
+            }),
+        }),
+    ],
+}));
+scene.addChild(floor);
 
 function update(t, dt) {
     scene.traverse(node => {
