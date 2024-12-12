@@ -305,7 +305,7 @@
 		},
 		{
 			"sampler":0,
-			"source":1
+			"source":3
 		}
 	],
 	"images":[
@@ -323,6 +323,11 @@
 			"mimeType":"image/png",
 			"name":"Wall",
 			"uri":"Wall.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"Box",
+			"uri":"Box-1.png"
 		}
 	],
 	"accessors":[
