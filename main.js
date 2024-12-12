@@ -23,35 +23,43 @@ const canvas = document.querySelector('canvas');
 const renderer = new UnlitRenderer(canvas);
 await renderer.initialize();
 
-const gltfLoader = new GLTFLoader();
-await gltfLoader.load(new URL('./models/player/player.gltf', import.meta.url));
+// const gltfLoader = new GLTFLoader();
+// await gltfLoader.load(new URL('./models/player/player.gltf', import.meta.url));
 
-const resources = await loadResources({
-    'mesh': new URL('./models/floor/floor.json', import.meta.url),
-    'image': new URL('./models/floor/grass.png', import.meta.url),
-});
+const gltfLoader = new GLTFLoader();
+await gltfLoader.load(new URL('./scene/scene.gltf', import.meta.url));
+
+
+// const resources = await loadResources({
+//     'mesh': new URL('./models/floor/floor.json', import.meta.url),
+//     'image': new URL('./models/floor/grass.png', import.meta.url),
+// });
 
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // scena je vozlisce, na katero so vezane neke komponenete
-const player = scene.find(node => node.getComponentOfType(Model))
+// const player = scene.find(node => node.getComponentOfType(Model))
+// const player = gltfLoader.loadNode("Player");
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 camera.addComponent(new Transform({
     translation: [
-        0,0,20
+        0,15,15
+    ],
+    rotation: [
+        -0.25,0,0,1
     ],
 }));
 
 
 // camera.addComponent(new TouchController(camera, canvas));
-player.addComponent(camera)
+// player.addComponent(camera)
 
-// model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
-player.addComponent({
-    update(t, dt) {
-    }
-});
+// // model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
+// player.addComponent({
+//     update(t, dt) {
+//     }
+// });
 
-player.addComponent(new ThirdPersonController(player, canvas));
+// player.addComponent(new ThirdPersonController(player, canvas));
 
 
 const light = new Node();
@@ -71,29 +79,29 @@ light.addComponent({
 })
 scene.addChild( light )
 
-const floor = new Node();
-floor.addComponent(new Transform({
-    scale: [10, 1, 10],
-}));
-floor.addComponent(new Model({
-    primitives: [
-        new Primitive({
-            mesh: resources.mesh,
-            material: new Material({
-                baseTexture: new Texture({
-                    image: resources.image,
-                    sampler: new Sampler({
-                        minFilter: 'nearest',
-                        magFilter: 'nearest',
-                        addressModeU: 'repeat',
-                        addressModeV: 'repeat',
-                    }),
-                }),
-            }),
-        }),
-    ],
-}));
-scene.addChild(floor);
+// const floor = new Node();
+// floor.addComponent(new Transform({
+//     scale: [10, 1, 10],
+// }));
+// floor.addComponent(new Model({
+//     primitives: [
+//         new Primitive({
+//             mesh: resources.mesh,
+//             material: new Material({
+//                 baseTexture: new Texture({
+//                     image: resources.image,
+//                     sampler: new Sampler({
+//                         minFilter: 'nearest',
+//                         magFilter: 'nearest',
+//                         addressModeU: 'repeat',
+//                         addressModeV: 'repeat',
+//                     }),
+//                 }),
+//             }),
+//         }),
+//     ],
+// }));
+// scene.addChild(floor);
 
 function update(t, dt) {
     scene.traverse(node => {
