@@ -38,28 +38,20 @@ await gltfLoader.load(new URL('./scene/scene.gltf', import.meta.url));
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // scena je vozlisce, na katero so vezane neke komponenete
 // const player = scene.find(node => node.getComponentOfType(Model))
-// const player = gltfLoader.loadNode("Player");
+const player = gltfLoader.loadNode("Player");
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
-camera.addComponent(new Transform({
-    translation: [
-        0,15,15
-    ],
-    rotation: [
-        -0.25,0,0,1
-    ],
-}));
 
 
 // camera.addComponent(new TouchController(camera, canvas));
 // player.addComponent(camera)
 
 // // model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
-// player.addComponent({
-//     update(t, dt) {
-//     }
-// });
+player.addComponent({
+    update(t, dt) {
+    }
+});
 
-// player.addComponent(new ThirdPersonController(player, canvas));
+player.addComponent(new ThirdPersonController(player, canvas));
 
 
 const light = new Node();
