@@ -17,6 +17,11 @@ import { UnlitRenderer } from 'engine/renderers/UnlitRenderer.js';
 import { ThirdPersonController } from "./engine/controllers/ThirdPersonController.js";
 import { TouchController } from "./engine/controllers/TouchController.js";
 import { loadResources } from 'engine/loaders/resources.js';
+import { Physics } from './Physics.js';
+import {
+    calculateAxisAlignedBoundingBox,
+    mergeAxisAlignedBoundingBoxes,
+} from 'engine/core/MeshUtils.js';
 
 // renderer je edini, ki se ukvarja z webgpu
 const canvas = document.querySelector('canvas');
@@ -52,6 +57,24 @@ player.addComponent({
 });
 
 player.addComponent(new ThirdPersonController(player, canvas));
+
+
+player.isDynamic = true;
+player.aabb = {
+    min: [-0.2, -0.2, -0.2],
+    max: [0.2, 0.2, 0.2],
+};
+
+gltfLoader.loadNode('Box.000').isStatic = true;
+gltfLoader.loadNode('Box.001').isStatic = true;
+gltfLoader.loadNode('Box.002').isStatic = true;
+gltfLoader.loadNode('Box.003').isStatic = true;
+gltfLoader.loadNode('Box.004').isStatic = true;
+gltfLoader.loadNode('Box.005').isStatic = true;
+gltfLoader.loadNode('Wall.000').isStatic = true;
+gltfLoader.loadNode('Wall.001').isStatic = true;
+gltfLoader.loadNode('Wall.002').isStatic = true;
+gltfLoader.loadNode('Wall.003').isStatic = true;
 
 
 const light = new Node();
@@ -95,12 +118,25 @@ scene.addChild( light )
 // }));
 // scene.addChild(floor);
 
+const physics = new Physics(scene);
+
+scene.traverse(node => {
+    const model = node.getComponentOfType(Model);
+    if (!model) {
+        return;
+    }
+
+    const boxes = model.primitives.map(primitive => calculateAxisAlignedBoundingBox(primitive.mesh));
+    node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
+});
 function update(t, dt) {
     scene.traverse(node => {
         for (const component of node.components) {
             component.update?.(t, dt);
         }
     });
+
+    physics.update(t, dt);
 }
 
 function render() {

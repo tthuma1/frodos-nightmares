@@ -29,7 +29,7 @@ export class ThirdPersonController {
         this.pointerSensitivity = pointerSensitivity;
 
         this.jumpVelocity = 0;
-        this.jumpForce = 4;
+        this.jumpForce = 10;
         this.isJumping = false;
         this.gravity = -10;
 
