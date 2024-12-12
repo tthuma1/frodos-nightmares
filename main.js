@@ -43,7 +43,7 @@ const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo k
 
 
 // camera.addComponent(new TouchController(camera, canvas));
-// player.addComponent(camera)
+player.addComponent(camera)
 
 // // model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
 player.addComponent({

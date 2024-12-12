@@ -115,13 +115,10 @@ export class ThirdPersonController {
 
             // const cameraTranslation = this.node.find(node => node.getComponentOfType(Camera)).getComponentOfType(Transform)
 
-            const cameraTranslation = this.node.components[0];
+            const cameraTranslation = this.node.components[2].getComponentOfType(Transform);
 
-            console.log("before", cameraTranslation.translation);
             vec3.scaleAndAdd(cameraTranslation.translation,
                 cameraTranslation.translation, this.velocity, dt);
-
-            console.log("after", cameraTranslation.translation);
 
             // Update rotation based on the Euler angles.
             const rotation = quat.create();
