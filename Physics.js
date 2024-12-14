@@ -1,23 +1,25 @@
 import { vec3, mat4 } from 'glm';
 import { getGlobalModelMatrix } from 'engine/core/SceneUtils.js';
 import { Transform } from 'engine/core.js';
+import {Key} from "./engine/core/Key.js";
 
 export class Physics {
-
-    constructor(scene) {
+    constructor(scene, player, key) {
         this.scene = scene;
+        this.player = player;
+        this.key = key;
     }
 
     update(t, dt) {
         this.scene.traverse(node => {
-            if (node.isDynamic) {
-                this.scene.traverse(other => {
-                    if (node !== other && other.isStatic) {
-                        this.resolveCollision(node, other);
-                    }
-                });
+            if (node !== this.player && node.isStatic) {
+                this.resolveCollision(this.player, node)
             }
-        });
+        })
+
+        if (this.key.getComponentOfType(Key).isCollected === false) {
+            this.keyCollision(this.player, this.key)
+        }
     }
 
     intervalIntersection(min1, max1, min2, max2) {
@@ -111,4 +113,17 @@ export class Physics {
         cameraTranslation.translation[1] = tmpY;
     }
 
+    keyCollision(player, key) {
+        const playerBox = this.getTransformedAABB(player);
+        const keyBox = this.getTransformedAABB(key);
+
+        // Check if there is collision.
+        const isColliding = this.aabbIntersection(playerBox, keyBox);
+        if (!isColliding) {
+            return;
+        }
+
+        this.key.getComponentOfType(Key).collectKey()
+        this.scene.removeChild(this.key)
+    }
 }

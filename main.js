@@ -1,4 +1,3 @@
-import { quat } from 'glm';
 import {
     Camera,
     Material,
@@ -15,13 +14,12 @@ import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
 import { UpdateSystem } from 'engine/systems/UpdateSystem.js';
 import { UnlitRenderer } from 'engine/renderers/UnlitRenderer.js';
 import { ThirdPersonController } from "./engine/controllers/ThirdPersonController.js";
-import { TouchController } from "./engine/controllers/TouchController.js";
-import { loadResources } from 'engine/loaders/resources.js';
 import { Physics } from './Physics.js';
 import {
     calculateAxisAlignedBoundingBox,
     mergeAxisAlignedBoundingBoxes,
 } from 'engine/core/MeshUtils.js';
+import {Key} from "./engine/core/Key.js";
 
 // renderer je edini, ki se ukvarja z webgpu
 const canvas = document.querySelector('canvas');
@@ -44,6 +42,8 @@ const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // scena je vozlisce, na katero so vezane neke komponenete
 // const player = scene.find(node => node.getComponentOfType(Model))
 const player = gltfLoader.loadNode("Player");
+const key = gltfLoader.loadNode('Torus.001'); //TODO: treba renamat na key
+key.addComponent(new Key())
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 
 
@@ -75,7 +75,6 @@ gltfLoader.loadNode('Wall.000').isStatic = true;
 gltfLoader.loadNode('Wall.001').isStatic = true;
 gltfLoader.loadNode('Wall.002').isStatic = true;
 gltfLoader.loadNode('Wall.003').isStatic = true;
-
 
 const light = new Node();
 light.addComponent(new Transform());
@@ -118,7 +117,7 @@ scene.addChild( light )
 // }));
 // scene.addChild(floor);
 
-const physics = new Physics(scene);
+const physics = new Physics(scene, player, key);
 
 scene.traverse(node => {
     const model = node.getComponentOfType(Model);
@@ -129,6 +128,7 @@ scene.traverse(node => {
     const boxes = model.primitives.map(primitive => calculateAxisAlignedBoundingBox(primitive.mesh));
     node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
 });
+
 function update(t, dt) {
     scene.traverse(node => {
         for (const component of node.components) {

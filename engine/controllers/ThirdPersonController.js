@@ -12,7 +12,6 @@ export class ThirdPersonController {
         acceleration = 50,
         maxSpeed = 5,
         decay = 0.99999,
-        pointerSensitivity = 0.002,
     } = {}) {
         this.node = node;
         this.domElement = domElement;
@@ -26,7 +25,7 @@ export class ThirdPersonController {
         this.acceleration = acceleration;
         this.maxSpeed = maxSpeed;
         this.decay = decay;
-        this.pointerSensitivity = pointerSensitivity;
+
 
         this.jumpVelocity = 0;
         this.jumpForce = 10;
@@ -37,7 +36,7 @@ export class ThirdPersonController {
     }
 
     initHandlers() {
-        this.pointermoveHandler = this.pointermoveHandler.bind(this);
+
         this.keydownHandler = this.keydownHandler.bind(this);
         this.keyupHandler = this.keyupHandler.bind(this);
 
@@ -46,15 +45,6 @@ export class ThirdPersonController {
 
         doc.addEventListener('keydown', this.keydownHandler);
         doc.addEventListener('keyup', this.keyupHandler);
-
-        element.addEventListener('click', e => element.requestPointerLock());
-        doc.addEventListener('pointerlockchange', e => {
-            if (doc.pointerLockElement === element) {
-                doc.addEventListener('pointermove', this.pointermoveHandler);
-            } else {
-                doc.removeEventListener('pointermove', this.pointermoveHandler);
-            }
-        });
     }
 
     update(t, dt) {
@@ -131,20 +121,6 @@ export class ThirdPersonController {
                 this.isJumping = false;
             }
         }
-    }
-
-    pointermoveHandler(e) {
-        const dx = e.movementX;
-        const dy = e.movementY;
-
-        this.pitch -= dy * this.pointerSensitivity;
-        this.yaw   -= dx * this.pointerSensitivity;
-
-        const twopi = Math.PI * 2;
-        const halfpi = Math.PI / 2;
-
-        this.pitch = Math.min(Math.max(this.pitch, -halfpi), halfpi);
-        this.yaw = ((this.yaw % twopi) + twopi) % twopi;
     }
 
     keydownHandler(e) {
