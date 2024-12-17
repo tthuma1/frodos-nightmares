@@ -7,7 +7,7 @@ import {
     Sampler,
     Texture,
     Transform,
-    Light
+    Light,
 } from 'engine/core.js';
 import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
 import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
@@ -43,10 +43,12 @@ const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // const player = scene.find(node => node.getComponentOfType(Model))
 const player = gltfLoader.loadNode("Player");
 player.isPlayer = true;
-const key = gltfLoader.loadNode('Torus.001'); //TODO: treba renamat na key
+const key = gltfLoader.loadNode('Key');
 key.addComponent(new Key())
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 
+// Lantern is added to player
+const lantern = gltfLoader.loadNode('Lantern');
 
 // camera.addComponent(new TouchController(camera, canvas));
 player.addComponent(camera)
@@ -71,6 +73,7 @@ gltfLoader.loadNode('Wall.001').isStatic = true;
 gltfLoader.loadNode('Wall.002').isStatic = true;
 gltfLoader.loadNode('Wall.003').isStatic = true;
 
+
 gltfLoader.loadNode('Trampoline').isDraggable = true;
 gltfLoader.loadNode('Box.001').isDraggable = true;
 gltfLoader.loadNode('Box.002').isDraggable = true;
@@ -80,19 +83,31 @@ gltfLoader.loadNode('Box.005').isDraggable = true;
 
 gltfLoader.loadNode('Trampoline').isTrampoline = true;
 
+// Lantern implementation
+const lanternLight = new Node();
+lanternLight.addComponent(new Transform({
+    translation: [0, 1, 0]
+}));
+
+lanternLight.addComponent(new Light({
+    color: [1.0, 0.85, 0.6],
+    intensity: 2.0,
+    range: 10,
+}))
+lantern.addChild(lanternLight);
+
+// Basic light implementation
 const light = new Node();
 light.addComponent(new Transform());
 light.addComponent(new Light({
-    color: [0.5, 0.5, 0.5],
+    color: [0, 0, 0],
 }));
 light.addComponent(new Transform({
-    translation: [0, 5, 0],
+    translation: [0, 0, 0],
 }));
 light.addComponent({
     update(t, dt) {
-        const lightComponent = light.getComponentOfType(Light);
-        const red = (Math.sin(t) ** 2);
-        lightComponent.color = [red, 0.1, 0.1];
+
     }
 })
 scene.addChild( light )

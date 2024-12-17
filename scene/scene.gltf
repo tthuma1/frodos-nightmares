@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.3.47",
+		"generator":"Khronos glTF Blender I/O v3.6.27",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -21,7 +21,8 @@
 				10,
 				11,
 				12,
-				13
+				13,
+				14
 			]
 		}
 	],
@@ -167,7 +168,7 @@
 		},
 		{
 			"mesh":4,
-			"name":"Torus.001",
+			"name":"Key",
 			"scale":[
 				0.5,
 				0.5,
@@ -187,6 +188,15 @@
 				1,
 				0
 			]
+		},
+		{
+			"mesh":6,
+			"name":"Lantern",
+			"translation":[
+				7.820943355560303,
+				1.070739984512329,
+				2.696572780609131
+			]
 		}
 	],
 	"cameras":[
@@ -203,6 +213,7 @@
 	],
 	"materials":[
 		{
+			"alphaMode":"BLEND",
 			"doubleSided":true,
 			"name":"Floor",
 			"pbrMetallicRoughness":{
@@ -214,6 +225,7 @@
 			}
 		},
 		{
+			"alphaMode":"BLEND",
 			"doubleSided":true,
 			"name":"Box",
 			"pbrMetallicRoughness":{
@@ -225,6 +237,7 @@
 			}
 		},
 		{
+			"alphaMode":"BLEND",
 			"doubleSided":true,
 			"name":"Wall",
 			"pbrMetallicRoughness":{
@@ -236,6 +249,7 @@
 			}
 		},
 		{
+			"alphaMode":"BLEND",
 			"doubleSided":true,
 			"name":"Box.001",
 			"pbrMetallicRoughness":{
@@ -258,11 +272,23 @@
 			}
 		},
 		{
+			"alphaMode":"BLEND",
 			"doubleSided":true,
 			"name":"Box.002",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":5
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Material",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":6
 				},
 				"metallicFactor":0,
 				"roughnessFactor":0.5
@@ -353,6 +379,20 @@
 					"material":5
 				}
 			]
+		},
+		{
+			"name":"Cube",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":21,
+						"NORMAL":22,
+						"TEXCOORD_0":23
+					},
+					"indices":24,
+					"material":6
+				}
+			]
 		}
 	],
 	"textures":[
@@ -379,6 +419,10 @@
 		{
 			"sampler":0,
 			"source":5
+		},
+		{
+			"sampler":1,
+			"source":4
 		}
 	],
 	"images":[
@@ -599,6 +643,40 @@
 			"componentType":5126,
 			"count":24,
 			"type":"VEC2"
+		},
+		{
+			"bufferView":21,
+			"componentType":5126,
+			"count":24,
+			"max":[
+				1,
+				1,
+				1
+			],
+			"min":[
+				-1,
+				-1,
+				-1
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":22,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":23,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":24,
+			"componentType":5123,
+			"count":36,
+			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
@@ -727,17 +805,45 @@
 			"byteLength":192,
 			"byteOffset":83732,
 			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":83924,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":84212,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":192,
+			"byteOffset":84500,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":72,
+			"byteOffset":84692,
+			"target":34963
 		}
 	],
 	"samplers":[
 		{
 			"magFilter":9728,
 			"minFilter":9984
+		},
+		{
+			"magFilter":9729,
+			"minFilter":9987
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":83924,
+			"byteLength":84764,
 			"uri":"scene.bin"
 		}
 	]
