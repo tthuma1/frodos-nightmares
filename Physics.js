@@ -16,6 +16,9 @@ export class Physics {
         this.scene.traverse(node => {
             if (node !== this.player && node.isStatic && node !== this.controller.draggedNode) {
                 this.resolveCollision(this.player, node)
+                if (this.controller.draggedNode && node !== this.controller.draggedNode) { // second part of && is necessarry, is draggedNode is set while scene is updating
+                    this.resolveCollision(this.controller.draggedNode, node);
+                }
             }
         })
 
@@ -105,20 +108,21 @@ export class Physics {
             this.controller.finishJump();
         }
 
-        // transform player and dragged node
-        const transform = a.getComponentOfType(Transform);
+        // transform player
+        const transform = this.player.getComponentOfType(Transform);
         if (!transform) {
             return;
         }
-
         vec3.add(transform.translation, transform.translation, minDirection);
+
+        // transform dragged node
         if (this.controller.draggedNode) {
             const draggedTransform = this.controller.draggedNodeTransform();
             vec3.add(draggedTransform.translation, draggedTransform.translation, [minDirection[0], 0, minDirection[2]]);
         }
 
         // transform camera with player
-        const cameraTranslation = a.components[2].getComponentOfType(Transform);
+        const cameraTranslation = this.player.components[2].getComponentOfType(Transform);
         const tmpY = cameraTranslation.translation[1];
 
         vec3.add(cameraTranslation.translation,
@@ -128,7 +132,12 @@ export class Physics {
 
         // check if collision is with draggable item
         const startDragText = document.getElementById("startDrag");
-        if (Math.abs(minDirection[0]) > 1e-4 || Math.abs(minDirection[2]) > 1e-4) {
+        if (
+            (Math.abs(minDirection[0]) > 1e-4 || Math.abs(minDirection[2]) > 1e-4) &&
+            !this.controller.draggedNode &&
+            this.controller.jumpVelocity < 1e-4 &&
+            b.isDraggable
+        ) {
             startDragText.style.display = "block";
             if (this.controller.keys['KeyE']) {
                 this.controller.startDragging(b);

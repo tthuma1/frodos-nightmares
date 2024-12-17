@@ -76,6 +76,10 @@ export class ThirdPersonController {
             this.jumpVelocity = this.jumpForce;
         }
 
+        if (this.keys['KeyE'] && this.draggedNode) {
+            this.stopDragging();
+        }
+
         this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
 
         // Update velocity based on acceleration.
@@ -128,10 +132,20 @@ export class ThirdPersonController {
     startDragging(draggedNode) {
         this.isDragging = true;
         this.draggedNode = draggedNode;
+
+        const startDragText = document.getElementById("startDrag");
+        startDragText.style.display = "none";
+
+        const stopDragText = document.getElementById("stopDrag");
+        stopDragText.style.display = "block";
     }
 
     stopDragging() {
         this.isDragging = false;
+        this.draggedNode = null;
+
+        const stopDragText = document.getElementById("stopDrag");
+        stopDragText.style.display = "none";
     }
 
     draggedNodeTransform()
