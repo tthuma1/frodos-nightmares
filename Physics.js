@@ -66,15 +66,88 @@ export class Physics {
         const aBox = this.getTransformedAABB(a);
         const bBox = this.getTransformedAABB(b);
 
+        const bDragBox = this.toDragBox(bBox);
+
         // Check if there is collision.
         const isColliding = this.aabbIntersection(aBox, bBox);
+        const isDragColliding = this.aabbIntersection(aBox, bDragBox);
+        if(isDragColliding) {
+            this.displayDragText(aBox, bDragBox, b);
+        }
+
         if (!isColliding) {
             return;
         }
 
+        const minDirection = this.getMinDirection(aBox, bBox);
+
+        // player is on top of object and is falling (you can only land if you're falling)
+        if (this.controller.jumpVelocity < 0 && minDirection[1] > 1e-4) {
+            this.controller.finishJump();
+        }
+
+        // transform player
+        const transform = this.player.getComponentOfType(Transform);
+        if (!transform) {
+            return;
+        }
+        vec3.add(transform.translation, transform.translation, minDirection);
+
+        // transform dragged node
+        if (this.controller.draggedNode) {
+            const draggedTransform = this.controller.draggedNodeTransform();
+            vec3.add(draggedTransform.translation, draggedTransform.translation, [minDirection[0], 0, minDirection[2]]);
+        }
+
+        // transform camera with player
+        const cameraTranslation = this.player.components[2].getComponentOfType(Transform);
+        const tmpY = cameraTranslation.translation[1];
+
+        vec3.add(cameraTranslation.translation,
+            cameraTranslation.translation, minDirection);
+
+        cameraTranslation.translation[1] = tmpY;
+    }
+
+    displayDragText(aBox, bDragBox, b) {
+        // check if collision is with draggable item
+        const minDragDirection = this.getMinDirection(aBox, bDragBox);
+        const startDragText = document.getElementById("startDrag");
+
+        if (
+            (Math.abs(minDragDirection[0]) > 1e-4 || Math.abs(minDragDirection[2]) > 1e-4) &&
+            !this.controller.draggedNode &&
+            this.controller.jumpVelocity < 1e-4 &&
+            b.isDraggable
+        ) {
+            startDragText.style.display = "block";
+            if (this.controller.keys['KeyE']) {
+                this.controller.startDragging(b);
+            }
+        } else {
+            startDragText.style.display = "none";
+        }
+    }
+
+    keyCollision(player, key) {
+        const playerBox = this.getTransformedAABB(player);
+        const keyBox = this.getTransformedAABB(key);
+
+        // Check if there is collision.
+        const isColliding = this.aabbIntersection(playerBox, keyBox);
+        if (!isColliding) {
+            return;
+        }
+
+        this.key.getComponentOfType(Key).collectKey()
+        this.scene.removeChild(this.key)
+    }
+
+    getMinDirection(aBox, bBox) {
         // Move node A minimally to avoid collision.
         const diffa = vec3.sub(vec3.create(), bBox.max, aBox.min);
         const diffb = vec3.sub(vec3.create(), aBox.max, bBox.min);
+        
 
         let minDiff = Infinity;
         let minDirection = [0, 0, 0];
@@ -103,61 +176,13 @@ export class Physics {
             minDirection = [0, 0, -minDiff];
         }
 
-        // player is on top of object and is falling (you can only land if you're falling)
-        if (this.controller.jumpVelocity < 0 && minDirection[1] > 1e-4) {
-            this.controller.finishJump();
-        }
-
-        // transform player
-        const transform = this.player.getComponentOfType(Transform);
-        if (!transform) {
-            return;
-        }
-        vec3.add(transform.translation, transform.translation, minDirection);
-
-        // transform dragged node
-        if (this.controller.draggedNode) {
-            const draggedTransform = this.controller.draggedNodeTransform();
-            vec3.add(draggedTransform.translation, draggedTransform.translation, [minDirection[0], 0, minDirection[2]]);
-        }
-
-        // transform camera with player
-        const cameraTranslation = this.player.components[2].getComponentOfType(Transform);
-        const tmpY = cameraTranslation.translation[1];
-
-        vec3.add(cameraTranslation.translation,
-            cameraTranslation.translation, minDirection);
-
-        cameraTranslation.translation[1] = tmpY;
-
-        // check if collision is with draggable item
-        const startDragText = document.getElementById("startDrag");
-        if (
-            (Math.abs(minDirection[0]) > 1e-4 || Math.abs(minDirection[2]) > 1e-4) &&
-            !this.controller.draggedNode &&
-            this.controller.jumpVelocity < 1e-4 &&
-            b.isDraggable
-        ) {
-            startDragText.style.display = "block";
-            if (this.controller.keys['KeyE']) {
-                this.controller.startDragging(b);
-            }
-        } else {
-            startDragText.style.display = "none";
-        }
+        return minDirection;
     }
 
-    keyCollision(player, key) {
-        const playerBox = this.getTransformedAABB(player);
-        const keyBox = this.getTransformedAABB(key);
-
-        // Check if there is collision.
-        const isColliding = this.aabbIntersection(playerBox, keyBox);
-        if (!isColliding) {
-            return;
+    toDragBox(box) {
+        return {
+            min: [box.min[0] - 0.5, box.min[1] - 0.5, box.min[2] - 0.5],
+            max: [box.max[0] + 0.5, box.max[1] + 0.5, box.max[2] + 0.5],
         }
-
-        this.key.getComponentOfType(Key).collectKey()
-        this.scene.removeChild(this.key)
     }
 }

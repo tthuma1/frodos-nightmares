@@ -32,8 +32,8 @@ export class ThirdPersonController {
         this.isJumping = false;
         this.gravity = -20;
 
-        this.isDragging = false; // maybe this bool is not necessary, because you can only check if this.draggedNode is null
         this.draggedNode = null;
+        this.lastDragTime = 0;
 
         this.initHandlers();
     }
@@ -114,7 +114,7 @@ export class ThirdPersonController {
                 cameraTranslation.translation, this.velocity, dt);
 
             // translate dragged object
-            if(this.isDragging) {
+            if(this.draggedNode) {
                 const draggedTransform = this.draggedNodeTransform();
                 vec3.scaleAndAdd(draggedTransform.translation, draggedTransform.translation, [this.velocity[0], 0, this.velocity[2]], dt);
             }
@@ -130,7 +130,7 @@ export class ThirdPersonController {
     }
 
     startDragging(draggedNode) {
-        this.isDragging = true;
+        if (this.lastDragTime && Date.now() - this.lastDragTime < 200) return; // wait for 200 ms before being able to drag again
         this.draggedNode = draggedNode;
 
         const startDragText = document.getElementById("startDrag");
@@ -138,14 +138,18 @@ export class ThirdPersonController {
 
         const stopDragText = document.getElementById("stopDrag");
         stopDragText.style.display = "block";
+
+        this.lastDragTime = Date.now();
     }
 
     stopDragging() {
-        this.isDragging = false;
+        if (this.lastDragTime && Date.now() - this.lastDragTime < 200) return; // wait for 200 ms before being able to stop drag
         this.draggedNode = null;
 
         const stopDragText = document.getElementById("stopDrag");
         stopDragText.style.display = "none";
+
+        this.lastDragTime = Date.now();
     }
 
     draggedNodeTransform()

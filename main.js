@@ -59,13 +59,6 @@ player.addComponent({
 
 player.addComponent(new ThirdPersonController(player, canvas));
 
-
-player.isDynamic = true;
-player.aabb = {
-    min: [-0.2, -0.2, -0.2],
-    max: [0.2, 0.2, 0.2],
-};
-
 gltfLoader.loadNode('Floor').isStatic = true;
 gltfLoader.loadNode('Box.000').isStatic = true;
 gltfLoader.loadNode('Box.001').isStatic = true;
@@ -129,8 +122,6 @@ scene.addChild( light )
 // }));
 // scene.addChild(floor);
 
-const physics = new Physics(scene, player, key);
-
 scene.traverse(node => {
     const model = node.getComponentOfType(Model);
     if (!model) {
@@ -141,6 +132,7 @@ scene.traverse(node => {
     node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
 });
 
+const physics = new Physics(scene, player, key);
 function update(t, dt) {
     scene.traverse(node => {
         for (const component of node.components) {
