@@ -32,15 +32,6 @@
 		},
 		{
 			"mesh":1,
-			"name":"Box.000",
-			"translation":[
-				0,
-				1,
-				0
-			]
-		},
-		{
-			"mesh":1,
 			"name":"Box.001",
 			"translation":[
 				3.646099090576172,
@@ -187,6 +178,15 @@
 				0.10271472483873367,
 				-7.257275581359863
 			]
+		},
+		{
+			"mesh":5,
+			"name":"Trampoline",
+			"translation":[
+				0,
+				1,
+				0
+			]
 		}
 	],
 	"cameras":[
@@ -252,6 +252,17 @@
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":4
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Box.002",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":5
 				},
 				"metallicFactor":0,
 				"roughnessFactor":0.5
@@ -328,6 +339,20 @@
 					"material":4
 				}
 			]
+		},
+		{
+			"name":"Trampoline",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":18,
+						"NORMAL":19,
+						"TEXCOORD_0":20
+					},
+					"indices":7,
+					"material":5
+				}
+			]
 		}
 	],
 	"textures":[
@@ -350,6 +375,10 @@
 		{
 			"sampler":0,
 			"source":4
+		},
+		{
+			"sampler":0,
+			"source":5
 		}
 	],
 	"images":[
@@ -377,6 +406,11 @@
 			"mimeType":"image/png",
 			"name":"key.003",
 			"uri":"key_003.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"Trampoline",
+			"uri":"Trampoline.png"
 		}
 	],
 	"accessors":[
@@ -537,6 +571,34 @@
 			"componentType":5123,
 			"count":3456,
 			"type":"SCALAR"
+		},
+		{
+			"bufferView":18,
+			"componentType":5126,
+			"count":24,
+			"max":[
+				1,
+				1,
+				1
+			],
+			"min":[
+				-1,
+				-1,
+				-1
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":19,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":20,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC2"
 		}
 	],
 	"bufferViews":[
@@ -647,6 +709,24 @@
 			"byteLength":6912,
 			"byteOffset":76244,
 			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":83156,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":83444,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":192,
+			"byteOffset":83732,
+			"target":34962
 		}
 	],
 	"samplers":[
@@ -657,7 +737,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":83156,
+			"byteLength":83924,
 			"uri":"scene.bin"
 		}
 	]

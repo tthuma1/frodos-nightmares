@@ -60,7 +60,7 @@ player.addComponent({
 player.addComponent(new ThirdPersonController(player, canvas));
 
 gltfLoader.loadNode('Floor').isStatic = true;
-gltfLoader.loadNode('Box.000').isStatic = true;
+gltfLoader.loadNode('Trampoline').isStatic = true;
 gltfLoader.loadNode('Box.001').isStatic = true;
 gltfLoader.loadNode('Box.002').isStatic = true;
 gltfLoader.loadNode('Box.003').isStatic = true;
@@ -71,15 +71,14 @@ gltfLoader.loadNode('Wall.001').isStatic = true;
 gltfLoader.loadNode('Wall.002').isStatic = true;
 gltfLoader.loadNode('Wall.003').isStatic = true;
 
-gltfLoader.loadNode('Box.000').isDraggable = true;
+gltfLoader.loadNode('Trampoline').isDraggable = true;
 gltfLoader.loadNode('Box.001').isDraggable = true;
 gltfLoader.loadNode('Box.002').isDraggable = true;
 gltfLoader.loadNode('Box.003').isDraggable = true;
 gltfLoader.loadNode('Box.004').isDraggable = true;
 gltfLoader.loadNode('Box.005').isDraggable = true;
 
-// gltfLoader.loadNode('Box.000').getComponentOfType(Transform).translation = [1,2,1];
-// console.log(gltfLoader.loadNode('Box.000').getComponentOfType(Transform))
+gltfLoader.loadNode('Trampoline').isTrampoline = true;
 
 const light = new Node();
 light.addComponent(new Transform());

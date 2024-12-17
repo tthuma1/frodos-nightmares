@@ -163,10 +163,14 @@ export class ThirdPersonController {
         return this.draggedNode?.getComponentOfType(Transform);
     }
 
-    finishJump()
+    finishJump(node)
     {
-        this.jumpVelocity = 0;
-        this.isJumping = false;
+        if (!node.isTrampoline) {
+            this.jumpVelocity = 0;
+            this.isJumping = false;
+        } else {
+            this.jumpVelocity = 15;
+        }
     }
 
     keydownHandler(e) {
