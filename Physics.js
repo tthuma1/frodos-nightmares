@@ -14,7 +14,7 @@ export class Physics {
 
     update(t, dt) {
         this.scene.traverse(node => {
-            if (node !== this.player && node.isStatic) {
+            if (node !== this.player && node.isStatic && node !== this.controller.draggedNode) {
                 this.resolveCollision(this.player, node)
             }
         })
@@ -105,12 +105,19 @@ export class Physics {
             this.controller.finishJump();
         }
 
+        // transform player and dragged node
         const transform = a.getComponentOfType(Transform);
         if (!transform) {
             return;
         }
 
         vec3.add(transform.translation, transform.translation, minDirection);
+        if (this.controller.draggedNode) {
+            const draggedTransform = this.controller.draggedNodeTransform();
+            vec3.add(draggedTransform.translation, draggedTransform.translation, [minDirection[0], 0, minDirection[2]]);
+        }
+
+        // transform camera with player
         const cameraTranslation = a.components[2].getComponentOfType(Transform);
         const tmpY = cameraTranslation.translation[1];
 
@@ -118,6 +125,17 @@ export class Physics {
             cameraTranslation.translation, minDirection);
 
         cameraTranslation.translation[1] = tmpY;
+
+        // check if collision is with draggable item
+        const startDragText = document.getElementById("startDrag");
+        if (Math.abs(minDirection[0]) > 1e-4 || Math.abs(minDirection[2]) > 1e-4) {
+            startDragText.style.display = "block";
+            if (this.controller.keys['KeyE']) {
+                this.controller.startDragging(b);
+            }
+        } else {
+            startDragText.style.display = "none";
+        }
     }
 
     keyCollision(player, key) {

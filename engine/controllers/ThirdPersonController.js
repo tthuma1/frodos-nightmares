@@ -32,6 +32,9 @@ export class ThirdPersonController {
         this.isJumping = false;
         this.gravity = -20;
 
+        this.isDragging = false; // maybe this bool is not necessary, because you can only check if this.draggedNode is null
+        this.draggedNode = null;
+
         this.initHandlers();
     }
 
@@ -68,7 +71,7 @@ export class ThirdPersonController {
         if (this.keys['KeyA']) {
             vec3.sub(acc, acc, right);
         }
-        if (this.keys['Space'] && ! this.isJumping) {
+        if (this.keys['Space'] && !this.isJumping && !this.draggedNode) {
             this.isJumping = true;
             this.jumpVelocity = this.jumpForce;
         }
@@ -101,12 +104,18 @@ export class ThirdPersonController {
             vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
             vec3.scaleAndAdd(transform.translation, transform.translation, [0, this.jumpVelocity, 0], dt);
 
-            // const cameraTranslation = this.node.find(node => node.getComponentOfType(Camera)).getComponentOfType(Transform)
-
+            // translate camera with player
             const cameraTranslation = this.node.components[2].getComponentOfType(Transform);
-
             vec3.scaleAndAdd(cameraTranslation.translation,
                 cameraTranslation.translation, this.velocity, dt);
+
+            // translate dragged object
+            if(this.isDragging) {
+                const draggedTransform = this.draggedNodeTransform();
+                vec3.scaleAndAdd(draggedTransform.translation, draggedTransform.translation, [this.velocity[0], 0, this.velocity[2]], dt);
+            }
+            // vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
+
 
             // Update rotation based on the Euler angles.
             const rotation = quat.create();
@@ -114,6 +123,20 @@ export class ThirdPersonController {
             quat.rotateX(rotation, rotation, this.pitch);
             transform.rotation = rotation;
         }
+    }
+
+    startDragging(draggedNode) {
+        this.isDragging = true;
+        this.draggedNode = draggedNode;
+    }
+
+    stopDragging() {
+        this.isDragging = false;
+    }
+
+    draggedNodeTransform()
+    {
+        return this.draggedNode?.getComponentOfType(Transform);
     }
 
     finishJump()

@@ -78,6 +78,16 @@ gltfLoader.loadNode('Wall.001').isStatic = true;
 gltfLoader.loadNode('Wall.002').isStatic = true;
 gltfLoader.loadNode('Wall.003').isStatic = true;
 
+gltfLoader.loadNode('Box.000').isDraggable = true;
+gltfLoader.loadNode('Box.001').isDraggable = true;
+gltfLoader.loadNode('Box.002').isDraggable = true;
+gltfLoader.loadNode('Box.003').isDraggable = true;
+gltfLoader.loadNode('Box.004').isDraggable = true;
+gltfLoader.loadNode('Box.005').isDraggable = true;
+
+// gltfLoader.loadNode('Box.000').getComponentOfType(Transform).translation = [1,2,1];
+// console.log(gltfLoader.loadNode('Box.000').getComponentOfType(Transform))
+
 const light = new Node();
 light.addComponent(new Transform());
 light.addComponent(new Light({
