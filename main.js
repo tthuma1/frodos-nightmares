@@ -42,6 +42,7 @@ const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // scena je vozlisce, na katero so vezane neke komponenete
 // const player = scene.find(node => node.getComponentOfType(Model))
 const player = gltfLoader.loadNode("Player");
+player.isPlayer = true;
 const key = gltfLoader.loadNode('Torus.001'); //TODO: treba renamat na key
 key.addComponent(new Key())
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
@@ -65,6 +66,7 @@ player.aabb = {
     max: [0.2, 0.2, 0.2],
 };
 
+gltfLoader.loadNode('Floor').isStatic = true;
 gltfLoader.loadNode('Box.000').isStatic = true;
 gltfLoader.loadNode('Box.001').isStatic = true;
 gltfLoader.loadNode('Box.002').isStatic = true;

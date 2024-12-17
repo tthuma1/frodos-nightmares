@@ -30,7 +30,7 @@ export class ThirdPersonController {
         this.jumpVelocity = 0;
         this.jumpForce = 10;
         this.isJumping = false;
-        this.gravity = -10;
+        this.gravity = -20;
 
         this.initHandlers();
     }
@@ -73,9 +73,7 @@ export class ThirdPersonController {
             this.jumpVelocity = this.jumpForce;
         }
 
-        if(this.isJumping) {
-            this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
-        }
+        this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
 
         // Update velocity based on acceleration.
         vec3.scaleAndAdd(this.velocity, this.velocity, acc, dt * this.acceleration);
@@ -115,12 +113,13 @@ export class ThirdPersonController {
             quat.rotateY(rotation, rotation, this.yaw);
             quat.rotateX(rotation, rotation, this.pitch);
             transform.rotation = rotation;
-
-            if(transform.translation[1] < 1) {
-                transform.translation[1] = 1;
-                this.isJumping = false;
-            }
         }
+    }
+
+    finishJump()
+    {
+        this.jumpVelocity = 0;
+        this.isJumping = false;
     }
 
     keydownHandler(e) {

@@ -2,12 +2,14 @@ import { vec3, mat4 } from 'glm';
 import { getGlobalModelMatrix } from 'engine/core/SceneUtils.js';
 import { Transform } from 'engine/core.js';
 import {Key} from "./engine/core/Key.js";
+import { ThirdPersonController } from './engine/controllers/ThirdPersonController.js';
 
 export class Physics {
     constructor(scene, player, key) {
         this.scene = scene;
         this.player = player;
         this.key = key;
+        this.controller = this.player.getComponentOfType(ThirdPersonController);
     }
 
     update(t, dt) {
@@ -96,6 +98,11 @@ export class Physics {
         if (diffb[2] >= 0 && diffb[2] < minDiff) {
             minDiff = diffb[2];
             minDirection = [0, 0, -minDiff];
+        }
+
+        // player is on top of object and is falling (you can only land if you're falling)
+        if (this.controller.jumpVelocity < 0 && minDirection[1] > 1e-4) {
+            this.controller.finishJump();
         }
 
         const transform = a.getComponentOfType(Transform);

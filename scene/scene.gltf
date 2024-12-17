@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v3.6.27",
+		"generator":"Khronos glTF Blender I/O v4.3.47",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -170,7 +170,7 @@
 			"name":"Player",
 			"translation":[
 				-0.6163086891174316,
-				1,
+				2.1986451148986816,
 				7.366758823394775
 			]
 		},
@@ -203,7 +203,6 @@
 	],
 	"materials":[
 		{
-			"alphaMode":"BLEND",
 			"doubleSided":true,
 			"name":"Floor",
 			"pbrMetallicRoughness":{
@@ -215,7 +214,6 @@
 			}
 		},
 		{
-			"alphaMode":"BLEND",
 			"doubleSided":true,
 			"name":"Box",
 			"pbrMetallicRoughness":{
@@ -227,7 +225,6 @@
 			}
 		},
 		{
-			"alphaMode":"BLEND",
 			"doubleSided":true,
 			"name":"Wall",
 			"pbrMetallicRoughness":{
@@ -239,7 +236,6 @@
 			}
 		},
 		{
-			"alphaMode":"BLEND",
 			"doubleSided":true,
 			"name":"Box.001",
 			"pbrMetallicRoughness":{
