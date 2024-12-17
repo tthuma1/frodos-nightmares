@@ -126,6 +126,12 @@ export class ThirdPersonController {
             quat.rotateY(rotation, rotation, this.yaw);
             quat.rotateX(rotation, rotation, this.pitch);
             transform.rotation = rotation;
+
+            // semi prevent weird bug that brakes gravity when switching tabs
+            if (transform.translation[1] < 1) {
+                transform.translation[1] = 1;
+                this.isJumping = false;
+            }
         }
     }
 
