@@ -11,10 +11,10 @@ Obstacles:
 Lantern v roki
 Črne sobe in stikala za luči
 
-- [ ] gravity and collision with the ground and walls
-- [ ] basic controls - move, jump
-- [ ] box obstacle, moraš preskočiti
-- [ ] moving box
+- [x] gravity and collision with the ground and walls
+- [x] basic controls - move, jump
+- [x] box obstacle, moraš preskočiti
+- [x] moving box
 
 
 - [ ] character in house
