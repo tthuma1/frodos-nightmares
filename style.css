@@ -1,0 +1,14 @@
+#dragText {
+    position: absolute;
+    width: 100%;
+    top: 100px;
+    display: flex;
+    justify-content: center;
+}
+
+#dragText p {
+    display: none;
+    width: fit-content;
+    padding: 10px;
+    background-color: #ddd;
+}

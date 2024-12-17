@@ -1,8 +1,9 @@
 import { quat, vec3, mat4 } from 'glm';
 
 import { Transform } from '../core/Transform.js';
+import {Camera} from "../core/Camera.js";
 
-export class FirstPersonController {
+export class ThirdPersonController {
 
     constructor(node, domElement, {
         pitch = 0,
@@ -11,7 +12,6 @@ export class FirstPersonController {
         acceleration = 50,
         maxSpeed = 5,
         decay = 0.99999,
-        pointerSensitivity = 0.002,
     } = {}) {
         this.node = node;
         this.domElement = domElement;
@@ -25,13 +25,21 @@ export class FirstPersonController {
         this.acceleration = acceleration;
         this.maxSpeed = maxSpeed;
         this.decay = decay;
-        this.pointerSensitivity = pointerSensitivity;
+
+
+        this.jumpVelocity = 0;
+        this.jumpForce = 10;
+        this.isJumping = false;
+        this.gravity = -20;
+
+        this.draggedNode = null;
+        this.lastDragTime = 0;
 
         this.initHandlers();
     }
 
     initHandlers() {
-        this.pointermoveHandler = this.pointermoveHandler.bind(this);
+
         this.keydownHandler = this.keydownHandler.bind(this);
         this.keyupHandler = this.keyupHandler.bind(this);
 
@@ -40,15 +48,6 @@ export class FirstPersonController {
 
         doc.addEventListener('keydown', this.keydownHandler);
         doc.addEventListener('keyup', this.keyupHandler);
-
-        element.addEventListener('click', e => element.requestPointerLock());
-        doc.addEventListener('pointerlockchange', e => {
-            if (doc.pointerLockElement === element) {
-                doc.addEventListener('pointermove', this.pointermoveHandler);
-            } else {
-                doc.removeEventListener('pointermove', this.pointermoveHandler);
-            }
-        });
     }
 
     update(t, dt) {
@@ -72,6 +71,16 @@ export class FirstPersonController {
         if (this.keys['KeyA']) {
             vec3.sub(acc, acc, right);
         }
+        if (this.keys['Space'] && !this.isJumping && !this.draggedNode) {
+            this.isJumping = true;
+            this.jumpVelocity = this.jumpForce;
+        }
+
+        if (this.keys['KeyE'] && this.draggedNode) {
+            this.stopDragging();
+        }
+
+        this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
 
         // Update velocity based on acceleration.
         vec3.scaleAndAdd(this.velocity, this.velocity, acc, dt * this.acceleration);
@@ -94,30 +103,74 @@ export class FirstPersonController {
 
         const transform = this.node.getComponentOfType(Transform);
         if (transform) {
+
             // Update translation based on velocity.
-            vec3.scaleAndAdd(transform.translation,
-                transform.translation, this.velocity, dt);
+            vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
+            vec3.scaleAndAdd(transform.translation, transform.translation, [0, this.jumpVelocity, 0], dt);
+
+            // translate camera with player
+            const cameraTranslation = this.node.components[2].getComponentOfType(Transform);
+            vec3.scaleAndAdd(cameraTranslation.translation,
+                cameraTranslation.translation, this.velocity, dt);
+
+            // translate dragged object
+            if(this.draggedNode) {
+                const draggedTransform = this.draggedNodeTransform();
+                vec3.scaleAndAdd(draggedTransform.translation, draggedTransform.translation, [this.velocity[0], 0, this.velocity[2]], dt);
+            }
+            // vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
+
 
             // Update rotation based on the Euler angles.
             const rotation = quat.create();
             quat.rotateY(rotation, rotation, this.yaw);
             quat.rotateX(rotation, rotation, this.pitch);
             transform.rotation = rotation;
+
+            // semi prevent weird bug that brakes gravity when switching tabs
+            if (transform.translation[1] < 1) {
+                transform.translation[1] = 1;
+                this.isJumping = false;
+            }
         }
     }
 
-    pointermoveHandler(e) {
-        const dx = e.movementX;
-        const dy = e.movementY;
+    startDragging(draggedNode) {
+        if (this.lastDragTime && Date.now() - this.lastDragTime < 200) return; // wait for 200 ms before being able to drag again
+        this.draggedNode = draggedNode;
 
-        this.pitch -= dy * this.pointerSensitivity;
-        this.yaw   -= dx * this.pointerSensitivity;
+        const startDragText = document.getElementById("startDrag");
+        startDragText.style.display = "none";
 
-        const twopi = Math.PI * 2;
-        const halfpi = Math.PI / 2;
+        const stopDragText = document.getElementById("stopDrag");
+        stopDragText.style.display = "block";
 
-        this.pitch = Math.min(Math.max(this.pitch, -halfpi), halfpi);
-        this.yaw = ((this.yaw % twopi) + twopi) % twopi;
+        this.lastDragTime = Date.now();
+    }
+
+    stopDragging() {
+        if (this.lastDragTime && Date.now() - this.lastDragTime < 200) return; // wait for 200 ms before being able to stop drag
+        this.draggedNode = null;
+
+        const stopDragText = document.getElementById("stopDrag");
+        stopDragText.style.display = "none";
+
+        this.lastDragTime = Date.now();
+    }
+
+    draggedNodeTransform()
+    {
+        return this.draggedNode?.getComponentOfType(Transform);
+    }
+
+    finishJump(node)
+    {
+        if (!node.isTrampoline) {
+            this.jumpVelocity = 0;
+            this.isJumping = false;
+        } else {
+            this.jumpVelocity = 15;
+        }
     }
 
     keydownHandler(e) {
