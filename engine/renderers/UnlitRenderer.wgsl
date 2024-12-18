@@ -71,12 +71,14 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     let N = vec3f(light.position - input.position);
     let R = reflect(N, L);
     let illumination = max(dot(N, L), 0);
+    let distance = length(light.position - input.position);
+    let illumination2 = pow(illumination * 1 / (distance), 2);
     let ambient = vec3f(0.3);
     let materialColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
     // dodamo ambientno osvetlitev
     // rgb komponente se pomnozijo z `illumination`, alpha pa ostane nespremenjena
     // output.color = materialColor * vec4f(vec3f(illumination + ambient), 1);
-    output.color = materialColor * vec4f(light.color * illumination + ambient, 1);
+    output.color = materialColor * vec4f(light.color * illumination2 + ambient, 1);
 
     return output;
 }

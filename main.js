@@ -86,7 +86,12 @@ light.addComponent(new Light({
     color: [0.5, 0.5, 0.5],
 }));
 light.addComponent(new Transform({
-    translation: [0, 5, 0],
+    translation: 
+    [
+        -0.6163086891174316,
+        2.1986451148986816,
+        7.366758823394775
+    ]
 }));
 light.addComponent({
     update(t, dt) {
