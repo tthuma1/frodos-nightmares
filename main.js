@@ -7,7 +7,8 @@ import {
     Sampler,
     Texture,
     Transform,
-    Light
+    Light,
+    LightView
 } from 'engine/core.js';
 import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
 import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
@@ -51,9 +52,10 @@ const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo k
 // camera.addComponent(new TouchController(camera, canvas));
 player.addComponent(camera)
 player.addComponent(new Light({
-    color: [0.5, 0.5, 0.5],
+        color: [0.5, 0.5, 0.5],
     })
 );
+player.addComponent(new LightView());
 
 // // model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
 player.addComponent({

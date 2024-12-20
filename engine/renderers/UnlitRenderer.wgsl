@@ -51,12 +51,15 @@ struct LightUniforms {
 
 @group(3) @binding(0) var<uniform> light: LightUniforms;
 
+
 @vertex
 fn vertex(input: VertexInput) -> VertexOutput {
     var output: VertexOutput;
 
-    output.clipPosition = camera.projectionMatrix * camera.viewMatrix * model.modelMatrix * vec4(input.position, 1);
-    output.position = (model.modelMatrix * vec4(input.position, 1)).xyz; // zadnja komponenta je 1
+    let position = model.modelMatrix * vec4(input.position, 1);
+
+    output.position = position.xyz;
+    output.clipPosition = camera.projectionMatrix * camera.viewMatrix * position;
     output.texcoords = input.texcoords;
     output.normal = model.normalMatrix * input.normal;
 
@@ -68,9 +71,13 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     var output: FragmentOutput;
     //Lightning = ambient + diffuse + specular
     let materialColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
-    let lightDirection = normalize(light.position - input.position);
     let distance = length(light.position - input.position);
     let attenuation = 1 / (0.001 + 0.05 * distance * distance);
+
+    //Directions
+    let lightDirection = normalize(light.position - input.position);
+    let viewDirection = normalize(camera.position - input.position);
+    let halfwayDirection = normalize(lightDirection + viewDirection);
 
     //Ambient
     let ambient = vec3f(0.03);
@@ -82,13 +89,11 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     let diffuse = diffuseStrength * lightColor;
 
     //Specular
-    let viewSource = normalize(camera.position - input.position);
-    let reflectDirection = reflect(-lightDirection, normal);
-    let specularStrength = pow(max(0.0, dot(reflectDirection, viewSource)), 32.0);
-    let specular = specularStrength * lightColor;
+    let specular = pow(max(dot(input.normal, halfwayDirection), 0.0), 8.0);
 
+    //Final lightning
     let lightning = vec4f(ambient + (diffuse + specular) * attenuation, 1.0);
-    output.color = materialColor * lightning;
+    output.color = lightning * materialColor;
 
     return output;
 }
