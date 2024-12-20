@@ -50,6 +50,10 @@ const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo k
 
 // camera.addComponent(new TouchController(camera, canvas));
 player.addComponent(camera)
+player.addComponent(new Light({
+    color: [0.5, 0.5, 0.5]
+    })
+);
 
 // // model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
 player.addComponent({
@@ -80,27 +84,7 @@ gltfLoader.loadNode('Box.005').isDraggable = true;
 
 gltfLoader.loadNode('Trampoline').isTrampoline = true;
 
-const light = new Node();
-light.addComponent(new Transform());
-light.addComponent(new Light({
-    color: [0.5, 0.5, 0.5],
-}));
-light.addComponent(new Transform({
-    translation: 
-    [
-        -0.6163086891174316,
-        2.1986451148986816,
-        7.366758823394775
-    ]
-}));
-light.addComponent({
-    update(t, dt) {
-        const lightComponent = light.getComponentOfType(Light);
-        const red = (Math.sin(t) ** 2);
-        lightComponent.color = [red, 0.1, 0.1];
-    }
-})
-scene.addChild( light )
+
 
 // const floor = new Node();
 // floor.addComponent(new Transform({

@@ -108,7 +108,7 @@ export class UnlitRenderer extends BaseRenderer {
         }
 
         const cameraUniformBuffer = this.device.createBuffer({
-            size: 128,
+            size: 144,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
@@ -169,7 +169,7 @@ export class UnlitRenderer extends BaseRenderer {
         }
 
         const lightUniformBuffer = this.device.createBuffer({
-            size: 32,
+            size: 48,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
@@ -212,9 +212,11 @@ export class UnlitRenderer extends BaseRenderer {
         const cameraComponent = camera.getComponentOfType(Camera);
         const viewMatrix = getGlobalViewMatrix(camera);
         const projectionMatrix = getProjectionMatrix(camera);
+        const cameraPosition = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(camera));
         const { cameraUniformBuffer, cameraBindGroup } = this.prepareCamera(cameraComponent);
         this.device.queue.writeBuffer(cameraUniformBuffer, 0, viewMatrix);
         this.device.queue.writeBuffer(cameraUniformBuffer, 64, projectionMatrix);
+        this.device.queue.writeBuffer(cameraUniformBuffer, 128, cameraPosition);
         this.renderPass.setBindGroup(0, cameraBindGroup);
 
         const light = scene.find(node => node.getComponentOfType(Light));
@@ -224,6 +226,8 @@ export class UnlitRenderer extends BaseRenderer {
         this.device.queue.writeBuffer(lightUniformBuffer, 0, new Float32Array([
             ...lightComponent.color, 0, // light position je poravnan na 16 bytov
             ...lightPosition,
+            light.intensity,
+            light.range
         ]));
         this.renderPass.setBindGroup(3, lightBindGroup);
 

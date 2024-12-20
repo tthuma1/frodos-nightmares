@@ -24,6 +24,7 @@ struct FragmentOutput {
 struct CameraUniforms {
     viewMatrix: mat4x4f, // 4x4x4 bytov
     projectionMatrix: mat4x4f,
+    position: vec3f,
 }
 
 struct ModelUniforms {
@@ -38,6 +39,8 @@ struct MaterialUniforms {
 struct LightUniforms {
     color: vec3f, // rgb
     position: vec3f,
+    intensity: f32,
+    range: f32
 }
 
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
@@ -65,20 +68,29 @@ fn vertex(input: VertexInput) -> VertexOutput {
 @fragment
 fn fragment(input: FragmentInput) -> FragmentOutput {
     var output: FragmentOutput;
-
-    // let L = normalize(vec3f(1, 1, 0)); // luč je vedno nad našim 3D modelom
-    let L = normalize(input.normal); // dobimo interpolirano normalo glede na normale na ogliščih modela
-    let N = vec3f(light.position - input.position);
-    let R = reflect(N, L);
-    let illumination = max(dot(N, L), 0);
-    let distance = length(light.position - input.position);
-    let illumination2 = pow(illumination * 1 / (distance), 2);
-    let ambient = vec3f(0.3);
+    //Lightning = ambient + diffuse + specular
     let materialColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
-    // dodamo ambientno osvetlitev
-    // rgb komponente se pomnozijo z `illumination`, alpha pa ostane nespremenjena
-    // output.color = materialColor * vec4f(vec3f(illumination + ambient), 1);
-    output.color = materialColor * vec4f(light.color * illumination2 + ambient, 1);
+    let lightDirection = normalize(light.position - input.position);
+    let distance = length(light.position - input.position);
+    let attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * distance * distance);
+
+    //Ambient
+    let ambient = vec3f(0.1);
+
+    //Diffuse
+    let normal = normalize(input.normal);
+    let lightColor = light.color;
+    let diffuseStrength = max(0.0, dot(lightDirection, normal));
+    let diffuse = diffuseStrength * lightColor;
+
+    //Specular
+    let viewSource = normalize(camera.position - input.position);
+    let reflectDirection = reflect(-lightDirection, normal);
+    let specularStrength = pow(max(0.0, dot(reflectDirection, viewSource)), 32.0); //TODO: 32 replace z shininess v Light
+    let specular = specularStrength * lightColor;
+
+    let lightning = vec4f(ambient + (diffuse + specular) * attenuation, 1.0);
+    output.color = materialColor * lightning;
 
     return output;
 }
