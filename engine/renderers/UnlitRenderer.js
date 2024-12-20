@@ -169,7 +169,7 @@ export class UnlitRenderer extends BaseRenderer {
         }
 
         const lightUniformBuffer = this.device.createBuffer({
-            size: 48,
+            size: 32,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
@@ -226,8 +226,6 @@ export class UnlitRenderer extends BaseRenderer {
         this.device.queue.writeBuffer(lightUniformBuffer, 0, new Float32Array([
             ...lightComponent.color, 0, // light position je poravnan na 16 bytov
             ...lightPosition,
-            light.intensity,
-            light.range
         ]));
         this.renderPass.setBindGroup(3, lightBindGroup);
 

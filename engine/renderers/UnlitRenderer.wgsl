@@ -39,8 +39,6 @@ struct MaterialUniforms {
 struct LightUniforms {
     color: vec3f, // rgb
     position: vec3f,
-    intensity: f32,
-    range: f32
 }
 
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
@@ -72,10 +70,10 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     let materialColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
     let lightDirection = normalize(light.position - input.position);
     let distance = length(light.position - input.position);
-    let attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * distance * distance);
+    let attenuation = 1 / (0.001 + 0.05 * distance * distance);
 
     //Ambient
-    let ambient = vec3f(0.1);
+    let ambient = vec3f(0.03);
 
     //Diffuse
     let normal = normalize(input.normal);
@@ -86,7 +84,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     //Specular
     let viewSource = normalize(camera.position - input.position);
     let reflectDirection = reflect(-lightDirection, normal);
-    let specularStrength = pow(max(0.0, dot(reflectDirection, viewSource)), 32.0); //TODO: 32 replace z shininess v Light
+    let specularStrength = pow(max(0.0, dot(reflectDirection, viewSource)), 32.0);
     let specular = specularStrength * lightColor;
 
     let lightning = vec4f(ambient + (diffuse + specular) * attenuation, 1.0);

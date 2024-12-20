@@ -51,7 +51,7 @@ const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo k
 // camera.addComponent(new TouchController(camera, canvas));
 player.addComponent(camera)
 player.addComponent(new Light({
-    color: [0.5, 0.5, 0.5]
+    color: [0.5, 0.5, 0.5],
     })
 );
 
