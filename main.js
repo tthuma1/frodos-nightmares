@@ -21,12 +21,12 @@ import {
     mergeAxisAlignedBoundingBoxes,
 } from 'engine/core/MeshUtils.js';
 import {Key} from "./engine/core/Key.js";
+import { TouchController } from 'engine/controllers/TouchController.js';
 
 // renderer je edini, ki se ukvarja z webgpu
 const canvas = document.querySelector('canvas');
 const renderer = new UnlitRenderer(canvas);
 await renderer.initialize();
-
 // const gltfLoader = new GLTFLoader();
 // await gltfLoader.load(new URL('./models/player/player.gltf', import.meta.url));
 
@@ -48,11 +48,9 @@ const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // const key = gltfLoader.loadNode('Torus.001'); //TODO: treba renamat na key
 // key.addComponent(new Key())
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
+// camera.addComponent(new TouchController(camera, canvas, { distance: 5 }));
 
 scene.light = new Light({color:[1,1,1]});
-// gltfLoader.loadNode('metarig').addComponent(new Transform({
-//     translation: [100,100,100],
-// }))
 
 // camera.addComponent(new TouchController(camera, canvas));
 // player.addComponent(camera)

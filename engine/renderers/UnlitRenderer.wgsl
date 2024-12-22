@@ -98,7 +98,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     // let lightning = vec4f(ambient + (diffuse + specular) * attenuation, 1.0);
     // output.color = lightning * materialColor;
     output.color = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
-    output.color = vec4f(0.5, 0.5, 0.5, 1);
+    // output.color = vec4f(0.2, 0.2, 0.2, 1);
 
     return output;
 }
