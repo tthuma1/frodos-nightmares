@@ -69,31 +69,36 @@ fn vertex(input: VertexInput) -> VertexOutput {
 @fragment
 fn fragment(input: FragmentInput) -> FragmentOutput {
     var output: FragmentOutput;
+    let a = light;
+    let b = camera;
+    let c = input;
     //Lightning = ambient + diffuse + specular
     let materialColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
-    let distance = length(light.position - input.position);
-    let attenuation = 1 / (0.001 + 0.05 * distance * distance);
+    // let distance = length(light.position - input.position);
+    // let attenuation = 1 / (0.001 + 0.05 * distance * distance);
 
-    //Directions
-    let lightDirection = normalize(light.position - input.position);
-    let viewDirection = normalize(camera.position - input.position);
-    let halfwayDirection = normalize(lightDirection + viewDirection);
+    // //Directions
+    // let lightDirection = normalize(light.position - input.position);
+    // let viewDirection = normalize(camera.position - input.position);
+    // let halfwayDirection = normalize(lightDirection + viewDirection);
 
-    //Ambient
-    let ambient = vec3f(0.03);
+    // //Ambient
+    // let ambient = vec3f(0.03);
 
-    //Diffuse
-    let normal = normalize(input.normal);
-    let lightColor = light.color;
-    let diffuseStrength = max(0.0, dot(lightDirection, normal));
-    let diffuse = diffuseStrength * lightColor;
+    // //Diffuse
+    // let normal = normalize(input.normal);
+    // let lightColor = light.color;
+    // let diffuseStrength = max(0.0, dot(lightDirection, normal));
+    // let diffuse = diffuseStrength * lightColor;
 
-    //Specular
-    let specular = pow(max(dot(input.normal, halfwayDirection), 0.0), 8.0);
+    // //Specular
+    // let specular = pow(max(dot(input.normal, halfwayDirection), 0.0), 8.0);
 
-    //Final lightning
-    let lightning = vec4f(ambient + (diffuse + specular) * attenuation, 1.0);
-    output.color = lightning * materialColor;
+    // //Final lightning
+    // let lightning = vec4f(ambient + (diffuse + specular) * attenuation, 1.0);
+    // output.color = lightning * materialColor;
+    output.color = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
+    output.color = vec4f(0.5, 0.5, 0.5, 1);
 
     return output;
 }

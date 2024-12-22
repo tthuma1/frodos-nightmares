@@ -31,7 +31,8 @@ await renderer.initialize();
 // await gltfLoader.load(new URL('./models/player/player.gltf', import.meta.url));
 
 const gltfLoader = new GLTFLoader();
-await gltfLoader.load(new URL('./scene/scene.gltf', import.meta.url));
+// await gltfLoader.load(new URL('./scene/scene.gltf', import.meta.url));
+await gltfLoader.load(new URL('./models/frodo/frodo.gltf', import.meta.url));
 
 
 // const resources = await loadResources({
@@ -42,49 +43,53 @@ await gltfLoader.load(new URL('./scene/scene.gltf', import.meta.url));
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // scena je vozlisce, na katero so vezane neke komponenete
 // const player = scene.find(node => node.getComponentOfType(Model))
-const player = gltfLoader.loadNode("Player");
-player.isPlayer = true;
-const key = gltfLoader.loadNode('Torus.001'); //TODO: treba renamat na key
-key.addComponent(new Key())
+// const player = gltfLoader.loadNode("Player");
+// player.isPlayer = true;
+// const key = gltfLoader.loadNode('Torus.001'); //TODO: treba renamat na key
+// key.addComponent(new Key())
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 
+scene.light = new Light({color:[1,1,1]});
+// gltfLoader.loadNode('metarig').addComponent(new Transform({
+//     translation: [100,100,100],
+// }))
 
 // camera.addComponent(new TouchController(camera, canvas));
-player.addComponent(camera)
-player.addComponent(new Light({
-        color: [0.5, 0.5, 0.5],
-    })
-);
-player.addComponent(new LightView());
+// player.addComponent(camera)
+// player.addComponent(new Light({
+//         color: [0.5, 0.5, 0.5],
+//     })
+// );
+// player.addComponent(new LightView());
 
-// // model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
-player.addComponent({
-    update(t, dt) {
-    }
-});
+// // // model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
+// player.addComponent({
+//     update(t, dt) {
+//     }
+// });
 
-player.addComponent(new ThirdPersonController(player, canvas));
+// player.addComponent(new ThirdPersonController(player, canvas));
 
-gltfLoader.loadNode('Floor').isStatic = true;
-gltfLoader.loadNode('Trampoline').isStatic = true;
-gltfLoader.loadNode('Box.001').isStatic = true;
-gltfLoader.loadNode('Box.002').isStatic = true;
-gltfLoader.loadNode('Box.003').isStatic = true;
-gltfLoader.loadNode('Box.004').isStatic = true;
-gltfLoader.loadNode('Box.005').isStatic = true;
-gltfLoader.loadNode('Wall.000').isStatic = true;
-gltfLoader.loadNode('Wall.001').isStatic = true;
-gltfLoader.loadNode('Wall.002').isStatic = true;
-gltfLoader.loadNode('Wall.003').isStatic = true;
+// gltfLoader.loadNode('Floor').isStatic = true;
+// gltfLoader.loadNode('Trampoline').isStatic = true;
+// gltfLoader.loadNode('Box.001').isStatic = true;
+// gltfLoader.loadNode('Box.002').isStatic = true;
+// gltfLoader.loadNode('Box.003').isStatic = true;
+// gltfLoader.loadNode('Box.004').isStatic = true;
+// gltfLoader.loadNode('Box.005').isStatic = true;
+// gltfLoader.loadNode('Wall.000').isStatic = true;
+// gltfLoader.loadNode('Wall.001').isStatic = true;
+// gltfLoader.loadNode('Wall.002').isStatic = true;
+// gltfLoader.loadNode('Wall.003').isStatic = true;
 
-gltfLoader.loadNode('Trampoline').isDraggable = true;
-gltfLoader.loadNode('Box.001').isDraggable = true;
-gltfLoader.loadNode('Box.002').isDraggable = true;
-gltfLoader.loadNode('Box.003').isDraggable = true;
-gltfLoader.loadNode('Box.004').isDraggable = true;
-gltfLoader.loadNode('Box.005').isDraggable = true;
+// gltfLoader.loadNode('Trampoline').isDraggable = true;
+// gltfLoader.loadNode('Box.001').isDraggable = true;
+// gltfLoader.loadNode('Box.002').isDraggable = true;
+// gltfLoader.loadNode('Box.003').isDraggable = true;
+// gltfLoader.loadNode('Box.004').isDraggable = true;
+// gltfLoader.loadNode('Box.005').isDraggable = true;
 
-gltfLoader.loadNode('Trampoline').isTrampoline = true;
+// gltfLoader.loadNode('Trampoline').isTrampoline = true;
 
 
 
@@ -118,11 +123,11 @@ scene.traverse(node => {
         return;
     }
 
-    const boxes = model.primitives.map(primitive => calculateAxisAlignedBoundingBox(primitive.mesh));
-    node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
+    // const boxes = model.primitives.map(primitive => calculateAxisAlignedBoundingBox(primitive.mesh));
+    // node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
 });
 
-const physics = new Physics(scene, player, key);
+// const physics = new Physics(scene, player, key);
 function update(t, dt) {
     scene.traverse(node => {
         for (const component of node.components) {
@@ -130,7 +135,7 @@ function update(t, dt) {
         }
     });
 
-    physics.update(t, dt);
+    // physics.update(t, dt);
 }
 
 function render() {

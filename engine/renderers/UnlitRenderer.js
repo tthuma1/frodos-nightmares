@@ -219,13 +219,13 @@ export class UnlitRenderer extends BaseRenderer {
         this.device.queue.writeBuffer(cameraUniformBuffer, 128, cameraPosition);
         this.renderPass.setBindGroup(0, cameraBindGroup);
 
-        const light = scene.find(node => node.getComponentOfType(Light));
-        const lightComponent = light.getComponentOfType(Light);
-        const lightPosition = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(light));
+        const lightComponent = scene.light;
+        // const lightComponent = light.getComponentOfType(Light);
+        // const lightPosition = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(light));
         const { lightUniformBuffer, lightBindGroup } = this.prepareLight(lightComponent);
         this.device.queue.writeBuffer(lightUniformBuffer, 0, new Float32Array([
-            ...lightComponent.color, 0, // light position je poravnan na 16 bytov
-            ...lightPosition,
+            ...[1,1,1], 0, // light position je poravnan na 16 bytov
+            ...[0,0,0],
         ]));
         this.renderPass.setBindGroup(3, lightBindGroup);
 
