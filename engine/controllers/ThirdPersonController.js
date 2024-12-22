@@ -28,9 +28,9 @@ export class ThirdPersonController {
 
 
         this.jumpVelocity = 0;
-        this.jumpForce = 10;
+        this.jumpForce = 5;
         this.isJumping = false;
-        this.gravity = -20;
+        this.gravity = -10;
 
         this.draggedNode = null;
         this.lastDragTime = 0;
@@ -109,7 +109,7 @@ export class ThirdPersonController {
             vec3.scaleAndAdd(transform.translation, transform.translation, [0, this.jumpVelocity, 0], dt);
 
             // translate camera with player
-            const cameraTranslation = this.node.components[2].getComponentOfType(Transform);
+            const cameraTranslation = this.node.components[1].getComponentOfType(Transform);
             vec3.scaleAndAdd(cameraTranslation.translation,
                 cameraTranslation.translation, this.velocity, dt);
 

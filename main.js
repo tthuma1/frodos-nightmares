@@ -43,17 +43,17 @@ await gltfLoader.load(new URL('./models/frodo/frodo.gltf', import.meta.url));
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // scena je vozlisce, na katero so vezane neke komponenete
 // const player = scene.find(node => node.getComponentOfType(Model))
-// const player = gltfLoader.loadNode("Player");
-// player.isPlayer = true;
-// const key = gltfLoader.loadNode('Torus.001'); //TODO: treba renamat na key
-// key.addComponent(new Key())
+const player = gltfLoader.loadNode("metarig");
+player.isPlayer = true;
+const key = gltfLoader.loadNode('Torus.001'); //TODO: treba renamat na key
+key.addComponent(new Key())
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 // camera.addComponent(new TouchController(camera, canvas, { distance: 5 }));
 
 scene.light = new Light({color:[1,1,1]});
 
 // camera.addComponent(new TouchController(camera, canvas));
-// player.addComponent(camera)
+player.addComponent(camera)
 // player.addComponent(new Light({
 //         color: [0.5, 0.5, 0.5],
 //     })
@@ -66,9 +66,9 @@ scene.light = new Light({color:[1,1,1]});
 //     }
 // });
 
-// player.addComponent(new ThirdPersonController(player, canvas));
+player.addComponent(new ThirdPersonController(player, canvas));
 
-// gltfLoader.loadNode('Floor').isStatic = true;
+gltfLoader.loadNode('Floor').isStatic = true;
 // gltfLoader.loadNode('Trampoline').isStatic = true;
 // gltfLoader.loadNode('Box.001').isStatic = true;
 // gltfLoader.loadNode('Box.002').isStatic = true;
@@ -133,7 +133,7 @@ function update(t, dt) {
         }
     });
 
-    // physics.update(t, dt);
+//     physics.update(t, dt);
 }
 
 function render() {
