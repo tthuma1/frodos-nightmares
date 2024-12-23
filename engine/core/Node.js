@@ -1,3 +1,6 @@
+import { AnimateRotation } from "../animations/AnimateRotation.js";
+import { AnimateTranslation } from "../animations/AnimateTranslation.js";
+
 export class Node {
 
     constructor() {
@@ -67,4 +70,45 @@ export class Node {
         return this.components.filter(component => component instanceof type);
     }
 
+    getIndexesOfAnimations() {
+        let indexes = [];
+        for (let i = 0; i < this.components.length; i++) {
+            if (this.components[i] instanceof AnimateRotation || this.components[i] instanceof AnimateTranslation) {
+                indexes.push(i);
+            }
+        }
+        return indexes;
+    }
+
+    findAnimationNodes(node) {
+        let animationNodes = [];
+        node.children.forEach((child) => {
+          child.components.forEach((component) => {
+            if (component instanceof AnimateRotation || component instanceof AnimateTranslation) {
+              animationNodes.push(component);
+            } 
+          });
+        });
+        return animationNodes;
+    }
+
+    setAnimation(animationIndexes, names, play, looped, progressBar = false) {
+        for (const index of animationIndexes) {
+            if (names.includes(this.components[index].name)) {
+                this.components[index].playAnimation = play;
+                this.components[index].looped = looped;
+                this.components[index].progressBar = progressBar;
+            }
+        }
+    }
+
+    setAnimationByComponents(animationComponents, names, play, looped, progressBar = false) {
+        for (const node of animationComponents) {
+            if (names.includes(node.name)) {
+                node.playAnimation = play;
+                node.looped = looped;
+                node.progressBar = progressBar;
+            }
+        }
+    }
 }

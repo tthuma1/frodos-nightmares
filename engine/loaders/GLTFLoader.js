@@ -12,6 +12,10 @@ import {
     Vertex,
 } from '../core.js';
 
+import { AnimationObjectData } from '../animations/AnimationObjectData.js';
+import { AnimateTranslation } from '../animations/AnimateTranslation.js';
+import { AnimateRotation } from '../animations/AnimateRotation.js';
+
 // TODO: GLB support
 // TODO: accessors with no buffer views (zero-initialized)
 // TODO: image from buffer view
@@ -482,4 +486,29 @@ export class GLTFLoader {
         return scene;
     }
 
+    /**
+     * Loads animations from the GLTF file and applies them to the corresponding nodes.
+     */
+    loadAnimations() {
+        const animations = this.gltf.animations || [];
+
+        animations.forEach(animationElement => {
+            const { channels, samplers } = animationElement;
+            const animationObjectData = new AnimationObjectData(channels[0].target.node, channels, samplers);
+            const node = this.loadNode(animationObjectData.nodeId);
+            const name = animationElement.name;
+
+            animationObjectData.channels.forEach(channel => {
+                const samplerId = animationObjectData.getSamplerId(channel);
+                const keyframes = this.loadAccessor(animationObjectData.getInputId(samplerId));
+                const transformations = this.loadAccessor(animationObjectData.getOutputId(samplerId));
+
+                if (channel.target.path === 'translation') {
+                    node.addComponent(new AnimateTranslation(name, node, keyframes, transformations));
+                } else if (channel.target.path === 'rotation') {
+                    node.addComponent(new AnimateRotation(name, node, keyframes, transformations));
+                }
+            });
+        });
+    }    
 }

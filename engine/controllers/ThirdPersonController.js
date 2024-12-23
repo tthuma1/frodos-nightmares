@@ -36,6 +36,9 @@ export class ThirdPersonController {
         this.lastDragTime = 0;
 
         this.initHandlers();
+        this.animationNodes = [];
+
+        this.state = "idle";
     }
 
     initHandlers() {
@@ -51,6 +54,11 @@ export class ThirdPersonController {
     }
 
     update(t, dt) {
+        if (this.animationNodes.length == 0) {
+            this.animationNodes = this.node.findAnimationNodes(this.node);
+            console.log(this.animationNodes);
+        }
+
         // Calculate forward and right vectors.
         const cos = Math.cos(this.yaw);
         const sin = Math.sin(this.yaw);
@@ -60,6 +68,11 @@ export class ThirdPersonController {
         // Map user input to the acceleration vector.
         const acc = vec3.create();
         if (this.keys['KeyW']) {
+            switch (this.state) {
+                case 'idle':
+                    this.startMoving();
+                break;
+            }
             vec3.add(acc, acc, forward);
         }
         if (this.keys['KeyS']) {
@@ -181,4 +194,8 @@ export class ThirdPersonController {
         this.keys[e.code] = false;
     }
 
+    startMoving() {
+        this.state = 'moving';
+        this.node.setAnimationByComponents(this.animationNodes, ['walk'], true, true);
+    }
 }

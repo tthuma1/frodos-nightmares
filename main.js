@@ -68,6 +68,8 @@ player.addComponent(camera)
 
 player.addComponent(new ThirdPersonController(player, canvas));
 
+gltfLoader.loadAnimations();
+
 gltfLoader.loadNode('Floor').isStatic = true;
 // gltfLoader.loadNode('Trampoline').isStatic = true;
 // gltfLoader.loadNode('Box.001').isStatic = true;
