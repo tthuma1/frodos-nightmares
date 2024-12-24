@@ -55,21 +55,6 @@ export class ThirdPersonController {
     }
 
     update(t, dt) {
-        // t = performance.now() / 1000;
-        // // const x = Math.sin(t) * 5;
-        // const velX = Math.sin(t) * 5;
-        // // const accX = Math.cos(t) * 0.01;
-        // const mp = this.mp;
-        // const mpTransform = mp.getComponentOfType(Transform);
-        // // mpTransform.translation = [mp.beginTranslate[0] + velX, mp.beginTranslate[1], mp.beginTranslate[2]];
-        // mpTransform.translation[0] += accX;
-        // let beforeVelX;
-        // if(this.movingPlat) {
-        //     beforeVelX = this.mp.getComponentOfType(MovingPlatform).velocity[0];
-        //     // this.velocity[0] = this.mp.getComponentOfType(MovingPlatform).velocity[0];
-        //     // beforeVelX = this.velocity[0];
-        // }
-        
         // Calculate forward and right vectors.
         const cos = Math.cos(this.yaw);
         const sin = Math.sin(this.yaw);
@@ -102,10 +87,6 @@ export class ThirdPersonController {
 
         this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
 
-        // if(this.movingPlat) {
-        //     vec3.add(acc, acc, [this.movingPlat.components[2].accX, 0, 0]);
-        // }
-
         // Update velocity based on acceleration.
         vec3.scaleAndAdd(this.velocity, this.velocity, acc, dt * this.acceleration);
 
@@ -128,10 +109,6 @@ export class ThirdPersonController {
         const transform = this.node.getComponentOfType(Transform);
         if (transform) {
 
-            // if (this.movingPlatform) {
-            //     const mpVelX = this.jumpOffVelocity ? this.jumpOffVelocity : this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0];
-            //     vec3.scaleAndAdd(transform.translation, transform.translation, [mpVelX, 0, 0], dt);
-            // }
             vec3.scaleAndAdd(transform.translation, transform.translation, [this.movingPlatformXVelocity(), 0, 0], dt);
             vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
             vec3.scaleAndAdd(transform.translation, transform.translation, [0, this.jumpVelocity, 0], dt);
@@ -141,10 +118,6 @@ export class ThirdPersonController {
             vec3.scaleAndAdd(cameraTranslation.translation,
                 cameraTranslation.translation, this.velocity, dt);
             vec3.scaleAndAdd(cameraTranslation.translation, cameraTranslation.translation, [this.movingPlatformXVelocity(), 0, 0], dt);
-            // if (this.movingPlatform) {
-            //     const mpVelX = this.jumpOffVelocity ? this.jumpOffVelocity : this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0];
-            //     vec3.scaleAndAdd(cameraTranslation.translation, cameraTranslation.translation, [mpVelX, 0, 0], dt);
-            // }
 
             // translate dragged object
             if(this.draggedNode) {
@@ -167,9 +140,6 @@ export class ThirdPersonController {
                 this.movingPlatform = null;
             }
         }
-
-        // console.log(mpTransform.translation[0], transform.translation[0], mpTransform.translation[0] - transform.translation[0]);
-        // console.log(beforeVelX - this.velocity[0])
     }
 
     startDragging(draggedNode) {
