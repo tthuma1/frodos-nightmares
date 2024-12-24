@@ -2,10 +2,11 @@ import { quat, vec3, mat4 } from 'glm';
 
 import { Transform } from '../core/Transform.js';
 import {Camera} from "../core/Camera.js";
+import { MovingPlatform } from '../core/MovingPlatform.js';
 
 export class ThirdPersonController {
 
-    constructor(node, domElement, {
+    constructor(node, domElement, mp, {
         pitch = 0,
         yaw = 0,
         velocity = [0, 0, 0],
@@ -35,6 +36,7 @@ export class ThirdPersonController {
         this.draggedNode = null;
         this.lastDragTime = 0;
 
+        this.mp = mp;
         this.movingPlat = null;
 
         this.initHandlers();
@@ -53,8 +55,19 @@ export class ThirdPersonController {
     }
 
     update(t, dt) {
+        // t = performance.now() / 1000;
+        // // const x = Math.sin(t) * 5;
+        // const velX = Math.sin(t) * 5;
+        // // const accX = Math.cos(t) * 0.01;
+        // const mp = this.mp;
+        // const mpTransform = mp.getComponentOfType(Transform);
+        // // mpTransform.translation = [mp.beginTranslate[0] + velX, mp.beginTranslate[1], mp.beginTranslate[2]];
+        // mpTransform.translation[0] += accX;
+        let beforeVelX;
         if(this.movingPlat) {
-            this.velocity[0] = this.movingPlat.components[2].accX;
+            beforeVelX = this.mp.getComponentOfType(MovingPlatform).velocity[0];
+            // this.velocity[0] = this.mp.getComponentOfType(MovingPlatform).velocity[0];
+            // beforeVelX = this.velocity[0];
         }
         
         // Calculate forward and right vectors.
@@ -104,6 +117,12 @@ export class ThirdPersonController {
             const decay = Math.exp(dt * Math.log(1 - this.decay));
             vec3.scale(this.velocity, this.velocity, decay);
         }
+        if(beforeVelX) {
+            // console.log(this.velocity[0]);
+            // this.velocity[0] = beforeVelX;
+            // vec3.scale(this.velocity, this.velocity, decay);
+            // console.log(beforeVelX - this.velocity[0])
+        }
 
         // Limit speed to prevent accelerating to infinity and beyond.
         const speed = vec3.length(this.velocity);
@@ -116,6 +135,9 @@ export class ThirdPersonController {
 
             // Update translation based on velocity.
             vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
+            if(beforeVelX) {
+                vec3.scaleAndAdd(transform.translation, transform.translation, [beforeVelX, 0, 0], dt);
+            }
             vec3.scaleAndAdd(transform.translation, transform.translation, [0, this.jumpVelocity, 0], dt);
 
             // translate camera with player
@@ -144,6 +166,9 @@ export class ThirdPersonController {
                 this.movingPlat = null;
             }
         }
+
+        // console.log(mpTransform.translation[0], transform.translation[0], mpTransform.translation[0] - transform.translation[0]);
+        // console.log(beforeVelX - this.velocity[0])
     }
 
     startDragging(draggedNode) {

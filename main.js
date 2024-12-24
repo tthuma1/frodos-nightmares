@@ -21,6 +21,7 @@ import {
     mergeAxisAlignedBoundingBoxes,
 } from 'engine/core/MeshUtils.js';
 import {Key} from "./engine/core/Key.js";
+import { MovingPlatform } from './engine/core/MovingPlatform.js';
 
 // renderer je edini, ki se ukvarja z webgpu
 const canvas = document.querySelector('canvas');
@@ -63,7 +64,12 @@ player.addComponent({
     }
 });
 
-player.addComponent(new ThirdPersonController(player, canvas));
+
+const mp = gltfLoader.loadNode('MovingPlat');
+mp.isMovingPlat = true;
+mp.beginTranslate = mp.getComponentOfType(Transform).translation;
+mp.addComponent(new MovingPlatform(mp));
+player.addComponent(new ThirdPersonController(player, canvas, mp));
 
 gltfLoader.loadNode('Floor').isStatic = true;
 gltfLoader.loadNode('Trampoline').isStatic = true;
@@ -86,20 +92,17 @@ gltfLoader.loadNode('Box.004').isDraggable = true;
 gltfLoader.loadNode('Box.005').isDraggable = true;
 
 gltfLoader.loadNode('Trampoline').isTrampoline = true;
-
-gltfLoader.loadNode('MovingPlat').isMovingPlat = true;
-gltfLoader.loadNode('MovingPlat').beginTranslate = gltfLoader.loadNode('MovingPlat').getComponentOfType(Transform).translation;
-const beginTranslate = gltfLoader.loadNode('MovingPlat').getComponentOfType(Transform).translation;
-gltfLoader.loadNode('MovingPlat').addComponent({
-    update(t, dt) {
-        t = performance.now() / 1000;
-        const node = gltfLoader.loadNode('MovingPlat');
-        const transform = node.getComponentOfType(Transform);
-        const x = Math.sin(t) * 5;
-        this.accX = Math.cos(t) * 5;
-        transform.translation = [beginTranslate[0] + x, beginTranslate[1], beginTranslate[2]];
-    }
-});
+// const beginTranslate = mp.getComponentOfType(Transform).translation;
+// gltfLoader.loadNode('MovingPlat').addComponent({
+//     update(t, dt) {
+//         t = performance.now() / 1000;
+//         const node = gltfLoader.loadNode('MovingPlat');
+//         const transform = node.getComponentOfType(Transform);
+//         const x = Math.sin(t) * 5;
+//         this.accX = Math.cos(t) * 5;
+//         transform.translation = [beginTranslate[0] + x, beginTranslate[1], beginTranslate[2]];
+//     }
+// });
 
 // const floor = new Node();
 // floor.addComponent(new Transform({
