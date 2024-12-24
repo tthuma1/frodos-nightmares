@@ -134,16 +134,24 @@ export class ThirdPersonController {
         if (transform) {
 
             // Update translation based on velocity.
-            vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
             if(beforeVelX) {
+                // this.velocity[0] += beforeVelX;
                 vec3.scaleAndAdd(transform.translation, transform.translation, [beforeVelX, 0, 0], dt);
+                // vec3.add(this.velocity, this.velocity, [beforeVelX, 0, 0]);
             }
+            vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
+            // if(beforeVelX) {
+            //     vec3.scaleAndAdd(transform.translation, transform.translation, [beforeVelX, 0, 0], dt);
+            // }
             vec3.scaleAndAdd(transform.translation, transform.translation, [0, this.jumpVelocity, 0], dt);
 
             // translate camera with player
             const cameraTranslation = this.node.components[2].getComponentOfType(Transform);
             vec3.scaleAndAdd(cameraTranslation.translation,
                 cameraTranslation.translation, this.velocity, dt);
+            if(beforeVelX) {
+                vec3.scaleAndAdd(cameraTranslation.translation, cameraTranslation.translation, [beforeVelX, 0, 0], dt);
+            }
 
             // translate dragged object
             if(this.draggedNode) {
