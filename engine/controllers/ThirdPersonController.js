@@ -171,14 +171,10 @@ export class ThirdPersonController {
         if (node.isTrampoline) {
             this.jumpVelocity = 15;
             this.movingPlatform = null;
-        } else if (node.isMovingPlatform) {
-            this.jumpVelocity = 0;
-            this.isJumping = false;
-            this.movingPlatform = node;
         } else {
             this.jumpVelocity = 0;
             this.isJumping = false;
-            this.movingPlatform = null;
+            this.movingPlatform = node.isMovingPlatform ? node : null;
         }
 
         this.jumpOffVelocity = null;
