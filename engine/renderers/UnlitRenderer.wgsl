@@ -39,6 +39,8 @@ struct MaterialUniforms {
 struct LightUniforms {
     color: vec3f, // rgb
     position: vec3f,
+    // type: u32,
+    // isActive: u32,
 }
 
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
@@ -50,6 +52,7 @@ struct LightUniforms {
 @group(2) @binding(2) var baseSampler: sampler;
 
 @group(3) @binding(0) var<uniform> light: LightUniforms;
+// @group(3) @binding(1) var<uniform> lightCount: u32;
 
 
 @vertex
@@ -69,31 +72,67 @@ fn vertex(input: VertexInput) -> VertexOutput {
 @fragment
 fn fragment(input: FragmentInput) -> FragmentOutput {
     var output: FragmentOutput;
-    //Lightning = ambient + diffuse + specular
-    let materialColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
-    let distance = length(light.position - input.position);
-    let attenuation = 1 / (0.001 + 0.05 * distance * distance);
 
-    //Directions
-    let lightDirection = normalize(light.position - input.position);
-    let viewDirection = normalize(camera.position - input.position);
-    let halfwayDirection = normalize(lightDirection + viewDirection);
+    let diffuse : f32 = 1;
+    let specular : f32 = 1;
+    let shininess : f32 = 50;
+    let ambient : f32 = 1;
+    let lightDirection = vec3f(0, 0, -1);
+    let lightAngle : f32 = 1;
+    let lightFocus : f32 = 1;
 
-    //Ambient
-    let ambient = vec3f(0.03);
+    let surfacePosition = input.position;
+    let dist = distance(surfacePosition, light.position);
+    let Ad = 1 / dot(vec2f(0.001, 0.03), vec2f(1, dist * dist));
 
-    //Diffuse
-    let normal = normalize(input.normal);
-    let lightColor = light.color;
-    let diffuseStrength = max(0.0, dot(lightDirection, normal));
-    let diffuse = diffuseStrength * lightColor;
+    let N = normalize(input.normal);
+    let L = normalize(light.position - surfacePosition);
+    let V = normalize(camera.position - surfacePosition);
+    let H = normalize(L + V); // half-way vektor za blinn
+    let D = normalize(lightDirection);
 
-    //Specular
-    let specular = pow(max(dot(input.normal, halfwayDirection), 0.0), 8.0);
+    let spotFactor = dot(-L, D);
+    let Af = smoothstep(cos(lightAngle), 1.0, spotFactor) * lightFocus;
 
-    //Final lightning
-    let lightning = vec4f(ambient + (diffuse + specular) * attenuation, 1.0);
-    output.color = lightning * materialColor;
+    let lambert = max(dot(N, L), 0.0) * diffuse;
+    // material.shininess je v bistvu vedno 50, kot piše v navodilih
+    let blinn = pow(max(dot(H, N), 0.0), shininess) * specular;
+
+    let Il = light.color * Ad * Af;
+    let ambientLight = vec3f(0.008) * ambient;
+    let diffuseLight = Il * lambert + ambientLight;
+    let specularLight = Il * blinn;
+
+    let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
+    let finalColor = baseColor.rgb * diffuseLight + specularLight;
+
+    output.color = pow(vec4(finalColor, 1), vec4(1 / 2.2));
+
+    // //Lightning = ambient + diffuse + specular
+    // let materialColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
+    // let distance = length(light.position - input.position);
+    // let attenuation = 1 / (0.001 + 0.05 * distance * distance);
+
+    // //Directions
+    // let lightDirection = normalize(light.position - input.position);
+    // let viewDirection = normalize(camera.position - input.position);
+    // let halfwayDirection = normalize(lightDirection + viewDirection);
+
+    // //Ambient
+    // let ambient = vec3f(0.03);
+
+    // //Diffuse
+    // let normal = normalize(input.normal);
+    // let lightColor = light.color;
+    // let diffuseStrength = max(0.0, dot(lightDirection, normal));
+    // let diffuse = diffuseStrength * lightColor;
+
+    // //Specular
+    // let specular = pow(max(dot(input.normal, halfwayDirection), 0.0), 8.0);
+
+    // //Final lightning
+    // let lightning = vec4f(ambient + (diffuse + specular) * attenuation, 1.0);
+    // output.color = lightning * materialColor;
 
     return output;
 }
