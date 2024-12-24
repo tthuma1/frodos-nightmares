@@ -109,15 +109,11 @@ export class ThirdPersonController {
         const transform = this.node.getComponentOfType(Transform);
         if (transform) {
 
-            vec3.scaleAndAdd(transform.translation, transform.translation, [this.movingPlatformXVelocity(), 0, 0], dt);
-            vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
-            vec3.scaleAndAdd(transform.translation, transform.translation, [0, this.jumpVelocity, 0], dt);
+            this.translateWithVelocity(transform.translation, dt);
 
             // translate camera with player
-            const cameraTranslation = this.node.components[2].getComponentOfType(Transform);
-            vec3.scaleAndAdd(cameraTranslation.translation,
-                cameraTranslation.translation, this.velocity, dt);
-            vec3.scaleAndAdd(cameraTranslation.translation, cameraTranslation.translation, [this.movingPlatformXVelocity(), 0, 0], dt);
+            const cameraTranslation = this.node.components[2].getComponentOfType(Transform).translation;
+            this.translateWithVelocity(cameraTranslation, dt);
 
             // translate dragged object
             if(this.draggedNode) {
@@ -134,11 +130,11 @@ export class ThirdPersonController {
             transform.rotation = rotation;
 
             // semi prevent weird bug that brakes gravity when switching tabs
-            if (transform.translation[1] < 1) {
-                transform.translation[1] = 1;
-                this.isJumping = false;
-                this.movingPlatform = null;
-            }
+            // if (transform.translation[1] < 1) {
+            //     transform.translation[1] = 1;
+            //     this.isJumping = false;
+            //     this.movingPlatform = null;
+            // }
         }
     }
 
@@ -194,6 +190,13 @@ export class ThirdPersonController {
 
     keyupHandler(e) {
         this.keys[e.code] = false;
+    }
+
+    translateWithVelocity(translationVector, dt) {
+        // Update translation based on velocity.
+        vec3.scaleAndAdd(translationVector, translationVector, [this.movingPlatformXVelocity(), 0, 0], dt);
+        vec3.scaleAndAdd(translationVector, translationVector, this.velocity, dt);
+        vec3.scaleAndAdd(translationVector, translationVector, [0, this.jumpVelocity, 0], dt);
     }
 
     movingPlatformXVelocity()
