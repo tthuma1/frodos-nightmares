@@ -35,6 +35,8 @@ export class ThirdPersonController {
         this.draggedNode = null;
         this.lastDragTime = 0;
 
+        this.movingPlat = null;
+
         this.initHandlers();
     }
 
@@ -51,6 +53,10 @@ export class ThirdPersonController {
     }
 
     update(t, dt) {
+        if(this.movingPlat) {
+            this.velocity[0] = this.movingPlat.components[2].accX;
+        }
+        
         // Calculate forward and right vectors.
         const cos = Math.cos(this.yaw);
         const sin = Math.sin(this.yaw);
@@ -81,6 +87,10 @@ export class ThirdPersonController {
         }
 
         this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
+
+        // if(this.movingPlat) {
+        //     vec3.add(acc, acc, [this.movingPlat.components[2].accX, 0, 0]);
+        // }
 
         // Update velocity based on acceleration.
         vec3.scaleAndAdd(this.velocity, this.velocity, acc, dt * this.acceleration);
@@ -131,6 +141,7 @@ export class ThirdPersonController {
             if (transform.translation[1] < 1) {
                 transform.translation[1] = 1;
                 this.isJumping = false;
+                this.movingPlat = null;
             }
         }
     }
@@ -165,11 +176,17 @@ export class ThirdPersonController {
 
     finishJump(node)
     {
-        if (!node.isTrampoline) {
+        if (node.isTrampoline) {
+            this.jumpVelocity = 15;
+            this.movingPlat = null;
+        } else if (node.isMovingPlat) {
+            this.movingPlat = node;
             this.jumpVelocity = 0;
             this.isJumping = false;
         } else {
-            this.jumpVelocity = 15;
+            this.jumpVelocity = 0;
+            this.isJumping = false;
+            this.movingPlat = null;
         }
     }
 

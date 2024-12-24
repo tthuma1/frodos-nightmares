@@ -88,13 +88,15 @@ gltfLoader.loadNode('Box.005').isDraggable = true;
 gltfLoader.loadNode('Trampoline').isTrampoline = true;
 
 gltfLoader.loadNode('MovingPlat').isMovingPlat = true;
+gltfLoader.loadNode('MovingPlat').beginTranslate = gltfLoader.loadNode('MovingPlat').getComponentOfType(Transform).translation;
 const beginTranslate = gltfLoader.loadNode('MovingPlat').getComponentOfType(Transform).translation;
 gltfLoader.loadNode('MovingPlat').addComponent({
     update(t, dt) {
         t = performance.now() / 1000;
         const node = gltfLoader.loadNode('MovingPlat');
         const transform = node.getComponentOfType(Transform);
-        const x = Math.cos(t) * 5;
+        const x = Math.sin(t) * 5;
+        this.accX = Math.cos(t) * 5;
         transform.translation = [beginTranslate[0] + x, beginTranslate[1], beginTranslate[2]];
     }
 });
