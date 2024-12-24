@@ -21,7 +21,8 @@
 				10,
 				11,
 				12,
-				13
+				13,
+				14
 			]
 		}
 	],
@@ -160,7 +161,7 @@
 			"mesh":3,
 			"name":"Player",
 			"translation":[
-				-0.6163086891174316,
+				0.14343875646591187,
 				2.1986451148986816,
 				7.366758823394775
 			]
@@ -186,6 +187,15 @@
 				0,
 				1,
 				0
+			]
+		},
+		{
+			"mesh":6,
+			"name":"MovingPlat",
+			"translation":[
+				20.147504806518555,
+				3.092536449432373,
+				3.0053999423980713
 			]
 		}
 	],
@@ -263,6 +273,17 @@
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":5
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Material",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":6
 				},
 				"metallicFactor":0,
 				"roughnessFactor":0.5
@@ -353,6 +374,20 @@
 					"material":5
 				}
 			]
+		},
+		{
+			"name":"Cube",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":21,
+						"NORMAL":22,
+						"TEXCOORD_0":23
+					},
+					"indices":24,
+					"material":6
+				}
+			]
 		}
 	],
 	"textures":[
@@ -379,6 +414,10 @@
 		{
 			"sampler":0,
 			"source":5
+		},
+		{
+			"sampler":1,
+			"source":6
 		}
 	],
 	"images":[
@@ -411,6 +450,11 @@
 			"mimeType":"image/png",
 			"name":"Trampoline",
 			"uri":"Trampoline.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"MovingPlat",
+			"uri":"MovingPlat.png"
 		}
 	],
 	"accessors":[
@@ -599,6 +643,40 @@
 			"componentType":5126,
 			"count":24,
 			"type":"VEC2"
+		},
+		{
+			"bufferView":21,
+			"componentType":5126,
+			"count":24,
+			"max":[
+				5.259740829467773,
+				0.09664201736450195,
+				5.539628982543945
+			],
+			"min":[
+				-5.259740829467773,
+				-0.09664201736450195,
+				-5.539628982543945
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":22,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":23,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":24,
+			"componentType":5123,
+			"count":36,
+			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
@@ -727,17 +805,45 @@
 			"byteLength":192,
 			"byteOffset":83732,
 			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":83924,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":84212,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":192,
+			"byteOffset":84500,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":72,
+			"byteOffset":84692,
+			"target":34963
 		}
 	],
 	"samplers":[
 		{
 			"magFilter":9728,
 			"minFilter":9984
+		},
+		{
+			"magFilter":9729,
+			"minFilter":9987
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":83924,
+			"byteLength":84764,
 			"uri":"scene.bin"
 		}
 	]

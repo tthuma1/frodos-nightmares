@@ -21,6 +21,7 @@ import {
     mergeAxisAlignedBoundingBoxes,
 } from 'engine/core/MeshUtils.js';
 import {Key} from "./engine/core/Key.js";
+import { MovingPlatform } from './engine/core/MovingPlatform.js';
 
 // renderer je edini, ki se ukvarja z webgpu
 const canvas = document.querySelector('canvas');
@@ -57,12 +58,10 @@ player.addComponent(new Light({
 );
 player.addComponent(new LightView());
 
-// // model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
-player.addComponent({
-    update(t, dt) {
-    }
-});
-
+const movingPlatform = gltfLoader.loadNode('MovingPlat');
+movingPlatform.isMovingPlatform = true;
+movingPlatform.isStatic = true;
+movingPlatform.addComponent(new MovingPlatform(movingPlatform));
 player.addComponent(new ThirdPersonController(player, canvas));
 
 gltfLoader.loadNode('Floor').isStatic = true;
@@ -85,8 +84,6 @@ gltfLoader.loadNode('Box.004').isDraggable = true;
 gltfLoader.loadNode('Box.005').isDraggable = true;
 
 gltfLoader.loadNode('Trampoline').isTrampoline = true;
-
-
 
 // const floor = new Node();
 // floor.addComponent(new Transform({

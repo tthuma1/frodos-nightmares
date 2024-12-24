@@ -2,6 +2,7 @@ import { quat, vec3, mat4 } from 'glm';
 
 import { Transform } from '../core/Transform.js';
 import {Camera} from "../core/Camera.js";
+import { MovingPlatform } from '../core/MovingPlatform.js';
 
 export class ThirdPersonController {
 
@@ -34,6 +35,9 @@ export class ThirdPersonController {
 
         this.draggedNode = null;
         this.lastDragTime = 0;
+
+        this.movingPlatform = null;
+        this.jumpOffVelocity = null; // velocity that moving platform had when you jumped off it
 
         this.initHandlers();
     }
@@ -74,6 +78,7 @@ export class ThirdPersonController {
         if (this.keys['Space'] && !this.isJumping && !this.draggedNode) {
             this.isJumping = true;
             this.jumpVelocity = this.jumpForce;
+            this.jumpOffVelocity = this.movingPlatform ? this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0] : null;
         }
 
         if (this.keys['KeyE'] && this.draggedNode) {
@@ -104,14 +109,11 @@ export class ThirdPersonController {
         const transform = this.node.getComponentOfType(Transform);
         if (transform) {
 
-            // Update translation based on velocity.
-            vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
-            vec3.scaleAndAdd(transform.translation, transform.translation, [0, this.jumpVelocity, 0], dt);
+            this.translateWithVelocity(transform.translation, dt);
 
             // translate camera with player
-            const cameraTranslation = this.node.components[2].getComponentOfType(Transform);
-            vec3.scaleAndAdd(cameraTranslation.translation,
-                cameraTranslation.translation, this.velocity, dt);
+            const cameraTranslation = this.node.components[2].getComponentOfType(Transform).translation;
+            this.translateWithVelocity(cameraTranslation, dt);
 
             // translate dragged object
             if(this.draggedNode) {
@@ -128,10 +130,11 @@ export class ThirdPersonController {
             transform.rotation = rotation;
 
             // semi prevent weird bug that brakes gravity when switching tabs
-            if (transform.translation[1] < 1) {
-                transform.translation[1] = 1;
-                this.isJumping = false;
-            }
+            // if (transform.translation[1] < 1) {
+            //     transform.translation[1] = 1;
+            //     this.isJumping = false;
+            //     this.movingPlatform = null;
+            // }
         }
     }
 
@@ -165,12 +168,16 @@ export class ThirdPersonController {
 
     finishJump(node)
     {
-        if (!node.isTrampoline) {
+        if (node.isTrampoline) {
+            this.jumpVelocity = 15;
+            this.movingPlatform = null;
+        } else {
             this.jumpVelocity = 0;
             this.isJumping = false;
-        } else {
-            this.jumpVelocity = 15;
+            this.movingPlatform = node.isMovingPlatform ? node : null;
         }
+
+        this.jumpOffVelocity = null;
     }
 
     keydownHandler(e) {
@@ -181,4 +188,20 @@ export class ThirdPersonController {
         this.keys[e.code] = false;
     }
 
+    translateWithVelocity(translationVector, dt) {
+        // Update translation based on velocity.
+        vec3.scaleAndAdd(translationVector, translationVector, [this.movingPlatformXVelocity(), 0, 0], dt);
+        vec3.scaleAndAdd(translationVector, translationVector, this.velocity, dt);
+        vec3.scaleAndAdd(translationVector, translationVector, [0, this.jumpVelocity, 0], dt);
+    }
+
+    movingPlatformXVelocity()
+    {
+        if (!this.movingPlatform) {
+            return 0;
+        }
+
+        // if player jumped off moving platform, apply velocity that it had on jump
+        return this.jumpOffVelocity !== null ? this.jumpOffVelocity : this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0]
+    }
 }

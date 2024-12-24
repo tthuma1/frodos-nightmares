@@ -100,13 +100,8 @@ export class Physics {
         }
 
         // transform camera with player
-        const cameraTranslation = this.player.components[2].getComponentOfType(Transform);
-        const tmpY = cameraTranslation.translation[1];
-
-        vec3.add(cameraTranslation.translation,
-            cameraTranslation.translation, minDirection);
-
-        cameraTranslation.translation[1] = tmpY;
+        const cameraTranslation = this.player.components[2].getComponentOfType(Transform).translation;
+        vec3.add(cameraTranslation, cameraTranslation, minDirection);
     }
 
     displayDragText(aBox, bDragBox, b) {
