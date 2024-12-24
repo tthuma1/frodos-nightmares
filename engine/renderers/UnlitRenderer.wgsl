@@ -39,9 +39,9 @@ struct MaterialUniforms {
 struct LightUniforms {
     color: vec3f, // rgb
     position: vec3f,
-    uType: f32, // todo: convert to u8
+    uType: u32,
     direction: vec3f,
-    isActive: f32, // todo: convert to u8
+    isActive: u32,
 }
 
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
@@ -73,6 +73,13 @@ fn vertex(input: VertexInput) -> VertexOutput {
 fn fragment(input: FragmentInput) -> FragmentOutput {
     var output: FragmentOutput;
 
+    let diffuse : f32 = 1;
+    let specular : f32 = 1;
+    let shininess : f32 = 50;
+
+    let surfacePosition = input.position;
+    let N = normalize(input.normal);
+    let V = normalize(camera.position - surfacePosition);
 
     // loop through all lights
     for (var i : u32 = 0; i < 2; i++) {
@@ -81,101 +88,42 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
             continue;
         }
 
-        // flashlight
-        if (light.uType == 1) {
-            let diffuse : f32 = 1;
-            let specular : f32 = 1;
-            let shininess : f32 = 50;
-            let ambient : f32 = 1;
-            let lightDirection = light.direction; //vec3f(0, 0, -1);
+        let dist = distance(surfacePosition, light.position);
+        let Ad = 1 / dot(vec2f(0.001, 0.03), vec2f(1, dist * dist));
+
+        let L = normalize(light.position - surfacePosition);
+        let H = normalize(L + V);
+
+        let lambert = max(dot(N, L), 0.0) * diffuse;
+        let blinn = pow(max(dot(H, N), 0.0), shininess) * specular;
+
+        var Il : vec3f;
+
+        if (light.uType == 0) {
+            // lantern
+            Il = light.color * Ad;
+        } else if (light.uType == 1) {
+            // flashlight
             let lightAngle : f32 = 0.8;
             let lightFocus : f32 = 1;
 
-            let surfacePosition = input.position;
-            let dist = distance(surfacePosition, light.position);
-            let Ad = 1 / dot(vec2f(0.001, 0.03), vec2f(1, dist * dist));
-
-            let N = normalize(input.normal);
-            let L = normalize(light.position - surfacePosition);
-            let V = normalize(camera.position - surfacePosition);
-            let H = normalize(L + V); // half-way vektor za blinn
-            let D = normalize(lightDirection);
+            let D = normalize(light.direction);
 
             let spotFactor = dot(-L, D);
             let Af = smoothstep(cos(lightAngle), 1.0, spotFactor) * lightFocus;
 
-            let lambert = max(dot(N, L), 0.0) * diffuse;
-            let blinn = pow(max(dot(H, N), 0.0), shininess) * specular;
-
-            let Il = light.color * Ad * Af;
-            let ambientLight = vec3f(0.008) * ambient;
-            let diffuseLight = Il * lambert + ambientLight;
-            let specularLight = Il * blinn;
-
-            let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
-            let finalColor = baseColor.rgb * diffuseLight + specularLight;
-
-            output.color += pow(vec4(finalColor, 1), vec4(1 / 2.2));
-        } else if (light.uType == 0) {
-            let diffuse : f32 = 1;
-            let specular : f32 = 1;
-            let shininess : f32 = 50;
-            let ambient : f32 = 1;
-
-            let surfacePosition = input.position;
-            let dist = distance(surfacePosition, light.position);
-            let Ad = 1 / dot(vec2f(0.001, 0.03), vec2f(1, dist * dist));
-
-            let N = normalize(input.normal);
-            let L = normalize(light.position - surfacePosition);
-            let V = normalize(camera.position - surfacePosition);
-            let H = normalize(L + V); // half-way vektor za blinn
-
-            let lambert = max(dot(N, L), 0.0) * diffuse;
-            let blinn = pow(max(dot(H, N), 0.0), shininess) * specular;
-
-            let Il = light.color * Ad;
-            let ambientLight = vec3f(0.008) * ambient;
-            let diffuseLight = Il * lambert + ambientLight;
-            let specularLight = Il * blinn;
-
-            let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
-            let finalColor = baseColor.rgb * diffuseLight + specularLight;
-
-            output.color += pow(vec4(finalColor, 1), vec4(1 / 2.2));
+            Il = light.color * Ad * Af;
         }
+
+        let ambientLight = vec3f(0.008);
+        let diffuseLight = Il * lambert + ambientLight;
+        let specularLight = Il * blinn;
+
+        let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
+        let finalColor = baseColor.rgb * diffuseLight + specularLight;
+
+        output.color += pow(vec4(finalColor, 1), vec4(1 / 2.2));
     }
-
-        // let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
-        // output.color = vec4f(baseColor.rgb, 1);
-
-        // output.color = vec4f(0.5,0.5,0.5,1);
-
-    // //Lightning = ambient + diffuse + specular
-    // let materialColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
-    // let distance = length(light.position - input.position);
-    // let attenuation = 1 / (0.001 + 0.05 * distance * distance);
-
-    // //Directions
-    // let lightDirection = normalize(light.position - input.position);
-    // let viewDirection = normalize(camera.position - input.position);
-    // let halfwayDirection = normalize(lightDirection + viewDirection);
-
-    // //Ambient
-    // let ambient = vec3f(0.03);
-
-    // //Diffuse
-    // let normal = normalize(input.normal);
-    // let lightColor = light.color;
-    // let diffuseStrength = max(0.0, dot(lightDirection, normal));
-    // let diffuse = diffuseStrength * lightColor;
-
-    // //Specular
-    // let specular = pow(max(dot(input.normal, halfwayDirection), 0.0), 8.0);
-
-    // //Final lightning
-    // let lightning = vec4f(ambient + (diffuse + specular) * attenuation, 1.0);
-    // output.color = lightning * materialColor;
 
     return output;
 }

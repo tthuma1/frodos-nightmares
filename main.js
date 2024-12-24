@@ -53,7 +53,7 @@ const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo k
 // camera.addComponent(new TouchController(camera, canvas));
 player.addComponent(camera)
 const lanternLight = new Light({
-    color: [0.9, 0.3, 0.05],
+    color: [0.2, 0.07, 0.0],
     type: 0,
     isActive: true,
 });

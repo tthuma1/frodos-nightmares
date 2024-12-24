@@ -222,20 +222,24 @@ export class UnlitRenderer extends BaseRenderer {
         const light = scene.find(node => node.getComponentOfType(Light));
         const lightComponents = light.getComponentsOfType(Light);
         const { lightUniformBuffer, lightBindGroup } = this.prepareLight(lightComponents);
-        let tmpArr = [];
+        const lightUniformSize = 48;
         for(let i = 0; i < lightComponents.length; i++) {
             const lightComponent = lightComponents[i];
             const lightPosition = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(light));
-            tmpArr = tmpArr.concat([
+            this.device.queue.writeBuffer(lightUniformBuffer, i * lightUniformSize, new Float32Array([
                 ...lightComponent.color, 0, // light position je poravnan na 16 bytov
                 ...lightPosition,
+            ]));
+            this.device.queue.writeBuffer(lightUniformBuffer, i * lightUniformSize + 28, new Uint32Array([
                 lightComponent.type,
+            ]));
+            this.device.queue.writeBuffer(lightUniformBuffer, i * lightUniformSize + 32, new Float32Array([
                 ...lightComponent.direction,
+            ]));
+            this.device.queue.writeBuffer(lightUniformBuffer, i * lightUniformSize + 44, new Uint32Array([
                 lightComponent.isActive ? 1 : 0,
-            ]);
+            ]));
         }
-        // tmpArr = new Array(64).fill(1);
-        this.device.queue.writeBuffer(lightUniformBuffer, 0, new Float32Array(tmpArr));
         this.renderPass.setBindGroup(3, lightBindGroup);
 
         this.renderNode(scene);
