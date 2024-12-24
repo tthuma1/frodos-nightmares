@@ -52,18 +52,27 @@ const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo k
 
 // camera.addComponent(new TouchController(camera, canvas));
 player.addComponent(camera)
-player.addComponent(new Light({
-        color: [0.5, 0.5, 0.5],
-        type: 1,
-        isActive: true,
-    })
-);
-player.addComponent(new Light({
-        color: [0.5, 0.5, 0.5],
-        type: 0,
-        isActive: true,
-    })
-);
+const lanternLight = new Light({
+    color: [0.9, 0.3, 0.05],
+    type: 0,
+    isActive: true,
+});
+const flashLight = new Light({
+    color: [0.5, 0.5, 0.5],
+    type: 1,
+    isActive: false,
+});
+player.addComponent(lanternLight);
+player.addComponent(flashLight);
+player.currentLight = 0;
+player.switchLight = () => {
+    const lights = player.getComponentsOfType(Light);
+    const nextLight = !player.currentLight ? 1 : 0;
+    lights[player.currentLight].isActive = false;
+    lights[nextLight].isActive = true;
+    player.currentLight = nextLight;
+};
+
 player.addComponent(new LightView());
 
 const movingPlatform = gltfLoader.loadNode('MovingPlat');

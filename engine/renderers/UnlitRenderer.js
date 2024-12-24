@@ -230,8 +230,9 @@ export class UnlitRenderer extends BaseRenderer {
                 ...lightComponent.color, 0, // light position je poravnan na 16 bytov
                 ...lightPosition,
                 lightComponent.type,
+                ...lightComponent.direction,
                 lightComponent.isActive ? 1 : 0,
-            ]).concat(new Array(3).fill(0));
+            ]);
         }
         // tmpArr = new Array(64).fill(1);
         this.device.queue.writeBuffer(lightUniformBuffer, 0, new Float32Array(tmpArr));

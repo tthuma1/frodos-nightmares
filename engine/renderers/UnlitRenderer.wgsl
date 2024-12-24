@@ -40,6 +40,7 @@ struct LightUniforms {
     color: vec3f, // rgb
     position: vec3f,
     uType: f32, // todo: convert to u8
+    direction: vec3f,
     isActive: f32, // todo: convert to u8
 }
 
@@ -86,7 +87,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
             let specular : f32 = 1;
             let shininess : f32 = 50;
             let ambient : f32 = 1;
-            let lightDirection = vec3f(0, 0, -1);
+            let lightDirection = light.direction; //vec3f(0, 0, -1);
             let lightAngle : f32 = 0.8;
             let lightFocus : f32 = 1;
 
