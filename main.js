@@ -76,6 +76,7 @@ gltfLoader.loadNode('Wall.000').isStatic = true;
 gltfLoader.loadNode('Wall.001').isStatic = true;
 gltfLoader.loadNode('Wall.002').isStatic = true;
 gltfLoader.loadNode('Wall.003').isStatic = true;
+gltfLoader.loadNode('MovingPlat').isStatic = true;
 
 gltfLoader.loadNode('Trampoline').isDraggable = true;
 gltfLoader.loadNode('Box.001').isDraggable = true;
@@ -86,7 +87,17 @@ gltfLoader.loadNode('Box.005').isDraggable = true;
 
 gltfLoader.loadNode('Trampoline').isTrampoline = true;
 
-
+gltfLoader.loadNode('MovingPlat').isMovingPlat = true;
+const beginTranslate = gltfLoader.loadNode('MovingPlat').getComponentOfType(Transform).translation;
+gltfLoader.loadNode('MovingPlat').addComponent({
+    update(t, dt) {
+        t = performance.now() / 1000;
+        const node = gltfLoader.loadNode('MovingPlat');
+        const transform = node.getComponentOfType(Transform);
+        const x = Math.cos(t) * 5;
+        transform.translation = [beginTranslate[0] + x, beginTranslate[1], beginTranslate[2]];
+    }
+});
 
 // const floor = new Node();
 // floor.addComponent(new Transform({
