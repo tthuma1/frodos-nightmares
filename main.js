@@ -58,18 +58,11 @@ player.addComponent(new Light({
 );
 player.addComponent(new LightView());
 
-// // model je iz primitiva, ki je iz mesha (indeksi vozlišč) in teksture
-player.addComponent({
-    update(t, dt) {
-    }
-});
-
-
-const mp = gltfLoader.loadNode('MovingPlat');
-mp.isMovingPlat = true;
-mp.beginTranslate = mp.getComponentOfType(Transform).translation;
-mp.addComponent(new MovingPlatform(mp));
-player.addComponent(new ThirdPersonController(player, canvas, mp));
+const movingPlatform = gltfLoader.loadNode('MovingPlat');
+movingPlatform.isMovingPlatform = true;
+movingPlatform.isStatic = true;
+movingPlatform.addComponent(new MovingPlatform(movingPlatform));
+player.addComponent(new ThirdPersonController(player, canvas));
 
 gltfLoader.loadNode('Floor').isStatic = true;
 gltfLoader.loadNode('Trampoline').isStatic = true;
@@ -82,7 +75,6 @@ gltfLoader.loadNode('Wall.000').isStatic = true;
 gltfLoader.loadNode('Wall.001').isStatic = true;
 gltfLoader.loadNode('Wall.002').isStatic = true;
 gltfLoader.loadNode('Wall.003').isStatic = true;
-gltfLoader.loadNode('MovingPlat').isStatic = true;
 
 gltfLoader.loadNode('Trampoline').isDraggable = true;
 gltfLoader.loadNode('Box.001').isDraggable = true;

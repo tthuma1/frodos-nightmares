@@ -6,7 +6,7 @@ import { MovingPlatform } from '../core/MovingPlatform.js';
 
 export class ThirdPersonController {
 
-    constructor(node, domElement, mp, {
+    constructor(node, domElement, {
         pitch = 0,
         yaw = 0,
         velocity = [0, 0, 0],
@@ -36,8 +36,8 @@ export class ThirdPersonController {
         this.draggedNode = null;
         this.lastDragTime = 0;
 
-        this.mp = mp;
-        this.movingPlat = null;
+        this.movingPlatform = null;
+        this.jumpOffVelocity = null; // velocity that moving platform had when you jumped off it
 
         this.initHandlers();
     }
@@ -63,12 +63,12 @@ export class ThirdPersonController {
         // const mpTransform = mp.getComponentOfType(Transform);
         // // mpTransform.translation = [mp.beginTranslate[0] + velX, mp.beginTranslate[1], mp.beginTranslate[2]];
         // mpTransform.translation[0] += accX;
-        let beforeVelX;
-        if(this.movingPlat) {
-            beforeVelX = this.mp.getComponentOfType(MovingPlatform).velocity[0];
-            // this.velocity[0] = this.mp.getComponentOfType(MovingPlatform).velocity[0];
-            // beforeVelX = this.velocity[0];
-        }
+        // let beforeVelX;
+        // if(this.movingPlat) {
+        //     beforeVelX = this.mp.getComponentOfType(MovingPlatform).velocity[0];
+        //     // this.velocity[0] = this.mp.getComponentOfType(MovingPlatform).velocity[0];
+        //     // beforeVelX = this.velocity[0];
+        // }
         
         // Calculate forward and right vectors.
         const cos = Math.cos(this.yaw);
@@ -93,6 +93,7 @@ export class ThirdPersonController {
         if (this.keys['Space'] && !this.isJumping && !this.draggedNode) {
             this.isJumping = true;
             this.jumpVelocity = this.jumpForce;
+            this.jumpOffVelocity = this.movingPlatform ? this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0] : null;
         }
 
         if (this.keys['KeyE'] && this.draggedNode) {
@@ -117,12 +118,6 @@ export class ThirdPersonController {
             const decay = Math.exp(dt * Math.log(1 - this.decay));
             vec3.scale(this.velocity, this.velocity, decay);
         }
-        if(beforeVelX) {
-            // console.log(this.velocity[0]);
-            // this.velocity[0] = beforeVelX;
-            // vec3.scale(this.velocity, this.velocity, decay);
-            // console.log(beforeVelX - this.velocity[0])
-        }
 
         // Limit speed to prevent accelerating to infinity and beyond.
         const speed = vec3.length(this.velocity);
@@ -133,25 +128,23 @@ export class ThirdPersonController {
         const transform = this.node.getComponentOfType(Transform);
         if (transform) {
 
-            // Update translation based on velocity.
-            if(beforeVelX) {
-                // this.velocity[0] += beforeVelX;
-                vec3.scaleAndAdd(transform.translation, transform.translation, [beforeVelX, 0, 0], dt);
-                // vec3.add(this.velocity, this.velocity, [beforeVelX, 0, 0]);
-            }
-            vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
-            // if(beforeVelX) {
-            //     vec3.scaleAndAdd(transform.translation, transform.translation, [beforeVelX, 0, 0], dt);
+            // if (this.movingPlatform) {
+            //     const mpVelX = this.jumpOffVelocity ? this.jumpOffVelocity : this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0];
+            //     vec3.scaleAndAdd(transform.translation, transform.translation, [mpVelX, 0, 0], dt);
             // }
+            vec3.scaleAndAdd(transform.translation, transform.translation, [this.movingPlatformXVelocity(), 0, 0], dt);
+            vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);
             vec3.scaleAndAdd(transform.translation, transform.translation, [0, this.jumpVelocity, 0], dt);
 
             // translate camera with player
             const cameraTranslation = this.node.components[2].getComponentOfType(Transform);
             vec3.scaleAndAdd(cameraTranslation.translation,
                 cameraTranslation.translation, this.velocity, dt);
-            if(beforeVelX) {
-                vec3.scaleAndAdd(cameraTranslation.translation, cameraTranslation.translation, [beforeVelX, 0, 0], dt);
-            }
+            vec3.scaleAndAdd(cameraTranslation.translation, cameraTranslation.translation, [this.movingPlatformXVelocity(), 0, 0], dt);
+            // if (this.movingPlatform) {
+            //     const mpVelX = this.jumpOffVelocity ? this.jumpOffVelocity : this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0];
+            //     vec3.scaleAndAdd(cameraTranslation.translation, cameraTranslation.translation, [mpVelX, 0, 0], dt);
+            // }
 
             // translate dragged object
             if(this.draggedNode) {
@@ -171,7 +164,7 @@ export class ThirdPersonController {
             if (transform.translation[1] < 1) {
                 transform.translation[1] = 1;
                 this.isJumping = false;
-                this.movingPlat = null;
+                this.movingPlatform = null;
             }
         }
 
@@ -211,16 +204,18 @@ export class ThirdPersonController {
     {
         if (node.isTrampoline) {
             this.jumpVelocity = 15;
-            this.movingPlat = null;
-        } else if (node.isMovingPlat) {
-            this.movingPlat = node;
+            this.movingPlatform = null;
+        } else if (node.isMovingPlatform) {
             this.jumpVelocity = 0;
             this.isJumping = false;
+            this.movingPlatform = node;
         } else {
             this.jumpVelocity = 0;
             this.isJumping = false;
-            this.movingPlat = null;
+            this.movingPlatform = null;
         }
+
+        this.jumpOffVelocity = null;
     }
 
     keydownHandler(e) {
@@ -231,4 +226,13 @@ export class ThirdPersonController {
         this.keys[e.code] = false;
     }
 
+    movingPlatformXVelocity()
+    {
+        if (!this.movingPlatform) {
+            return 0;
+        }
+
+        // if player jumped off moving platform, apply velocity that it had on jump
+        return this.jumpOffVelocity !== null ? this.jumpOffVelocity : this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0]
+    }
 }

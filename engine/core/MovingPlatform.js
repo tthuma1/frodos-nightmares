@@ -1,7 +1,7 @@
 import { Transform } from './Transform.js';
 import { vec3 } from 'glm';
 
-export class MovingPlatform{
+export class MovingPlatform {
     constructor(node) {
         this.node = node;
         this.velocity = [0, 0, 0];
