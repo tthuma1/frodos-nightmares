@@ -54,6 +54,14 @@ const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo k
 player.addComponent(camera)
 player.addComponent(new Light({
         color: [0.5, 0.5, 0.5],
+        type: 1,
+        isActive: true,
+    })
+);
+player.addComponent(new Light({
+        color: [0.5, 0.5, 0.5],
+        type: 0,
+        isActive: true,
     })
 );
 player.addComponent(new LightView());

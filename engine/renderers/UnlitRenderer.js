@@ -169,7 +169,7 @@ export class UnlitRenderer extends BaseRenderer {
         }
 
         const lightUniformBuffer = this.device.createBuffer({
-            size: 32,
+            size: 256,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
@@ -220,13 +220,21 @@ export class UnlitRenderer extends BaseRenderer {
         this.renderPass.setBindGroup(0, cameraBindGroup);
 
         const light = scene.find(node => node.getComponentOfType(Light));
-        const lightComponent = light.getComponentOfType(Light);
-        const lightPosition = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(light));
-        const { lightUniformBuffer, lightBindGroup } = this.prepareLight(lightComponent);
-        this.device.queue.writeBuffer(lightUniformBuffer, 0, new Float32Array([
-            ...lightComponent.color, 0, // light position je poravnan na 16 bytov
-            ...lightPosition,
-        ]));
+        const lightComponents = light.getComponentsOfType(Light);
+        const { lightUniformBuffer, lightBindGroup } = this.prepareLight(lightComponents);
+        let tmpArr = [];
+        for(let i = 0; i < lightComponents.length; i++) {
+            const lightComponent = lightComponents[i];
+            const lightPosition = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(light));
+            tmpArr = tmpArr.concat([
+                ...lightComponent.color, 0, // light position je poravnan na 16 bytov
+                ...lightPosition,
+                lightComponent.type,
+                lightComponent.isActive ? 1 : 0,
+            ]).concat(new Array(3).fill(0));
+        }
+        // tmpArr = new Array(64).fill(1);
+        this.device.queue.writeBuffer(lightUniformBuffer, 0, new Float32Array(tmpArr));
         this.renderPass.setBindGroup(3, lightBindGroup);
 
         this.renderNode(scene);
