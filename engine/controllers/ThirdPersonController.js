@@ -11,7 +11,7 @@ export class ThirdPersonController {
         yaw = 0,
         velocity = [0, 0, 0],
         acceleration = 50,
-        maxSpeed = 5,
+        maxSpeed = 3,
         decay = 0.99999,
     } = {}) {
         this.node = node;
@@ -29,7 +29,7 @@ export class ThirdPersonController {
 
 
         this.jumpVelocity = 0;
-        this.jumpForce = 10;
+        this.jumpForce = 7;
         this.isJumping = false;
         this.gravity = -20;
 
@@ -169,7 +169,7 @@ export class ThirdPersonController {
     finishJump(node)
     {
         if (node.isTrampoline) {
-            this.jumpVelocity = 15;
+            this.jumpVelocity = 10;
             this.movingPlatform = null;
         } else {
             this.jumpVelocity = 0;
