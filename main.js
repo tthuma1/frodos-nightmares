@@ -77,6 +77,7 @@ const draggableObjects =[
     'Cube.010',
 ];
 const staticObject = [
+    'Floor',
     'Cube.004',
     // 'wall1',
     'wall2',
@@ -89,19 +90,6 @@ const staticObject = [
 for (const obj of staticObject) {
     gltfLoader.loadNode(obj).isStatic = true;
 }
-
-gltfLoader.loadNode('Floor').isStatic = true;
-gltfLoader.loadNode('Cube.004').isStatic = true;
-// gltfLoader.loadNode('Trampoline').isStatic = true;
-// gltfLoader.loadNode('Cube.017').isStatic = true;
-
-// gltfLoader.loadNode('Trampoline').isDraggable = true;
-// gltfLoader.loadNode('Cube.017').isDraggable = true;
-// gltfLoader.loadNode('Box.001').isDraggable = true;
-// gltfLoader.loadNode('Box.002').isDraggable = true;
-// gltfLoader.loadNode('Box.003').isDraggable = true;
-// gltfLoader.loadNode('Box.004').isDraggable = true;
-// gltfLoader.loadNode('Box.005').isDraggable = true;
 
 for (const obj of draggableObjects ) {
     gltfLoader.loadNode(obj).isStatic = true;

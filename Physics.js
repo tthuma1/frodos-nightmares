@@ -39,16 +39,8 @@ export class Physics {
 
     getTransformedAABB(node) {
         // Transform all vertices of the AABB from local to global space.
-        // const matrix = getGlobalModelMatrix(node.isPlayer ? node.children[0] : node);
         const matrix = getGlobalModelMatrix(node);
-        // if (node.isPlayer) {
-        //     node.aabb = {
-        //         min: node.children.reduce((acc, current) => vec3.min(acc, acc, current.aabb.min), [1000000,1000000,1000000]),
-        //         max: node.children.reduce((acc, current) => vec3.max(acc, acc, current.aabb.max), [-1000000,-1000000,-1000000])
-        //     }
-        // }
         const { min, max } = node.aabb;
-        // console.log(min,max)
         const vertices = [
             [min[0], min[1], min[2]],
             [min[0], min[1], max[2]],
@@ -90,7 +82,6 @@ export class Physics {
         const minDirection = this.getMinDirection(aBox, bBox);
 
         // player hit his head in an object
-        // console.log(minDirection[1])
         if (this.controller.jumpVelocity > 0 && minDirection[1] < -1e-4) {
             this.controller.jumpVelocity = 0;
         }
