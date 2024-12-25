@@ -39,7 +39,7 @@ export class Physics {
 
     getTransformedAABB(node) {
         // Transform all vertices of the AABB from local to global space.
-        const matrix = getGlobalModelMatrix(node);
+        const matrix = getGlobalModelMatrix(node.isPlayer ? node.children[0] : node);
         // if (node.isPlayer) {
         //     node.aabb = {
         //         min: node.children.reduce((acc, current) => vec3.min(acc, acc, current.aabb.min), [1000000,1000000,1000000]),
@@ -107,7 +107,7 @@ export class Physics {
         }
 
         // transform camera with player
-        const cameraTranslation = this.player.components[2].getComponentOfType(Transform).translation;
+        const cameraTranslation = this.player.components[1].getComponentOfType(Transform).translation;
         vec3.add(cameraTranslation, cameraTranslation, minDirection);
     }
 

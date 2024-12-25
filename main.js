@@ -45,7 +45,7 @@ await gltfLoader.load(new URL('./frodomap/frodomap.gltf', import.meta.url));
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // scena je vozlisce, na katero so vezane neke komponenete
 // const player = scene.find(node => node.getComponentOfType(Model))
-const player = gltfLoader.loadNode("body");
+const player = gltfLoader.loadNode("Player");
 player.isPlayer = true;
 const key = gltfLoader.loadNode('key'); //TODO: treba renamat na key
 key.addComponent(new Key())
@@ -123,10 +123,10 @@ scene.traverse(node => {
 });
 
 // maybe use this if player is a collection?
-// player.aabb = {
-//     min: player.children.reduce((acc, current) => vec3.min(acc, acc, current.aabb.min), [1000000,1000000,1000000]),
-//     max: player.children.reduce((acc, current) => vec3.max(acc, acc, current.aabb.max), [-1000000,-1000000,-1000000])
-// }
+player.aabb = {
+    min: player.children.reduce((acc, current) => vec3.min(acc, acc, current.aabb.min), [1000000,1000000,1000000]),
+    max: player.children.reduce((acc, current) => vec3.max(acc, acc, current.aabb.max), [-1000000,-1000000,-1000000])
+}
 
 const physics = new Physics(scene, player, key);
 function update(t, dt) {
