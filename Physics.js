@@ -81,6 +81,10 @@ export class Physics {
 
         const minDirection = this.getMinDirection(aBox, bBox);
 
+        // player hit his head in an object
+        if (this.controller.jumpVelocity > 0 && minDirection[1] < -1e-4) {
+            this.controller.jumpVelocity = 0;
+        }
         // player is on top of object and is falling (you can only land if you're falling)
         if (this.controller.jumpVelocity < 0 && minDirection[1] > 1e-4) {
             this.controller.finishJump(b);

@@ -22,6 +22,8 @@ import {
 } from 'engine/core/MeshUtils.js';
 import {Key} from "./engine/core/Key.js";
 import { MovingPlatform } from './engine/core/MovingPlatform.js';
+import { TouchController } from './engine/controllers/TouchController.js'
+import { quat, vec3, vec4, mat3, mat4 } from './lib/glm.js';
 
 // renderer je edini, ki se ukvarja z webgpu
 const canvas = document.querySelector('canvas');
@@ -32,7 +34,7 @@ await renderer.initialize();
 // await gltfLoader.load(new URL('./models/player/player.gltf', import.meta.url));
 
 const gltfLoader = new GLTFLoader();
-await gltfLoader.load(new URL('./scene/scene.gltf', import.meta.url));
+await gltfLoader.load(new URL('./frodomap/frodomap.gltf', import.meta.url));
 
 
 // const resources = await loadResources({
@@ -45,7 +47,7 @@ const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // const player = scene.find(node => node.getComponentOfType(Model))
 const player = gltfLoader.loadNode("Player");
 player.isPlayer = true;
-const key = gltfLoader.loadNode('Torus.001'); //TODO: treba renamat na key
+const key = gltfLoader.loadNode('key');
 key.addComponent(new Key())
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 
@@ -75,56 +77,43 @@ player.switchLight = () => {
 
 player.addComponent(new LightView());
 
-const movingPlatform = gltfLoader.loadNode('MovingPlat');
+const movingPlatform = gltfLoader.loadNode('MovingPlatform');
 movingPlatform.isMovingPlatform = true;
 movingPlatform.isStatic = true;
 movingPlatform.addComponent(new MovingPlatform(movingPlatform));
 player.addComponent(new ThirdPersonController(player, canvas));
 
-gltfLoader.loadNode('Floor').isStatic = true;
-gltfLoader.loadNode('Trampoline').isStatic = true;
-gltfLoader.loadNode('Box.001').isStatic = true;
-gltfLoader.loadNode('Box.002').isStatic = true;
-gltfLoader.loadNode('Box.003').isStatic = true;
-gltfLoader.loadNode('Box.004').isStatic = true;
-gltfLoader.loadNode('Box.005').isStatic = true;
-gltfLoader.loadNode('Wall.000').isStatic = true;
-gltfLoader.loadNode('Wall.001').isStatic = true;
-gltfLoader.loadNode('Wall.002').isStatic = true;
-gltfLoader.loadNode('Wall.003').isStatic = true;
+const draggableObjects =[
+    'Trampoline',
+    'Cube.017',
+    'Cube.005',
+    'Cube.006',
+    'Cube.007',
+    'Cube.008',
+    'Cube.009',
+    'Cube.010',
+];
+const staticObject = [
+    'Floor',
+    'Cube.004',
+    // 'wall1',
+    'wall2',
+    'wall3',
+    'wall4',
+    'wall3.001',
+    'Cube.016',
+]
 
-gltfLoader.loadNode('Trampoline').isDraggable = true;
-gltfLoader.loadNode('Box.001').isDraggable = true;
-gltfLoader.loadNode('Box.002').isDraggable = true;
-gltfLoader.loadNode('Box.003').isDraggable = true;
-gltfLoader.loadNode('Box.004').isDraggable = true;
-gltfLoader.loadNode('Box.005').isDraggable = true;
+for (const obj of staticObject) {
+    gltfLoader.loadNode(obj).isStatic = true;
+}
+
+for (const obj of draggableObjects ) {
+    gltfLoader.loadNode(obj).isStatic = true;
+    gltfLoader.loadNode(obj).isDraggable = true;
+}
 
 gltfLoader.loadNode('Trampoline').isTrampoline = true;
-
-// const floor = new Node();
-// floor.addComponent(new Transform({
-//     scale: [10, 1, 10],
-// }));
-// floor.addComponent(new Model({
-//     primitives: [
-//         new Primitive({
-//             mesh: resources.mesh,
-//             material: new Material({
-//                 baseTexture: new Texture({
-//                     image: resources.image,
-//                     sampler: new Sampler({
-//                         minFilter: 'nearest',
-//                         magFilter: 'nearest',
-//                         addressModeU: 'repeat',
-//                         addressModeV: 'repeat',
-//                     }),
-//                 }),
-//             }),
-//         }),
-//     ],
-// }));
-// scene.addChild(floor);
 
 scene.traverse(node => {
     const model = node.getComponentOfType(Model);
