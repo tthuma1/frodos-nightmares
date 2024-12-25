@@ -112,7 +112,7 @@ export class ThirdPersonController {
             this.translateWithVelocity(transform.translation, dt);
 
             // translate camera with player
-            const cameraTranslation = this.node.components[1].getComponentOfType(Transform).translation;
+            const cameraTranslation = this.node.components[2].getComponentOfType(Transform).translation;
             this.translateWithVelocity(cameraTranslation, dt);
 
             // translate dragged object

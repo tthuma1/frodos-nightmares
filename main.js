@@ -83,10 +83,10 @@ gltfLoader.loadNode('Floor').floor = true;
 gltfLoader.loadNode('MovingPlatform').mp = true;
 gltfLoader.loadNode('key').key = true;
 
-gltfLoader.loadNode('tuxedo').tuxedo = true;
-gltfLoader.loadNode('body').body = true;
-gltfLoader.loadNode('pants.001').pants = true;
-gltfLoader.loadNode('cloak').cloak = true;
+// gltfLoader.loadNode('tuxedo').tuxedo = true;
+// gltfLoader.loadNode('body').body = true;
+gltfLoader.loadNode('pants').pants = true;
+// gltfLoader.loadNode('cloak').cloak = true;
 
 // const floor = new Node();
 // floor.addComponent(new Transform({
@@ -123,10 +123,10 @@ scene.traverse(node => {
 });
 
 // maybe use this if player is a collection?
-player.aabb = {
-    min: player.children.reduce((acc, current) => vec3.min(acc, acc, current.aabb.min), [1000000,1000000,1000000]),
-    max: player.children.reduce((acc, current) => vec3.max(acc, acc, current.aabb.max), [-1000000,-1000000,-1000000])
-}
+// player.aabb = {
+//     min: player.children.reduce((acc, current) => vec3.min(acc, acc, current.aabb.min), [1000000,1000000,1000000]),
+//     max: player.children.reduce((acc, current) => vec3.max(acc, acc, current.aabb.max), [-1000000,-1000000,-1000000])
+// }
 
 const physics = new Physics(scene, player, key);
 function update(t, dt) {
