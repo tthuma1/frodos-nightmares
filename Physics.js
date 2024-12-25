@@ -5,11 +5,14 @@ import {Key} from "./engine/core/Key.js";
 import { ThirdPersonController } from './engine/controllers/ThirdPersonController.js';
 
 export class Physics {
-    constructor(scene, player, key) {
+    constructor(scene, player, key, blocksToCircleDict, movingPlatform) {
         this.scene = scene;
         this.player = player;
         this.key = key;
         this.controller = this.player.getComponentOfType(ThirdPersonController);
+        this.blocksToCircleDict = blocksToCircleDict;
+        this.solvedPuzzle = false;
+        this.movingPlatform = movingPlatform
     }
 
     update(t, dt) {
@@ -24,6 +27,18 @@ export class Physics {
 
         if (this.key.getComponentOfType(Key).isCollected === false) {
             this.keyCollision(this.player, this.key)
+        }
+        
+        if (!this.solvedPuzzle){
+            let counter = 0;
+            for (const [block, circle] of this.blocksToCircleDict){
+                if (this.blocksCircleCollision(block, circle))
+                    counter++;
+            }
+            if (counter === 0){
+                this.controller.movingPlatform.solvedPuzzle = true;
+                console.log("hura");
+            }
         }
     }
 
@@ -140,6 +155,18 @@ export class Physics {
 
         this.key.getComponentOfType(Key).collectKey()
         this.scene.removeChild(this.key)
+    }
+
+    blocksCircleCollision(block, circle) {
+        const blockBox = this.getTransformedAABB(block);
+        const circleBox = this.getTransformedAABB(circle);
+        
+        const isColliding = this.aabbIntersection(blockBox, circleBox);
+        if (!isColliding) {
+            return false;
+        }
+        return true;
+
     }
 
     getMinDirection(aBox, bBox) {

@@ -37,6 +37,8 @@ const gltfLoader = new GLTFLoader();
 await gltfLoader.load(new URL('./frodomap/frodomap.gltf', import.meta.url));
 
 
+
+
 // const resources = await loadResources({
 //     'mesh': new URL('./models/floor/floor.json', import.meta.url),
 //     'image': new URL('./models/floor/grass.png', import.meta.url),
@@ -52,6 +54,22 @@ key.addComponent(new Key())
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 
 
+// BOXES
+const orange_block = gltfLoader.loadNode("orange_block");
+const purple_block = gltfLoader.loadNode("purple_block");
+const green_block = gltfLoader.loadNode("green_block");
+
+const orange_circle = gltfLoader.loadNode("orange_circle");
+const purple_circle = gltfLoader.loadNode("purple_circle");
+const green_circle = gltfLoader.loadNode("green_circle");
+
+const blockToCircleDict = new Map([
+    [orange_block, orange_circle],
+    [purple_block, purple_circle],
+    [green_block, green_circle]
+]);
+
+
 // camera.addComponent(new TouchController(camera, canvas));
 player.addComponent(camera)
 const lanternLight = new Light({
@@ -64,6 +82,7 @@ const flashLight = new Light({
     type: 1,
     isActive: false,
 });
+
 player.addComponent(lanternLight);
 player.addComponent(flashLight);
 player.currentLight = 0;
@@ -86,12 +105,9 @@ player.addComponent(new ThirdPersonController(player, canvas));
 const draggableObjects =[
     'Trampoline',
     'Cube.017',
-    'Cube.005',
-    'Cube.006',
-    'Cube.007',
-    'Cube.008',
-    'Cube.009',
-    'Cube.010',
+    'orange_block',
+    'purple_block',
+    'green_block',
 ];
 const staticObject = [
     'Floor',
@@ -125,7 +141,7 @@ scene.traverse(node => {
     node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
 });
 
-const physics = new Physics(scene, player, key);
+const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform);
 function update(t, dt) {
     scene.traverse(node => {
         for (const component of node.components) {
