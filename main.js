@@ -47,7 +47,7 @@ const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 // const player = scene.find(node => node.getComponentOfType(Model))
 const player = gltfLoader.loadNode("Player");
 player.isPlayer = true;
-const key = gltfLoader.loadNode('key'); //TODO: treba renamat na key
+const key = gltfLoader.loadNode('key');
 key.addComponent(new Key())
 const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 
