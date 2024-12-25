@@ -68,7 +68,13 @@ player.addComponent(new ThirdPersonController(player, canvas));
 
 const draggableObjects =[
     'Trampoline',
-    'Cube.017'
+    'Cube.017',
+    'Cube.005',
+    'Cube.006',
+    'Cube.007',
+    'Cube.008',
+    'Cube.009',
+    'Cube.010',
 ];
 const staticObject = [
     'Cube.004',
@@ -76,6 +82,8 @@ const staticObject = [
     'wall2',
     'wall3',
     'wall4',
+    'wall3.001',
+    'Cube.016',
 ]
 
 for (const obj of staticObject) {
