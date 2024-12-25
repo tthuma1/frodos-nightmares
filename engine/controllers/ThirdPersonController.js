@@ -3,6 +3,7 @@ import { quat, vec3, mat4 } from 'glm';
 import { Transform } from '../core/Transform.js';
 import {Camera} from "../core/Camera.js";
 import { MovingPlatform } from '../core/MovingPlatform.js';
+import { Light } from '../core/Light.js';
 
 export class ThirdPersonController {
 
@@ -38,6 +39,8 @@ export class ThirdPersonController {
 
         this.movingPlatform = null;
         this.jumpOffVelocity = null; // velocity that moving platform had when you jumped off it
+
+        this.lastLightSwitchTime = 0;
 
         this.initHandlers();
     }
@@ -80,6 +83,12 @@ export class ThirdPersonController {
             this.jumpVelocity = this.jumpForce;
             this.jumpOffVelocity = this.movingPlatform ? this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0] : null;
         }
+        if (this.keys['KeyQ']) {
+            if (!(this.lastLightSwitchTime && Date.now() - this.lastLightSwitchTime < 200)) { // last light switch was at least 200ms ago q
+                this.node.switchLight();
+                this.lastLightSwitchTime = Date.now();
+            }
+        }
 
         if (this.keys['KeyE'] && this.draggedNode) {
             this.stopDragging();
@@ -105,6 +114,8 @@ export class ThirdPersonController {
         if (speed > this.maxSpeed) {
             vec3.scale(this.velocity, this.velocity, this.maxSpeed / speed);
         }
+
+        this.updateFlashlightDirection();
 
         const transform = this.node.getComponentOfType(Transform);
         if (transform) {
@@ -203,5 +214,13 @@ export class ThirdPersonController {
 
         // if player jumped off moving platform, apply velocity that it had on jump
         return this.jumpOffVelocity !== null ? this.jumpOffVelocity : this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0]
+    }
+
+    updateFlashlightDirection()
+    {
+        const light = this.node.getComponentsOfType(Light).find(x => x.type === 1);
+        if (vec3.length(this.velocity) > 0.1) {
+            light.direction = this.velocity.slice();
+        }
     }
 }

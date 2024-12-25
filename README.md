@@ -21,4 +21,8 @@ Lantern v roki
 - [ ] fade in when game starts
 - [ ] stairs
 - [ ] prepad
-- [ ] luči - lahko lantern ali pa luči v hiši
+- [x] luči - lahko lantern ali pa luči v hiši
+
+- [ ] mipmaps
+- [ ] shadow mapping
+- [ ] animations
