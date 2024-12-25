@@ -69,7 +69,18 @@ player.addComponent(new ThirdPersonController(player, canvas));
 const draggableObjects =[
     'Trampoline',
     'Cube.017'
+];
+const staticObject = [
+    'Cube.004',
+    // 'wall1',
+    'wall2',
+    'wall3',
+    'wall4',
 ]
+
+for (const obj of staticObject) {
+    gltfLoader.loadNode(obj).isStatic = true;
+}
 
 gltfLoader.loadNode('Floor').isStatic = true;
 gltfLoader.loadNode('Cube.004').isStatic = true;
@@ -90,39 +101,6 @@ for (const obj of draggableObjects ) {
 }
 
 gltfLoader.loadNode('Trampoline').isTrampoline = true;
-gltfLoader.loadNode('Floor').floor = true;
-// gltfLoader.loadNode('metarig').player = true;
-gltfLoader.loadNode('MovingPlatform').mp = true;
-gltfLoader.loadNode('key').key = true;
-
-// gltfLoader.loadNode('tuxedo').tuxedo = true;
-// gltfLoader.loadNode('body').body = true;
-gltfLoader.loadNode('pants').pants = true;
-// gltfLoader.loadNode('cloak').cloak = true;
-
-// const floor = new Node();
-// floor.addComponent(new Transform({
-//     scale: [10, 1, 10],
-// }));
-// floor.addComponent(new Model({
-//     primitives: [
-//         new Primitive({
-//             mesh: resources.mesh,
-//             material: new Material({
-//                 baseTexture: new Texture({
-//                     image: resources.image,
-//                     sampler: new Sampler({
-//                         minFilter: 'nearest',
-//                         magFilter: 'nearest',
-//                         addressModeU: 'repeat',
-//                         addressModeV: 'repeat',
-//                     }),
-//                 }),
-//             }),
-//         }),
-//     ],
-// }));
-// scene.addChild(floor);
 
 scene.traverse(node => {
     const model = node.getComponentOfType(Model);
@@ -133,12 +111,6 @@ scene.traverse(node => {
     const boxes = model.primitives.map(primitive => calculateAxisAlignedBoundingBox(primitive.mesh));
     node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
 });
-
-// maybe use this if player is a collection?
-// player.aabb = {
-//     min: player.children.reduce((acc, current) => vec3.min(acc, acc, current.aabb.min), [1000000,1000000,1000000]),
-//     max: player.children.reduce((acc, current) => vec3.max(acc, acc, current.aabb.max), [-1000000,-1000000,-1000000])
-// }
 
 const physics = new Physics(scene, player, key);
 function update(t, dt) {
