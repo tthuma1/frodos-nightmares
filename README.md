@@ -17,12 +17,22 @@ Lantern v roki
 - [x] moving box
 
 
-- [ ] character in house
-- [ ] fade in when game starts
+- [x] character in house
+- [ ] fade in when game starts (cutscene)
 - [ ] stairs
 - [ ] prepad
 - [x] luči - lahko lantern ali pa luči v hiši
-
-- [ ] mipmaps
-- [ ] shadow mapping
 - [ ] animations
+---
+Luka:
+- [ ] color puzzle
+---
+Tilen:
+- [ ] shadow mapping
+---
+Tim:
+- [ ] mipmaps
+- [ ] player naj se obraca kot flashlight
+- [ ] ko poberes kljuc imas cutscene - vrata se odprejo
+- [ ] “you won” text ko prides ven
+- [ ] background texture cez cel svet
