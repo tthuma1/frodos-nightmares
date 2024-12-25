@@ -3,6 +3,9 @@
 		"generator":"Khronos glTF Blender I/O v4.3.47",
 		"version":"2.0"
 	},
+	"extensionsUsed":[
+		"EXT_texture_webp"
+	],
 	"scene":0,
 	"scenes":[
 		{
@@ -156,13 +159,13 @@
 			"mesh":6,
 			"name":"Cube.017",
 			"scale":[
-				0.20612390339374542,
-				0.20612390339374542,
-				0.20612390339374542
+				0.3116566240787506,
+				0.3116566240787506,
+				0.3116566240787506
 			],
 			"translation":[
 				-1.8674973249435425,
-				0.4093160033226013,
+				0.5485895872116089,
 				-2.883439064025879
 			]
 		},
@@ -190,26 +193,26 @@
 			"mesh":8,
 			"name":"cloak",
 			"scale":[
-				1.2944685220718384,
-				1.2944685220718384,
-				1.2944685220718384
+				1.2944684028625488,
+				1.2944684028625488,
+				1.2944684028625488
 			],
 			"translation":[
 				0,
 				-0.1317119598388672,
-				-0.10589981079101562
+				-0.10589790344238281
 			]
 		},
 		{
 			"mesh":9,
 			"name":"pants",
 			"scale":[
-				1.1284840106964111,
-				1.1284840106964111,
-				1.1284840106964111
+				1.1284838914871216,
+				1.1284838914871216,
+				1.1284838914871216
 			],
 			"translation":[
-				-0.019399642944335938,
+				-0.01940155029296875,
 				0.4829082489013672,
 				0.05069160461425781
 			]
@@ -218,9 +221,9 @@
 			"mesh":10,
 			"name":"tuxedo",
 			"scale":[
-				1.2628066539764404,
-				1.2628066539764404,
-				1.2628066539764404
+				1.2628064155578613,
+				1.2628064155578613,
+				1.2628064155578613
 			],
 			"translation":[
 				0,
@@ -237,9 +240,9 @@
 			"mesh":11,
 			"name":"Player",
 			"scale":[
-				0.19881533086299896,
-				0.19881533086299896,
-				0.19881533086299896
+				0.17237168550491333,
+				0.17237168550491333,
+				0.17237168550491333
 			],
 			"translation":[
 				-3.570936918258667,
@@ -591,59 +594,139 @@
 	],
 	"textures":[
 		{
-			"sampler":0,
-			"source":0
-		},
-		{
+			"extensions":{
+				"EXT_texture_webp":{
+					"source":0
+				}
+			},
 			"sampler":0,
 			"source":1
 		},
 		{
-			"sampler":0,
-			"source":2
-		},
-		{
+			"extensions":{
+				"EXT_texture_webp":{
+					"source":2
+				}
+			},
 			"sampler":0,
 			"source":3
 		},
 		{
-			"sampler":0,
-			"source":0
-		},
-		{
-			"sampler":1,
-			"source":0
-		},
-		{
-			"sampler":0,
-			"source":4
-		},
-		{
+			"extensions":{
+				"EXT_texture_webp":{
+					"source":4
+				}
+			},
 			"sampler":0,
 			"source":5
 		},
 		{
-			"sampler":0,
-			"source":6
-		},
-		{
-			"sampler":0,
-			"source":5
-		},
-		{
+			"extensions":{
+				"EXT_texture_webp":{
+					"source":6
+				}
+			},
 			"sampler":0,
 			"source":7
 		},
 		{
+			"extensions":{
+				"EXT_texture_webp":{
+					"source":8
+				}
+			},
 			"sampler":0,
-			"source":8
+			"source":9
+		},
+		{
+			"extensions":{
+				"EXT_texture_webp":{
+					"source":10
+				}
+			},
+			"sampler":0,
+			"source":11
+		},
+		{
+			"extensions":{
+				"EXT_texture_webp":{
+					"source":12
+				}
+			},
+			"sampler":0,
+			"source":13
+		},
+		{
+			"extensions":{
+				"EXT_texture_webp":{
+					"source":14
+				}
+			},
+			"sampler":0,
+			"source":15
+		},
+		{
+			"extensions":{
+				"EXT_texture_webp":{
+					"source":16
+				}
+			},
+			"sampler":0,
+			"source":17
+		},
+		{
+			"extensions":{
+				"EXT_texture_webp":{
+					"source":14
+				}
+			},
+			"sampler":0,
+			"source":15
+		},
+		{
+			"extensions":{
+				"EXT_texture_webp":{
+					"source":18
+				}
+			},
+			"sampler":0,
+			"source":19
+		},
+		{
+			"extensions":{
+				"EXT_texture_webp":{
+					"source":20
+				}
+			},
+			"sampler":0,
+			"source":21
 		}
 	],
 	"images":[
 		{
+			"mimeType":"image/webp",
+			"name":"oak_veneer_01",
+			"uri":"oak_veneer_01.webp"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"oak_veneer_01",
+			"uri":"oak_veneer_01.png"
+		},
+		{
+			"mimeType":"image/webp",
+			"name":"Untitled",
+			"uri":"Untitled.webp"
+		},
+		{
 			"mimeType":"image/png",
 			"name":"Untitled",
 			"uri":"Untitled.png"
+		},
+		{
+			"mimeType":"image/webp",
+			"name":"Untitled",
+			"uri":"Untitled-1.webp"
 		},
 		{
 			"mimeType":"image/png",
@@ -651,9 +734,19 @@
 			"uri":"Untitled-1.png"
 		},
 		{
+			"mimeType":"image/webp",
+			"name":"Untitled",
+			"uri":"Untitled-2.webp"
+		},
+		{
 			"mimeType":"image/png",
 			"name":"Untitled",
 			"uri":"Untitled-2.png"
+		},
+		{
+			"mimeType":"image/webp",
+			"name":"Untitled",
+			"uri":"Untitled-3.webp"
 		},
 		{
 			"mimeType":"image/png",
@@ -661,9 +754,29 @@
 			"uri":"Untitled-3.png"
 		},
 		{
+			"mimeType":"image/webp",
+			"name":"rosewood_veneer1.webp",
+			"uri":"rosewood_veneer1_webp.webp"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"rosewood_veneer1.webp",
+			"uri":"rosewood_veneer1_webp.png"
+		},
+		{
+			"mimeType":"image/webp",
+			"name":"Untitled",
+			"uri":"Untitled-4.webp"
+		},
+		{
 			"mimeType":"image/png",
 			"name":"Untitled",
 			"uri":"Untitled-4.png"
+		},
+		{
+			"mimeType":"image/webp",
+			"name":"CloakGreen",
+			"uri":"CloakGreen.webp"
 		},
 		{
 			"mimeType":"image/png",
@@ -671,14 +784,29 @@
 			"uri":"CloakGreen.png"
 		},
 		{
+			"mimeType":"image/webp",
+			"name":"PantsBrown",
+			"uri":"PantsBrown.webp"
+		},
+		{
 			"mimeType":"image/png",
 			"name":"PantsBrown",
 			"uri":"PantsBrown.png"
 		},
 		{
+			"mimeType":"image/webp",
+			"name":"Skin",
+			"uri":"Skin.webp"
+		},
+		{
 			"mimeType":"image/png",
 			"name":"Skin",
 			"uri":"Skin.png"
+		},
+		{
+			"mimeType":"image/webp",
+			"name":"white",
+			"uri":"white.webp"
 		},
 		{
 			"mimeType":"image/png",
@@ -1451,12 +1579,6 @@
 		{
 			"magFilter":9729,
 			"minFilter":9987
-		},
-		{
-			"magFilter":9729,
-			"minFilter":9987,
-			"wrapS":33071,
-			"wrapT":33071
 		}
 	],
 	"buffers":[

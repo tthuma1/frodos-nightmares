@@ -68,9 +68,10 @@ player.addComponent(new ThirdPersonController(player, canvas));
 
 gltfLoader.loadNode('Floor').isStatic = true;
 gltfLoader.loadNode('Trampoline').isStatic = true;
-// gltfLoader.loadNode('Cube.017').isStatic = true;
+gltfLoader.loadNode('Cube.017').isStatic = true;
 
 gltfLoader.loadNode('Trampoline').isDraggable = true;
+gltfLoader.loadNode('Cube.017').isDraggable = true;
 // gltfLoader.loadNode('Box.001').isDraggable = true;
 // gltfLoader.loadNode('Box.002').isDraggable = true;
 // gltfLoader.loadNode('Box.003').isDraggable = true;
