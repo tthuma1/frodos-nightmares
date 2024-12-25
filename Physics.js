@@ -3,6 +3,7 @@ import { getGlobalModelMatrix } from 'engine/core/SceneUtils.js';
 import { Transform } from 'engine/core.js';
 import {Key} from "./engine/core/Key.js";
 import { ThirdPersonController } from './engine/controllers/ThirdPersonController.js';
+import { MovingPlatform } from './engine/core/MovingPlatform.js';
 
 export class Physics {
     constructor(scene, player, key, blocksToCircleDict, movingPlatform) {
@@ -12,7 +13,7 @@ export class Physics {
         this.controller = this.player.getComponentOfType(ThirdPersonController);
         this.blocksToCircleDict = blocksToCircleDict;
         this.solvedPuzzle = false;
-        this.movingPlatform = movingPlatform
+        this.movingPlatform = movingPlatform;
     }
 
     update(t, dt) {
@@ -35,9 +36,9 @@ export class Physics {
                 if (this.blocksCircleCollision(block, circle))
                     counter++;
             }
-            if (counter === 0){
-                this.controller.movingPlatform.solvedPuzzle = true;
-                console.log("hura");
+
+            if (counter === 3){
+                this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle = true;
             }
         }
     }
