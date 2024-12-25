@@ -95,5 +95,8 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     let lightning = vec4f(ambient + (diffuse + specular) * attenuation, 1.0);
     output.color = lightning * materialColor;
 
+    output.color = vec4f(materialColor.rgb, 1.0);
+
+
     return output;
 }
