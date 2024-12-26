@@ -107,22 +107,22 @@ movingPlatform.addComponent(new MovingPlatform(movingPlatform));
 player.addComponent(new ThirdPersonController(player, canvas));
 
 const draggableObjects =[
-    'Cube.010',
+    'Cube.017',
     'orange_block',
     'purple_block',
     'green_block',
 ];
 const staticObject = [
-    'Trampoline',
     'Floor',
-    'Cube.005',
-    'Cube.006',
-    'Cube.008',
+    'Cube.004',
+    'wall1',
     'wall2',
-    'wall3.001',
-    'Cube.001',
-    'Cube.009',
+    'wall3',
+    'wall4',
+    'Cube.016',
     'doors',
+    'wall4.001',
+    'wall4.003',
 ]
 
 for (const obj of staticObject) {
