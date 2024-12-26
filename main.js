@@ -69,6 +69,9 @@ const blockToCircleDict = new Map([
     [green_block, green_circle]
 ]);
 
+// doors
+const doors = gltfLoader.loadNode("doors");
+
 
 // camera.addComponent(new TouchController(camera, canvas));
 player.addComponent(camera)
@@ -103,7 +106,6 @@ movingPlatform.addComponent(new MovingPlatform(movingPlatform));
 player.addComponent(new ThirdPersonController(player, canvas));
 
 const draggableObjects =[
-    'Trampoline',
     'Cube.017',
     'orange_block',
     'purple_block',
@@ -112,12 +114,14 @@ const draggableObjects =[
 const staticObject = [
     'Floor',
     'Cube.004',
-    // 'wall1',
+    'wall1',
     'wall2',
     'wall3',
     'wall4',
-    'wall3.001',
     'Cube.016',
+    'doors',
+    'wall4.001',
+    'wall4.003',
 ]
 
 for (const obj of staticObject) {
@@ -141,7 +145,7 @@ scene.traverse(node => {
     node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
 });
 
-const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform);
+const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, doors);
 function update(t, dt) {
     scene.traverse(node => {
         for (const component of node.components) {
