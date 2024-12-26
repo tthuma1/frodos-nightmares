@@ -103,6 +103,7 @@ const movingPlatform = gltfLoader.loadNode('MovingPlatform');
 movingPlatform.isMovingPlatform = true;
 movingPlatform.isStatic = true;
 movingPlatform.addComponent(new MovingPlatform(movingPlatform));
+
 player.addComponent(new ThirdPersonController(player, canvas));
 
 const draggableObjects =[
@@ -125,6 +126,7 @@ const staticObject = [
 ]
 
 for (const obj of staticObject) {
+    console.log(obj);
     gltfLoader.loadNode(obj).isStatic = true;
 }
 
