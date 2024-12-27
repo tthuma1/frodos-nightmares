@@ -4,6 +4,7 @@ import { Transform } from 'engine/core.js';
 import {Key} from "./engine/core/Key.js";
 import { ThirdPersonController } from './engine/controllers/ThirdPersonController.js';
 import { MovingPlatform } from './engine/core/MovingPlatform.js';
+import { Sound } from './engine/core/Sound.js';
 
 export class Physics {
     constructor(scene, player, key, blocksToCircleDict, movingPlatform, doors) {
@@ -15,6 +16,10 @@ export class Physics {
         this.solvedPuzzle = false;
         this.movingPlatform = movingPlatform;
         this.doors = doors;
+        this.sound = new Sound({
+            collect: { src: './sounds/collect.mp3', volume : 0.6 },
+
+        });
     }
 
     update(t, dt) {
@@ -167,7 +172,8 @@ export class Physics {
         }
         this.key.getComponentOfType(Key).collectKey()
         this.scene.removeChild(this.key)
-        this.endFunction();
+        this.sound.play('collect');
+        //this.endFunction();
     }
 
     blocksCircleCollision(block, circle) {

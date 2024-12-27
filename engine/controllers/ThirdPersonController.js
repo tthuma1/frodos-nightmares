@@ -4,6 +4,7 @@ import { Transform } from '../core/Transform.js';
 import {Camera} from "../core/Camera.js";
 import { MovingPlatform } from '../core/MovingPlatform.js';
 import { Light } from '../core/Light.js';
+import { Sound } from '../core/Sound.js';
 
 export class ThirdPersonController {
 
@@ -43,6 +44,14 @@ export class ThirdPersonController {
         this.lastLightSwitchTime = 0;
 
         this.initHandlers();
+
+        
+        this.sound = new Sound({
+            walk: { src: './sounds/walk.mp3', volume : 0.15 },
+            jump: { src: './sounds/jump.mp3', volume : 0.3 },
+            bounce: { src: './sounds/bounce.mp3', volume : 0.4} ,
+            drag: {src: './sounds/drag.mp3', volume : 0.25 },
+        });
     }
 
     initHandlers() {
@@ -67,18 +76,35 @@ export class ThirdPersonController {
         // Map user input to the acceleration vector.
         const acc = vec3.create();
         if (this.keys['KeyW']) {
+            if (!this.isJumping)
+                this.sound.play('walk');
+            if (this.draggedNode)
+                this.sound.play('drag');
             vec3.add(acc, acc, forward);
         }
         if (this.keys['KeyS']) {
+            if (!this.isJumping)
+                this.sound.play('walk');
+            if (this.draggedNode)
+                this.sound.play('drag');
             vec3.sub(acc, acc, forward);
         }
         if (this.keys['KeyD']) {
+            if (!this.isJumping)
+                this.sound.play('walk');
+            if (this.draggedNode)
+                this.sound.play('drag');
             vec3.add(acc, acc, right);
         }
         if (this.keys['KeyA']) {
+            if (!this.isJumping)
+                this.sound.play('walk');
+            if (this.draggedNode)
+                this.sound.play('drag');
             vec3.sub(acc, acc, right);
         }
         if (this.keys['Space'] && !this.isJumping && !this.draggedNode) {
+            this.sound.play('jump');
             this.isJumping = true;
             this.jumpVelocity = this.jumpForce;
             this.jumpOffVelocity = this.movingPlatform ? this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0] : null;
@@ -182,6 +208,8 @@ export class ThirdPersonController {
         if (node.isTrampoline) {
             this.jumpVelocity = 10;
             this.movingPlatform = null;
+            this.sound.play('bounce');
+
         } else {
             this.jumpVelocity = 0;
             this.isJumping = false;
