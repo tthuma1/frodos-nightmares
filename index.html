@@ -17,16 +17,27 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <div class="fullscreen no-touch pixelated">
-        <canvas></canvas>
+    <div id="menu">
+        <div id="heading">
+            <h1>Frodo's Nightmares</h1>
+        </div>
+        <div id="buttons">
+            <button id="start-btn">Start game</button>
+        </div>
     </div>
-    <div id="dragText">
-        <p id="startDrag">
-            Press E to start dragging.
-        </p>
-        <p id="stopDrag">
-            Press E to stop dragging.
-        </p>
+
+    <div id="game" style="display: none;">
+        <div class="fullscreen no-touch pixelated">
+            <canvas></canvas>
+        </div>
+        <div id="dragText">
+            <p id="startDrag">
+                Press E to start dragging.
+            </p>
+            <p id="stopDrag">
+                Press E to stop dragging.
+            </p>
+        </div>
     </div>
 </body>
 </html>
