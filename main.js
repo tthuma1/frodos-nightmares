@@ -112,7 +112,6 @@ async function startGame(instantStart) {
     ]
 
     for (const obj of staticObject) {
-        console.log(obj);
         gltfLoader.loadNode(obj).isStatic = true;
     }
 
@@ -133,10 +132,7 @@ async function startGame(instantStart) {
         node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
     });
 
-    new ResizeSystem({ canvas, resize }).start();
-    const updateSystem = new UpdateSystem({ update, render });
-
-    const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, doors, winGame, updateSystem);
+    const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, doors);
 
     function update(t, dt) {
         scene.traverse(node => {
@@ -156,6 +152,13 @@ async function startGame(instantStart) {
         camera.getComponentOfType(Camera).aspect = width / height;
     }
 
+    new ResizeSystem({ canvas, resize }).start();
+    const updateSystem = new UpdateSystem({ update, render });
+
+    physics.endFunction = () => {
+        winGame(updateSystem);
+    }
+
     if (instantStart) {
         updateSystem.start();
     } else {
@@ -163,11 +166,11 @@ async function startGame(instantStart) {
             document.getElementById("game").style.display = "block";
             document.getElementById("menu").style.display = "none";
             updateSystem.start();
-        });
+        }, { once: true });
     }
 }
 
-async function winGame(updateSystem) {
+function winGame(updateSystem) {
     updateSystem.stop();
     document.getElementById("startDrag").style.display = "none";
     document.getElementById("stopDrag").style.display = "none";
@@ -176,8 +179,7 @@ async function winGame(updateSystem) {
     document.getElementById("restart-btn").addEventListener("click", async () => {
         await startGame(true);
         document.getElementById("end").style.display = "none";
-    })
-
+    }, { once: true });
 }
 
 startGame(false);

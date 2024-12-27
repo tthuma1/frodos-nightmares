@@ -6,7 +6,7 @@ import { ThirdPersonController } from './engine/controllers/ThirdPersonControlle
 import { MovingPlatform } from './engine/core/MovingPlatform.js';
 
 export class Physics {
-    constructor(scene, player, key, blocksToCircleDict, movingPlatform, doors, endFunction, updateSystem) {
+    constructor(scene, player, key, blocksToCircleDict, movingPlatform, doors) {
         this.scene = scene;
         this.player = player;
         this.key = key;
@@ -15,8 +15,6 @@ export class Physics {
         this.solvedPuzzle = false;
         this.movingPlatform = movingPlatform;
         this.doors = doors;
-        this.endFunction = endFunction;
-        this.updateSystem = updateSystem;
     }
 
     update(t, dt) {
@@ -169,7 +167,7 @@ export class Physics {
         }
         this.key.getComponentOfType(Key).collectKey()
         this.scene.removeChild(this.key)
-        this.endFunction(this.updateSystem);
+        this.endFunction();
     }
 
     blocksCircleCollision(block, circle) {
