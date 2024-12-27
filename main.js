@@ -148,6 +148,7 @@ scene.traverse(node => {
 });
 
 const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, doors);
+
 function update(t, dt) {
     scene.traverse(node => {
         for (const component of node.components) {
@@ -166,9 +167,20 @@ function resize({ displaySize: { width, height }}) {
     camera.getComponentOfType(Camera).aspect = width / height;
 }
 
+new ResizeSystem({ canvas, resize }).start();
+const updateSystem = new UpdateSystem({ update, render });
+
 document.getElementById("start-btn").addEventListener("click", () => {
     document.getElementById("game").style.display = "block";
     document.getElementById("menu").style.display = "none";
-    new ResizeSystem({ canvas, resize }).start();
-    new UpdateSystem({ update, render }).start();
+    updateSystem.start();
+    setTimeout(() => {
+        winGame();
+    }, 300);
 });
+
+function winGame() {
+    console.log("end")
+    updateSystem.stop();
+    document.getElementById("end").style.display = "block";
+}
