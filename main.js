@@ -166,5 +166,9 @@ function resize({ displaySize: { width, height }}) {
     camera.getComponentOfType(Camera).aspect = width / height;
 }
 
-new ResizeSystem({ canvas, resize }).start();
-new UpdateSystem({ update, render }).start();
+document.getElementById("start-btn").addEventListener("click", () => {
+    document.getElementById("game").style.display = "block";
+    document.getElementById("menu").style.display = "none";
+    new ResizeSystem({ canvas, resize }).start();
+    new UpdateSystem({ update, render }).start();
+});
