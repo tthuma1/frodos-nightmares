@@ -38,7 +38,7 @@ export class Physics {
                     counter++;
             }
 
-            if (counter === 0){
+            if (counter === 3) { // set to 3 when not testing
                 this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle = true;
 
 
