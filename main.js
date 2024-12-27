@@ -155,8 +155,9 @@ async function startGame(instantStart) {
     new ResizeSystem({ canvas, resize }).start();
     const updateSystem = new UpdateSystem({ update, render });
 
+    const startGameTime = Date.now();
     physics.endFunction = () => {
-        winGame(updateSystem);
+        winGame(updateSystem, startGameTime);
     }
 
     if (instantStart) {
@@ -170,11 +171,16 @@ async function startGame(instantStart) {
     }
 }
 
-function winGame(updateSystem) {
+function winGame(updateSystem, startTime) {
     updateSystem.stop();
     document.getElementById("startDrag").style.display = "none";
     document.getElementById("stopDrag").style.display = "none";
     document.getElementById("end").style.display = "block";
+
+    const time = parseInt((Date.now() - startTime) / 1000);
+    const minutes = parseInt(time / 60).toString().padStart(2, "0");
+    const seconds = (time % 60).toString().padStart(2, "0");
+    document.getElementById("time").innerText = minutes + ":" + seconds;
 
     document.getElementById("restart-btn").addEventListener("click", async () => {
         await startGame(true);
