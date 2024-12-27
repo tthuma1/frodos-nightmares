@@ -13,11 +13,11 @@
     }
     </script>
     <script type="module" src="main.js"></script>
-    <link rel="stylesheet" href="../../../engine/style.css">
     <link rel="stylesheet" href="./style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
-    <div id="menu">
+    <div id="menu" class="screen">
         <div id="heading">
             <h1>Frodo's Nightmares</h1>
         </div>
@@ -37,6 +37,16 @@
             <p id="stopDrag">
                 Press E to stop dragging.
             </p>
+        </div>
+    </div>
+
+    <div id="end" class="screen" style="display: none;">
+        <div id="won">
+            <p>You won</p>
+            <p>Time spent:&nbsp;<span id="time">00:00</span></p>
+        </div>
+        <div id="buttons">
+            <button id="restart-btn">New Game</button>
         </div>
     </div>
 </body>

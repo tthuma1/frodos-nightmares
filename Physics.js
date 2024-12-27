@@ -1,15 +1,20 @@
-import { vec3, mat4 } from 'glm';
+import { vec3, mat4, quat } from 'glm';
 import { getGlobalModelMatrix } from 'engine/core/SceneUtils.js';
 import { Transform } from 'engine/core.js';
 import {Key} from "./engine/core/Key.js";
 import { ThirdPersonController } from './engine/controllers/ThirdPersonController.js';
+import { MovingPlatform } from './engine/core/MovingPlatform.js';
 
 export class Physics {
-    constructor(scene, player, key) {
+    constructor(scene, player, key, blocksToCircleDict, movingPlatform, doors) {
         this.scene = scene;
         this.player = player;
         this.key = key;
         this.controller = this.player.getComponentOfType(ThirdPersonController);
+        this.blocksToCircleDict = blocksToCircleDict;
+        this.solvedPuzzle = false;
+        this.movingPlatform = movingPlatform;
+        this.doors = doors;
     }
 
     update(t, dt) {
@@ -24,6 +29,29 @@ export class Physics {
 
         if (this.key.getComponentOfType(Key).isCollected === false) {
             this.keyCollision(this.player, this.key)
+        }
+        
+        if (!this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle){
+            let counter = 0;
+            for (const [block, circle] of this.blocksToCircleDict){
+                if (this.blocksCircleCollision(block, circle))
+                    counter++;
+            }
+
+            if (counter === 3) { // set to 3 when not testing
+                this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle = true;
+
+
+                const doorsTranslation = this.doors.getComponentOfType(Transform).translation;
+                const transform = this.doors.getComponentOfType(Transform);
+                const rotation = quat.create();
+                quat.rotateY(rotation, rotation, Math.PI/2);
+                transform.rotation = rotation;
+
+                const boundingBox = this.getTransformedAABB(this.doors);
+                const width = boundingBox.max[0] - boundingBox.min[0];
+                const offPosition = [width/2, 0, -width/2];
+            }
         }
     }
 
@@ -137,9 +165,21 @@ export class Physics {
         if (!isColliding) {
             return;
         }
-
         this.key.getComponentOfType(Key).collectKey()
         this.scene.removeChild(this.key)
+        this.endFunction();
+    }
+
+    blocksCircleCollision(block, circle) {
+        const blockBox = this.getTransformedAABB(block);
+        const circleBox = this.getTransformedAABB(circle);
+        
+        const isColliding = this.aabbIntersection(blockBox, circleBox);
+        if (!isColliding) {
+            return false;
+        }
+        return true;
+
     }
 
     getMinDirection(aBox, bBox) {

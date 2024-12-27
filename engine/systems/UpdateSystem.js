@@ -19,6 +19,7 @@ export class UpdateSystem {
 
         this._updateFrame = setInterval(this._update, 0);
         this._renderFrame = requestAnimationFrame(this._render);
+        this.running = true;
     }
 
     stop() {
@@ -30,6 +31,7 @@ export class UpdateSystem {
 
         this._updateFrame = clearInterval(this._updateFrame);
         this._renderFrame = cancelAnimationFrame(this._render);
+        this.running = false;
     }
 
     _update() {
