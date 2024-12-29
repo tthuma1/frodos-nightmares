@@ -107,6 +107,7 @@ async function startGame(instantStart) {
         'wall2',
         'wall3.001',
         'Cube.001',
+        'Cube.002',
         'Cube.009',
         'doors',
     ]

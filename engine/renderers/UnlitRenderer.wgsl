@@ -34,6 +34,7 @@ struct ModelUniforms {
 
 struct MaterialUniforms {
     baseFactor: vec4f,
+    metalnessFactor: f32,
 }
 
 struct LightUniforms {
@@ -74,8 +75,8 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     var output: FragmentOutput;
 
     let diffuse : f32 = 1;
-    let specular : f32 = 1;
-    let shininess : f32 = 50;
+    let specular : f32 = 0;
+    let shininess : f32 = 10;
 
     let surfacePosition = input.position;
     let N = normalize(input.normal);
@@ -89,13 +90,13 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
         }
 
         let dist = distance(surfacePosition, light.position);
-        let Ad = 1 / dot(vec2f(0.001, 0.03), vec2f(1, dist * dist));
+        let Ad = 1 / dot(vec2f(0.001, 0.1), vec2f(1, dist * dist));
 
         let L = normalize(light.position - surfacePosition);
         let H = normalize(L + V);
 
         let lambert = max(dot(N, L), 0.0) * diffuse;
-        let blinn = pow(max(dot(H, N), 0.0), shininess) * specular;
+        let blinn = pow(max(dot(H, N), 0.0), shininess) * material.metalnessFactor;
 
         var Il : vec3f;
 
@@ -105,7 +106,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
         } else if (light.uType == 1) {
             // flashlight
             let lightAngle : f32 = 0.8;
-            let lightFocus : f32 = 1;
+            let lightFocus : f32 = 0.6;
 
             let D = normalize(light.direction);
 
