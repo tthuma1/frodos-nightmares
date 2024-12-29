@@ -33,7 +33,8 @@
 				27,
 				28,
 				29,
-				30
+				30,
+				31
 			]
 		}
 	],
@@ -73,9 +74,9 @@
 				0.9951757192611694
 			],
 			"translation":[
-				-3.491147756576538,
-				7.69484806060791,
-				8.335770606994629
+				-1.639723777770996,
+				7.534847736358643,
+				16.582313537597656
 			]
 		},
 		{
@@ -459,7 +460,7 @@
 			"translation":[
 				-0.01940155029296875,
 				0.4829063415527344,
-				0.05069160461425781
+				0.050689697265625
 			]
 		},
 		{
@@ -490,9 +491,9 @@
 				0.17154009640216827
 			],
 			"translation":[
-				-3.5384743213653564,
+				-1.9113744497299194,
 				3.3651256561279297,
-				-3.735600471496582
+				5.401820182800293
 			]
 		},
 		{
@@ -563,6 +564,20 @@
 				-4.598820686340332,
 				0.5561285018920898,
 				-1.526608943939209
+			]
+		},
+		{
+			"mesh":30,
+			"name":"Cube",
+			"scale":[
+				1.2850157022476196,
+				1.2850157022476196,
+				1.2850157022476196
+			],
+			"translation":[
+				-2.0086421966552734,
+				2.140245199203491,
+				0
 			]
 		}
 	],
@@ -859,6 +874,17 @@
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":25
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Material.010",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":26
 				},
 				"metallicFactor":0,
 				"roughnessFactor":0.5
@@ -1298,6 +1324,20 @@
 					"material":25
 				}
 			]
+		},
+		{
+			"name":"Cube.003",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":109,
+						"NORMAL":110,
+						"TEXCOORD_0":111
+					},
+					"indices":18,
+					"material":26
+				}
+			]
 		}
 	],
 	"textures":[
@@ -1404,6 +1444,10 @@
 		{
 			"sampler":0,
 			"source":17
+		},
+		{
+			"sampler":0,
+			"source":19
 		}
 	],
 	"images":[
@@ -1501,6 +1545,11 @@
 			"mimeType":"image/png",
 			"name":"herringbone_parquet",
 			"uri":"herringbone_parquet.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"Untitled",
+			"uri":"Untitled-9.png"
 		}
 	],
 	"accessors":[
@@ -2471,6 +2520,34 @@
 			"componentType":5126,
 			"count":24,
 			"type":"VEC2"
+		},
+		{
+			"bufferView":109,
+			"componentType":5126,
+			"count":24,
+			"max":[
+				1,
+				1,
+				1
+			],
+			"min":[
+				-1,
+				-1,
+				-1
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":110,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":111,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC2"
 		}
 	],
 	"bufferViews":[
@@ -3127,6 +3204,24 @@
 			"byteLength":192,
 			"byteOffset":625232,
 			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":625424,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":625712,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":192,
+			"byteOffset":626000,
+			"target":34962
 		}
 	],
 	"samplers":[
@@ -3137,7 +3232,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":625424,
+			"byteLength":626192,
 			"uri":"frodomap.bin"
 		}
 	]
