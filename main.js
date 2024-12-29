@@ -65,11 +65,13 @@ async function startGame(instantStart) {
         color: [0.2, 0.07, 0.0],
         type: 0,
         isActive: true,
+        intensity: 2,
     });
     const flashLight = new Light({
         color: [0.5, 0.5, 0.5],
         type: 1,
         isActive: false,
+        intensity: 2,
     });
 
     player.addComponent(lanternLight);
