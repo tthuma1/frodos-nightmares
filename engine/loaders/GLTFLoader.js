@@ -154,7 +154,7 @@ export class GLTFLoader {
         const sampler = new Sampler({
             minFilter: 'linear',//minFilter[gltfSpec.minFilter ?? 9729],
             magFilter: 'linear',//magFilter[gltfSpec.magFilter ?? 9729],
-            mipmapFilter: 'linear', //mipmapFilter[gltfSpec.minFilter ?? 9729],
+            mipmapFilter: 'nearest', //mipmapFilter[gltfSpec.minFilter ?? 9729],
             addressModeU: addressMode[gltfSpec.wrapS ?? 10497],
             addressModeV: addressMode[gltfSpec.wrapT ?? 10497],
         });

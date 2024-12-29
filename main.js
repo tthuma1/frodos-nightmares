@@ -130,7 +130,7 @@ async function startGame(instantStart) {
     rotCube.addComponent({
         update(time, dt) {
             const rotation = quat.create();
-            quat.rotateX(rotation, rotation, 0.7);
+            quat.rotateX(rotation, rotation, 0.8);
             const transform = rotCube.getComponentOfType(Transform);
             transform.rotation = rotation;
         }
