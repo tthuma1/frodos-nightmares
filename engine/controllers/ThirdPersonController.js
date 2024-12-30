@@ -120,7 +120,7 @@ export class ThirdPersonController {
             this.stopDragging();
         }
 
-        this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
+        // this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
 
         // Update velocity based on acceleration.
         vec3.scaleAndAdd(this.velocity, this.velocity, acc, dt * this.acceleration);
