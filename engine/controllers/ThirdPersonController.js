@@ -121,10 +121,10 @@ export class ThirdPersonController {
         }
 
         // prevent switching tabs from breaking game
-        if (dt < 0.01) {
-            this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
+        if (dt * this.gravity < -0.3) {
+            this.jumpVelocity = this.jumpVelocity - 0.3;
         } else {
-            this.jumpVelocity = this.jumpVelocity + 0.01 * this.gravity;
+            this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
         }
 
         // Update velocity based on acceleration.
