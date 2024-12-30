@@ -25,11 +25,24 @@ import { MovingPlatform } from './engine/core/MovingPlatform.js';
 import { TouchController } from './engine/controllers/TouchController.js'
 import { quat, vec3, vec4, mat3, mat4 } from './lib/glm.js';
 import { RotateAnimator } from './engine/animators/RotateAnimator.js';
+import { ImageLoader } from './engine/loaders/ImageLoader.js';
 
 const gltfLoader = new GLTFLoader();
 const canvas = document.querySelector('canvas');
 const renderer = new UnlitRenderer(canvas);
 await renderer.initialize();
+
+const imageLoader = new ImageLoader();
+const environmentImages = await Promise.all([
+    'px.webp',
+    'nx.webp',
+    'py.webp',
+    'ny.webp',
+    'pz.webp',
+    'nz.webp',
+].map(url => imageLoader.load(url)));
+renderer.setEnvironment(environmentImages);
+
 
 async function startGame(instantStart) {
     await gltfLoader.load(new URL('./frodomap/frodomap.gltf', import.meta.url));
@@ -60,7 +73,7 @@ async function startGame(instantStart) {
     const finalDoor = gltfLoader.loadNode("doors");
     const firstDoor = gltfLoader.loadNode("doors.001")
 
-    // camera.addComponent(new TouchController(camera, canvas));
+    camera.addComponent(new TouchController(camera, canvas));
     player.addComponent(camera)
     const lanternLight = new Light({
         color: [0.01, 0.01, 0.01],

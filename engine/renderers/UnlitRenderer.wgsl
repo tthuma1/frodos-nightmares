@@ -46,6 +46,8 @@ struct LightUniforms {
 }
 
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
+@group(0) @binding(1) var uEnvironmentTexture: texture_cube<f32>;
+@group(0) @binding(2) var uEnvironmentSampler: sampler;
 
 @group(1) @binding(0) var<uniform> model: ModelUniforms;
 
@@ -93,6 +95,10 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
 
         let L = normalize(light.position - surfacePosition);
         let H = normalize(L + V);
+
+    let reflectedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, L);
+    let refractedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, H);
+
 
         let lambert = max(dot(N, L), 0.0) * diffuse;
         let blinn = pow(max(dot(H, N), 0.0), shininess) * material.metalnessFactor;

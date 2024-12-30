@@ -67,6 +67,50 @@ export class UnlitRenderer extends BaseRenderer {
             },
         });
 
+        const skyboxCode = await fetch('skybox.wgsl').then(response => response.text());
+        const skyboxModule = this.device.createShaderModule({ code: skyboxCode });
+
+        this.skyboxPipeline = await this.device.createRenderPipelineAsync({
+            layout: 'auto',
+            vertex: {
+                module: skyboxModule,
+                buffers: [{
+                    arrayStride: 8,
+                    attributes: [{
+                        shaderLocation: 0,
+                        offset: 0,
+                        format: 'float32x2',
+                    }]
+                }]
+            },
+            fragment: {
+                module: skyboxModule,
+                targets: [{ format: this.format }],
+            },
+            depthStencil: {
+                format: 'depth24plus',
+                depthWriteEnabled: false,
+                depthCompare: 'less-equal',
+            },
+            primitive: {
+                topology: 'triangle-strip',
+            },
+        });
+
+        const clipQuadVertices = new Float32Array([
+            -1, -1,
+             1, -1,
+            -1,  1,
+             1,  1,
+        ]);
+
+        this.clipQuadBuffer = this.device.createBuffer({
+            size: clipQuadVertices.byteLength,
+            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+        });
+
+        this.device.queue.writeBuffer(this.clipQuadBuffer, 0, clipQuadVertices);
+
         this.recreateDepthTexture();
     }
 
@@ -112,14 +156,48 @@ export class UnlitRenderer extends BaseRenderer {
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
+        this.environmentSampler = this.device.createSampler({
+            minFilter: 'linear',
+            magFilter: 'linear',
+        });
+
+        this.skyboxBindGroup = this.device.createBindGroup({
+            label:'skyboxneofa',
+            layout: this.skyboxPipeline.getBindGroupLayout(1),
+            entries: [
+                { binding: 0, resource: this.environmentTexture.createView({ dimension: 'cube' }) },
+                { binding: 1, resource: this.environmentSampler },
+            ],
+        });
+
         const cameraBindGroup = this.device.createBindGroup({
             layout: this.pipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: cameraUniformBuffer } },
+                { binding: 1, resource: this.environmentTexture.createView({ dimension: 'cube' }) },
+                { binding: 2, resource: this.environmentSampler },
             ],
         });
 
-        const gpuObjects = { cameraUniformBuffer, cameraBindGroup };
+        const unprojectUniformBuffer = this.device.createBuffer({
+            size: 64,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+
+        const unprojectBindGroup = this.device.createBindGroup({
+            label: 'neki',
+            layout: this.skyboxPipeline.getBindGroupLayout(0),
+            entries: [
+                { binding: 0, resource: { buffer: unprojectUniformBuffer } }
+            ],
+        });
+
+        const gpuObjects = {
+            cameraUniformBuffer,
+            cameraBindGroup,
+            unprojectUniformBuffer,
+            unprojectBindGroup,
+        };
         this.gpuObjects.set(camera, gpuObjects);
         return gpuObjects;
     }
@@ -210,13 +288,24 @@ export class UnlitRenderer extends BaseRenderer {
         this.renderPass.setPipeline(this.pipeline);
 
         const cameraComponent = camera.getComponentOfType(Camera);
+        const cameraMatrix = getGlobalModelMatrix(camera);
         const viewMatrix = getGlobalViewMatrix(camera);
         const projectionMatrix = getProjectionMatrix(camera);
+        const unprojectionMatrix = mat4.invert(mat4.create(), projectionMatrix);
+        const unprojectMatrix = mat4.multiply(mat4.create(), cameraMatrix, unprojectionMatrix);
         const cameraPosition = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(camera));
-        const { cameraUniformBuffer, cameraBindGroup } = this.prepareCamera(cameraComponent);
+        const {
+            cameraUniformBuffer,
+            cameraBindGroup,
+            unprojectUniformBuffer,
+            unprojectBindGroup,
+        } = this.prepareCamera(cameraComponent);  
         this.device.queue.writeBuffer(cameraUniformBuffer, 0, viewMatrix);
         this.device.queue.writeBuffer(cameraUniformBuffer, 64, projectionMatrix);
         this.device.queue.writeBuffer(cameraUniformBuffer, 128, cameraPosition);
+        this.device.queue.writeBuffer(cameraUniformBuffer, 128, cameraPosition);
+        this.device.queue.writeBuffer(cameraUniformBuffer, 128, cameraPosition);
+        this.device.queue.writeBuffer(unprojectUniformBuffer, 0, unprojectMatrix);
         this.renderPass.setBindGroup(0, cameraBindGroup);
 
         const light = scene.find(node => node.getComponentOfType(Light));
@@ -244,6 +333,12 @@ export class UnlitRenderer extends BaseRenderer {
         this.renderPass.setBindGroup(3, lightBindGroup);
 
         this.renderNode(scene);
+
+        this.renderPass.setPipeline(this.skyboxPipeline);
+        this.renderPass.setVertexBuffer(0, this.clipQuadBuffer);
+        this.renderPass.setBindGroup(0, unprojectBindGroup);
+        this.renderPass.setBindGroup(1, this.skyboxBindGroup);
+        this.renderPass.draw(4);
 
         this.renderPass.end();
         this.device.queue.submit([encoder.finish()]);
@@ -290,4 +385,46 @@ export class UnlitRenderer extends BaseRenderer {
         this.renderPass.drawIndexed(primitive.mesh.indices.length);
     }
 
+    setEnvironment(images) {
+        this.environmentTexture?.destroy();
+        this.environmentTexture = this.device.createTexture({
+            size: [images[0].width, images[0].height, 6],
+            format: 'rgba8unorm-srgb',
+            usage:
+                GPUTextureUsage.TEXTURE_BINDING |
+                GPUTextureUsage.COPY_DST |
+                GPUTextureUsage.RENDER_ATTACHMENT,
+        });
+
+        for (let i = 0; i < images.length; i++) {
+            this.device.queue.copyExternalImageToTexture(
+                { source: images[i] },
+                { texture: this.environmentTexture, origin: [0, 0, i] },
+                [images[i].width, images[i].height],
+            );
+        }
+
+        // this.environmentSampler = this.device.createSampler({
+        //     minFilter: 'linear',
+        //     magFilter: 'linear',
+        // });
+
+        // this.environmentBindGroup = this.device.createBindGroup({
+        //     label: 'envjfisa',
+        //     layout: this.pipeline.getBindGroupLayout(3),
+        //     entries: [
+        //         { binding: 0, resource: this.environmentTexture.createView({ dimension: 'cube' }) },
+        //         { binding: 1, resource: this.environmentSampler },
+        //     ],
+        // });
+
+        // this.skyboxBindGroup = this.device.createBindGroup({
+        //     label:'skyboxneofa',
+        //     layout: this.skyboxPipeline.getBindGroupLayout(1),
+        //     entries: [
+        //         { binding: 0, resource: this.environmentTexture.createView({ dimension: 'cube' }) },
+        //         { binding: 1, resource: this.environmentSampler },
+        //     ],
+        // });
+    }
 }
