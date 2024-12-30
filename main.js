@@ -62,8 +62,7 @@ async function startGame(instantStart) {
     // camera.addComponent(new TouchController(camera, canvas));
     player.addComponent(camera)
     const lanternLight = new Light({
-        // color: [0.2, 0.07, 0.0],
-        color: [0.5, 0.5, 0.5],
+        color: [0.2, 0.07, 0.0],
         type: 0,
         isActive: true,
         intensity: 3,
@@ -110,7 +109,6 @@ async function startGame(instantStart) {
         'wall2',
         'wall3.001',
         'Cube.001',
-        'Cube.002',
         'Cube.009',
         'doors',
     ]
@@ -125,16 +123,6 @@ async function startGame(instantStart) {
     }
 
     gltfLoader.loadNode('Trampoline').isTrampoline = true;
-
-    const rotCube = gltfLoader.loadNode('Cube');
-    rotCube.addComponent({
-        update(time, dt) {
-            const rotation = quat.create();
-            quat.rotateX(rotation, rotation, 0.8);
-            const transform = rotCube.getComponentOfType(Transform);
-            transform.rotation = rotation;
-        }
-    })
 
     scene.traverse(node => {
         const model = node.getComponentOfType(Model);
