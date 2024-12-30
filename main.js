@@ -56,13 +56,13 @@ async function startGame(instantStart) {
     ]);
 
     // doors
-    const doors = gltfLoader.loadNode("doors");
-
+    const finalDoor = gltfLoader.loadNode("doors");
+    const firstDoor = gltfLoader.loadNode("doors.001")
 
     // camera.addComponent(new TouchController(camera, canvas));
     player.addComponent(camera)
     const lanternLight = new Light({
-        color: [0.2, 0.07, 0.0],
+        color: [0.001, 0.001, 0.001],
         type: 0,
         isActive: true,
     });
@@ -98,6 +98,7 @@ async function startGame(instantStart) {
         'purple_block',
         'green_block',
     ];
+
     const staticObject = [
         'Trampoline',
         'Floor',
@@ -109,6 +110,20 @@ async function startGame(instantStart) {
         'Cube.001',
         'Cube.009',
         'doors',
+        'wall3.003',
+        'doors.001',
+        'wall4',
+        'wall3.002',
+        'wall3.004',
+    ];
+
+    const searchableObjects = [
+        'chest.01',
+        'chest.02',
+        'chest.03',
+        'chest.04',
+        'chest.05',
+        'chest.06',
     ]
 
     for (const obj of staticObject) {
@@ -118,6 +133,16 @@ async function startGame(instantStart) {
     for (const obj of draggableObjects ) {
         gltfLoader.loadNode(obj).isStatic = true;
         gltfLoader.loadNode(obj).isDraggable = true;
+    }
+
+    const lanternIndex = Math.floor(Math.random() * searchableObjects.length);
+
+    for (let i = 0; i < searchableObjects.length; i++) {
+        gltfLoader.loadNode(searchableObjects.at(i)).isStatic = true;
+        gltfLoader.loadNode(searchableObjects.at(i)).isSearchable = true;
+        if (i === lanternIndex) {
+            gltfLoader.loadNode(searchableObjects.at(i)).hasLantern = true;
+        }
     }
 
     gltfLoader.loadNode('Trampoline').isTrampoline = true;
@@ -132,7 +157,9 @@ async function startGame(instantStart) {
         node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
     });
 
-    const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, doors);
+    const lantern = gltfLoader.loadNode("Lantern");
+
+    const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, finalDoor, firstDoor, lantern);
 
     function update(t, dt) {
         scene.traverse(node => {
