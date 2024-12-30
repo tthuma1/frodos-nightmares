@@ -63,7 +63,7 @@ async function startGame(instantStart) {
     // camera.addComponent(new TouchController(camera, canvas));
     player.addComponent(camera)
     const lanternLight = new Light({
-        color: [0.001, 0.001, 0.001],
+        color: [0.01, 0.01, 0.01],
         type: 0,
         isActive: true,
         intensity: 3,
@@ -90,7 +90,12 @@ async function startGame(instantStart) {
 
 
     // player.addComponent(new Transform({rotation: [1,0,0,1]}))
-    const rotator = new RotateAnimator(player, { endRotation: [1, 0, 0], duration: 1, startTime: 2 });
+    const rotator = new RotateAnimator(player, {
+        startRotation: [-10, 0, 0],
+        endRotation: [10, 0, 0],
+        duration: 1,
+        startTime: 2
+    });
     player.addComponent(rotator);
     setTimeout(() => {
         console.log("a")

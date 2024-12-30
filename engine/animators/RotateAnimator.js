@@ -13,6 +13,8 @@ export class RotateAnimator {
     } = {}) {
         this.node = node;
 
+        quat.fromEuler(startRotation, ...startRotation);
+        quat.fromEuler(endRotation, ...endRotation);
         this.startRotation = startRotation;
         this.endRotation = endRotation;
 
@@ -22,7 +24,6 @@ export class RotateAnimator {
 
         this.playing = false;
         this.transform = new Transform({ rotation: [...startRotation] });
-        quat.fromEuler(endRotation, 20, 0, 0);
 
         this.direction = 1;
 
