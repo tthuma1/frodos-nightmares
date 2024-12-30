@@ -1,3 +1,6 @@
+import { mipLevelCountF, generateMipmaps2D } from './WebGPUMipmaps.js';
+
+
 export function createBuffer(device, { data, usage }) {
     const buffer = device.createBuffer({
         size: Math.ceil(data.byteLength / 4) * 4,
@@ -20,11 +23,12 @@ export function createTextureFromSource(device, {
     mipLevelCount = 1,
     flipY = false,
 }) {
-    const size = [source.width, source.height];
+    const size = [source.width, source.height, 1];
+    const mpc = mipLevelCountF(size);
     const texture = device.createTexture({
         format,
         size,
-        mipLevelCount,
+        mipLevelCount: mpc,
         usage: usage |
             GPUTextureUsage.TEXTURE_BINDING |
             GPUTextureUsage.COPY_DST |
@@ -35,6 +39,7 @@ export function createTextureFromSource(device, {
         { texture },
         size,
     );
+    generateMipmaps2D(device, texture);
     return texture;
 }
 
@@ -49,10 +54,12 @@ export function createTextureFromData(device, {
     mipLevelCount = 1,
     flipY = false,
 }) {
+    size = [...size, 1];
+    const mpc = mipLevelCountF(size);
     const texture = device.createTexture({
         format,
         size,
-        mipLevelCount,
+        mipLevelCount: mpc,
         usage: usage | GPUTextureUsage.COPY_DST,
     });
     device.queue.writeTexture(
@@ -61,6 +68,7 @@ export function createTextureFromData(device, {
         { bytesPerRow, rowsPerImage },
         size,
     );
+    generateMipmaps2D(device, texture);
     return texture;
 }
 
