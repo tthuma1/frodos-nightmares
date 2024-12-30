@@ -75,7 +75,6 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     var output: FragmentOutput;
 
     let diffuse : f32 = 1;
-    let specular : f32 = 0;
     let shininess : f32 = 10;
 
     let surfacePosition = input.position;
