@@ -68,8 +68,8 @@ export class ThirdPersonController {
 
     update(t, dt) {
         // Calculate forward and right vectors.
-        const cos = Math.cos(this.yaw);
-        const sin = Math.sin(this.yaw);
+        const cos = Math.cos(0);
+        const sin = Math.sin(0);
         const forward = [-sin, 0, -cos];
         const right = [cos, 0, -sin];
 
@@ -120,7 +120,12 @@ export class ThirdPersonController {
             this.stopDragging();
         }
 
-        this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
+        // prevent switching tabs from breaking game
+        if (dt * this.gravity < -0.3) {
+            this.jumpVelocity = this.jumpVelocity - 0.3;
+        } else {
+            this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
+        }
 
         // Update velocity based on acceleration.
         vec3.scaleAndAdd(this.velocity, this.velocity, acc, dt * this.acceleration);
@@ -162,16 +167,10 @@ export class ThirdPersonController {
 
             // Update rotation based on the Euler angles.
             const rotation = quat.create();
+            this.updateYaw();
             quat.rotateY(rotation, rotation, this.yaw);
             quat.rotateX(rotation, rotation, this.pitch);
             transform.rotation = rotation;
-
-            // semi prevent weird bug that brakes gravity when switching tabs
-            // if (transform.translation[1] < 1) {
-            //     transform.translation[1] = 1;
-            //     this.isJumping = false;
-            //     this.movingPlatform = null;
-            // }
         }
     }
 
@@ -242,6 +241,12 @@ export class ThirdPersonController {
 
         // if player jumped off moving platform, apply velocity that it had on jump
         return this.jumpOffVelocity !== null ? this.jumpOffVelocity : this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0]
+    }
+
+    updateYaw() {
+        const velX = this.velocity[0];
+        const velZ = this.velocity[2];
+        this.yaw = Math.atan2(velX, velZ);
     }
 
     updateFlashlightDirection()

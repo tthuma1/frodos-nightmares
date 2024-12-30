@@ -57,7 +57,7 @@ function getOrCreateMipmapPipeline(device, format) {
     return pipeline;
 }
 
-export function mipLevelCount(size) {
+export function mipLevelCountF(size) {
     return 1 + Math.floor(Math.log2(Math.max(...size)));
 }
 

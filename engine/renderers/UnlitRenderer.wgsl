@@ -34,6 +34,7 @@ struct ModelUniforms {
 
 struct MaterialUniforms {
     baseFactor: vec4f,
+    metalnessFactor: f32,
 }
 
 struct LightUniforms {
@@ -74,8 +75,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     var output: FragmentOutput;
 
     let diffuse : f32 = 1;
-    let specular : f32 = 1;
-    let shininess : f32 = 50;
+    let shininess : f32 = 10;
 
     let surfacePosition = input.position;
     let N = normalize(input.normal);
@@ -89,13 +89,13 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
         }
 
         let dist = distance(surfacePosition, light.position);
-        let Ad = 1 / dot(vec2f(0.001, 0.03), vec2f(1, dist * dist));
+        let Ad = 1 / dot(vec2f(0.001, 0.1), vec2f(1, dist * dist));
 
         let L = normalize(light.position - surfacePosition);
         let H = normalize(L + V);
 
         let lambert = max(dot(N, L), 0.0) * diffuse;
-        let blinn = pow(max(dot(H, N), 0.0), shininess) * specular;
+        let blinn = pow(max(dot(H, N), 0.0), shininess) * material.metalnessFactor;
 
         var Il : vec3f;
 
