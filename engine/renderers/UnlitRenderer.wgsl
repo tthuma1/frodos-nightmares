@@ -105,7 +105,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
             Il = light.color * Ad;
         } else if (light.uType == 1) {
             // flashlight
-            let lightAngle : f32 = 4;
+            let lightAngle : f32 = 0.8;
             let lightFocus : f32 = 1;
 
             let D = normalize(light.direction);
