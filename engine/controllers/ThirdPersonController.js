@@ -120,7 +120,12 @@ export class ThirdPersonController {
             this.stopDragging();
         }
 
-        this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
+        // prevent switching tabs from breaking game
+        if (dt < 0.01) {
+            this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
+        } else {
+            this.jumpVelocity = this.jumpVelocity + 0.01 * this.gravity;
+        }
 
         // Update velocity based on acceleration.
         vec3.scaleAndAdd(this.velocity, this.velocity, acc, dt * this.acceleration);
@@ -165,13 +170,6 @@ export class ThirdPersonController {
             quat.rotateY(rotation, rotation, this.yaw);
             quat.rotateX(rotation, rotation, this.pitch);
             transform.rotation = rotation;
-
-            // semi prevent weird bug that brakes gravity when switching tabs
-            // if (transform.translation[1] < 1) {
-            //     transform.translation[1] = 1;
-            //     this.isJumping = false;
-            //     this.movingPlatform = null;
-            // }
         }
     }
 
