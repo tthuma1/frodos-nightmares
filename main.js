@@ -24,6 +24,7 @@ import {Key} from "./engine/core/Key.js";
 import { MovingPlatform } from './engine/core/MovingPlatform.js';
 import { TouchController } from './engine/controllers/TouchController.js'
 import { quat, vec3, vec4, mat3, mat4 } from './lib/glm.js';
+import { RotateAnimator } from './engine/animators/RotateAnimator.js';
 
 const gltfLoader = new GLTFLoader();
 const canvas = document.querySelector('canvas');
@@ -86,6 +87,15 @@ async function startGame(instantStart) {
     };
 
     player.addComponent(new LightView());
+
+
+    // player.addComponent(new Transform({rotation: [1,0,0,1]}))
+    const rotator = new RotateAnimator(player, { endRotation: [1, 0, 0], duration: 1, startTime: 2 });
+    player.addComponent(rotator);
+    setTimeout(() => {
+        console.log("a")
+        rotator.play();
+    }, 1000);
 
     const movingPlatform = gltfLoader.loadNode('MovingPlatform');
     movingPlatform.isMovingPlatform = true;
