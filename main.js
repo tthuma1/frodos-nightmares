@@ -93,14 +93,14 @@ async function startGame(instantStart) {
     const rotator = new RotateAnimator(player, {
         startRotation: [-10, 0, 0],
         endRotation: [10, 0, 0],
-        duration: 1,
-        startTime: 2
+        duration: 0.5,
+        // startTime: 2
     });
     player.addComponent(rotator);
-    setTimeout(() => {
-        console.log("a")
-        rotator.play();
-    }, 1000);
+    // setTimeout(() => {
+    //     console.log("a")
+    //     rotator.play();
+    // }, 1000);
 
     const movingPlatform = gltfLoader.loadNode('MovingPlatform');
     movingPlatform.isMovingPlatform = true;

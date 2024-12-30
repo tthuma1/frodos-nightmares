@@ -1,10 +1,11 @@
-import { quat, vec3, mat4 } from 'glm';
+import { quat, vec2, vec3, mat4 } from 'glm';
 
 import { Transform } from '../core/Transform.js';
 import {Camera} from "../core/Camera.js";
 import { MovingPlatform } from '../core/MovingPlatform.js';
 import { Light } from '../core/Light.js';
 import { Sound } from '../core/Sound.js';
+import { RotateAnimator } from '../animators/RotateAnimator.js';
 
 export class ThirdPersonController {
 
@@ -45,7 +46,6 @@ export class ThirdPersonController {
 
         this.initHandlers();
 
-        
         this.sound = new Sound({
             walk: { src: './sounds/walk.mp3', volume : 0.15 },
             jump: { src: './sounds/jump.mp3', volume : 0.3 },
@@ -73,6 +73,7 @@ export class ThirdPersonController {
         const forward = [-sin, 0, -cos];
         const right = [cos, 0, -sin];
 
+        const walkAnimation = this.node.getComponentOfType(RotateAnimator);
         // Map user input to the acceleration vector.
         const acc = vec3.create();
         if (this.keys['KeyW']) {
@@ -81,6 +82,7 @@ export class ThirdPersonController {
             if (this.draggedNode)
                 this.sound.play('drag');
             vec3.add(acc, acc, forward);
+            walkAnimation.play();
         }
         if (this.keys['KeyS']) {
             if (!this.isJumping)
@@ -88,6 +90,7 @@ export class ThirdPersonController {
             if (this.draggedNode)
                 this.sound.play('drag');
             vec3.sub(acc, acc, forward);
+            walkAnimation.play();
         }
         if (this.keys['KeyD']) {
             if (!this.isJumping)
@@ -95,6 +98,7 @@ export class ThirdPersonController {
             if (this.draggedNode)
                 this.sound.play('drag');
             vec3.add(acc, acc, right);
+            walkAnimation.play();
         }
         if (this.keys['KeyA']) {
             if (!this.isJumping)
@@ -102,6 +106,7 @@ export class ThirdPersonController {
             if (this.draggedNode)
                 this.sound.play('drag');
             vec3.sub(acc, acc, right);
+            walkAnimation.play();
         }
         if (this.keys['Space'] && !this.isJumping && !this.draggedNode) {
             this.sound.play('jump');
@@ -120,9 +125,13 @@ export class ThirdPersonController {
             this.stopDragging();
         }
 
+        if (vec2.length([this.velocity[0], this.velocity[2]]) < 0.1) {
+            walkAnimation.stop();
+        }
+
         // prevent switching tabs from breaking game
-        if (dt * this.gravity < -0.3) {
-            this.jumpVelocity = this.jumpVelocity - 0.3;
+        if (dt * this.gravity < -0.2) {
+            this.jumpVelocity = this.jumpVelocity - 0.2;
         } else {
             this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
         }

@@ -30,8 +30,12 @@ export class RotateAnimator {
         this.node.addComponent(this.transform);
     }
 
-    play() {
+    stop() {
+        this.playing = false;
+        this.transform.rotation = [0, 0, 0, 1];
+    }
 
+    play() {
         this.playing = true;
     }
 
@@ -40,7 +44,6 @@ export class RotateAnimator {
     }
 
     update(t, dt) {
-        // console.log(t, this.playing)
         if (!this.playing) {
             return;
         }
