@@ -1,13 +1,13 @@
 import { vec3, mat4, quat } from 'glm';
 import { getGlobalModelMatrix } from 'engine/core/SceneUtils.js';
-import { Transform } from 'engine/core.js';
+import {Light, Transform} from 'engine/core.js';
 import {Key} from "./engine/core/Key.js";
 import { ThirdPersonController } from './engine/controllers/ThirdPersonController.js';
 import { MovingPlatform } from './engine/core/MovingPlatform.js';
 import { Sound } from './engine/core/Sound.js';
 
 export class Physics {
-    constructor(scene, player, key, blocksToCircleDict, movingPlatform, doors) {
+    constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern) {
         this.scene = scene;
         this.player = player;
         this.key = key;
@@ -15,10 +15,11 @@ export class Physics {
         this.blocksToCircleDict = blocksToCircleDict;
         this.solvedPuzzle = false;
         this.movingPlatform = movingPlatform;
-        this.doors = doors;
+        this.finalDoor = finalDoor;
+        this.firstDoor = firstDoor;
+        this.lantern = lantern;
         this.sound = new Sound({
             collect: { src: './sounds/collect.mp3', volume : 0.6 },
-
         });
     }
 
@@ -26,6 +27,7 @@ export class Physics {
         this.scene.traverse(node => {
             if (node !== this.player && node.isStatic && node !== this.controller.draggedNode) {
                 this.resolveCollision(this.player, node)
+
                 if (this.controller.draggedNode && node !== this.controller.draggedNode) { // second part of && is necessarry, is draggedNode is set while scene is updating
                     this.resolveCollision(this.controller.draggedNode, node);
                 }
@@ -46,14 +48,12 @@ export class Physics {
             if (counter === 3) { // set to 3 when not testing
                 this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle = true;
 
-
-                const doorsTranslation = this.doors.getComponentOfType(Transform).translation;
-                const transform = this.doors.getComponentOfType(Transform);
+                const transform = this.finalDoor.getComponentOfType(Transform);
                 const rotation = quat.create();
                 quat.rotateY(rotation, rotation, Math.PI/2);
                 transform.rotation = rotation;
 
-                const boundingBox = this.getTransformedAABB(this.doors);
+                const boundingBox = this.getTransformedAABB(this.finalDoor);
                 const width = boundingBox.max[0] - boundingBox.min[0];
                 const offPosition = [width/2, 0, -width/2];
             }
@@ -104,6 +104,7 @@ export class Physics {
         // Check if there is collision.
         const isColliding = this.aabbIntersection(aBox, bBox);
         const isDragColliding = this.aabbIntersection(aBox, bDragBox);
+
         if(isDragColliding) {
             this.displayDragText(aBox, bDragBox, b);
         }
@@ -149,15 +150,46 @@ export class Physics {
         if (
             (Math.abs(minDragDirection[0]) > 1e-4 || Math.abs(minDragDirection[2]) > 1e-4) &&
             !this.controller.draggedNode &&
-            this.controller.jumpVelocity < 1e-4 &&
-            b.isDraggable
+            this.controller.jumpVelocity < 1e-4
         ) {
-            startDragText.style.display = "block";
-            if (this.controller.keys['KeyE']) {
-                this.controller.startDragging(b);
+            if (b.isDraggable) {
+                startDragText.style.display = "block";
+                startDragText.innerText = "Press E to start dragging."
+                if (this.controller.keys['KeyE']) {
+                    this.controller.startDragging(b);
+                }
+            } else if (b.isSearchable) {
+                startDragText.style.display = "block";
+                startDragText.innerText = "Press E to search chest."
+                if (this.controller.keys['KeyE']) {
+                    this.searchChest(b)
+                }
+            } else {
+                startDragText.style.display = "none";
             }
         } else {
             startDragText.style.display = "none";
+        }
+    }
+
+    searchChest(chest) {
+        chest.isSearchable = false;
+        if (chest.hasLantern) {
+            const light = this.player.getComponentOfType(Light)
+            light.color = [0.2, 0.07, 0.0];
+
+            const doorTransform = this.firstDoor.getComponentOfType(Transform);
+            const rotation = quat.create();
+            quat.rotateY(rotation, rotation, -Math.PI/2);
+            doorTransform.rotation = rotation;
+            vec3.add(doorTransform.translation, doorTransform.translation, [-0.5, 0, -0.5])
+
+            const lanternTransform = this.lantern.getComponentOfType(Transform)
+            console.log(lanternTransform.translation)
+            const playerTransform = this.player.getComponentOfType(Transform)
+            console.log(playerTransform.translation)
+            vec3.add(lanternTransform.translation, lanternTransform.translation, [0, 29*6.02, 0]);
+            console.log(lanternTransform.translation)
         }
     }
 
