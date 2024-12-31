@@ -147,16 +147,24 @@ async function startGame(instantStart) {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, -60],
         duration: 0.3,
-        startTime: 0.3,
     });
     armRight.addComponent(jumpRightArmAnim);
     const jumpLeftArmAnim = new RotateAnimator(armLeft, {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, 60],
         duration: 0.3,
-        startTime: 0.3,
     });
     armLeft.addComponent(jumpLeftArmAnim);
+    legRight.addComponent(new RotateAnimator(legRight, {
+        startRotation: [0, 0, 0],
+        endRotation: [0, 0, 20],
+        duration: 0.3,
+    }));
+    legLeft.addComponent(new RotateAnimator(legLeft, {
+        startRotation: [0, 0, 0],
+        endRotation: [0, 0, -20],
+        duration: 0.3,
+    }));
 
     player.addComponent(new RotateAnimator(player, {
         startRotation: [0, 15, 0],

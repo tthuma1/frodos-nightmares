@@ -279,26 +279,7 @@ export class ThirdPersonController {
         }
     }
 
-    startWalkAnimation() {
-        if (!this.isJumping) {
-            const legRight = this.gltfLoader.loadNode("legRight");
-            const legLeft = this.gltfLoader.loadNode("legLeft");
-            const armLeft = this.gltfLoader.loadNode("armLeft");
-            const armRight = this.gltfLoader.loadNode("armRight");
-            const walkAnimationRight = legRight.getComponentOfType(RotateAnimator);
-            const walkAnimationLeft = legLeft.getComponentOfType(RotateAnimator);
-            const walkAnimationLeftArm = armLeft.getComponentOfType(RotateAnimator);
-            const walkAnimationRightArm = armRight.getComponentOfType(RotateAnimator);
-            const bodyAnimation = this.node.getComponentOfType(RotateAnimator);
-            walkAnimationRight.play();
-            walkAnimationLeft.play();
-            walkAnimationLeftArm.play();
-            walkAnimationRightArm.play();
-            bodyAnimation.play();
-        }
-    }
-
-    stopWalkAnimation() {
+    getWalkAnimators() {
         const legRight = this.gltfLoader.loadNode("legRight");
         const legLeft = this.gltfLoader.loadNode("legLeft");
         const armLeft = this.gltfLoader.loadNode("armLeft");
@@ -308,30 +289,57 @@ export class ThirdPersonController {
         const walkAnimationLeftArm = armLeft.getComponentOfType(RotateAnimator);
         const walkAnimationRightArm = armRight.getComponentOfType(RotateAnimator);
         const bodyAnimation = this.node.getComponentOfType(RotateAnimator);
-        walkAnimationRight.stop();
-        walkAnimationLeft.stop();
-        walkAnimationLeftArm.stop();
-        walkAnimationRightArm.stop();
-        bodyAnimation.stop();
+        return [
+            walkAnimationRight,
+            walkAnimationLeft,
+            walkAnimationLeftArm,
+            walkAnimationRightArm,
+            bodyAnimation,
+        ];
+    }
+
+    startWalkAnimation() {
+        if (!this.isJumping) {
+            for (const animation of this.getWalkAnimators()) {
+                animation.play();
+            }
+        }
+    }
+
+    stopWalkAnimation() {
+        for (const animation of this.getWalkAnimators()) {
+            animation.stop();
+        }
+    }
+
+    getJumpAnimators() {
+        const armRight = this.gltfLoader.loadNode("armRight");
+        const armLeft = this.gltfLoader.loadNode("armLeft");
+        const legLeft = this.gltfLoader.loadNode("legLeft");
+        const legRight = this.gltfLoader.loadNode("legRight");
+        const rightArmAnim = armRight.getComponentsOfType(RotateAnimator)[1];
+        const leftArmAnim = armLeft.getComponentsOfType(RotateAnimator)[1];
+        const leftLegAnim = legLeft.getComponentsOfType(RotateAnimator)[1];
+        const rightLegAnim = legRight.getComponentsOfType(RotateAnimator)[1];
+        return [
+            rightArmAnim,
+            leftArmAnim,
+            leftLegAnim,
+            rightLegAnim,
+        ];
     }
 
     startJumpAnimation(time) {
-        const armRight = this.gltfLoader.loadNode("armRight");
-        const armLeft = this.gltfLoader.loadNode("armLeft");
-        const rightArmAnim = armRight.getComponentsOfType(RotateAnimator)[1];
-        const leftArmAnim = armLeft.getComponentsOfType(RotateAnimator)[1];
-        rightArmAnim.startTime = time;
-        leftArmAnim.startTime = time;
-        rightArmAnim.play();
-        leftArmAnim.play();
+        for (const animation of this.getJumpAnimators()) {
+            animation.startTime = time;
+            animation.play();
+        }
     }
 
     stopJumpAnimation() {
-        const armRight = this.gltfLoader.loadNode("armRight");
-        const armLeft = this.gltfLoader.loadNode("armLeft");
-        const rightArmAnim = armRight.getComponentsOfType(RotateAnimator)[1];
-        const leftArmAnim = armLeft.getComponentsOfType(RotateAnimator)[1];
-        rightArmAnim.stop();
-        leftArmAnim.stop();
+        for (const animation of this.getJumpAnimators()) {
+            animation.startTime = time;
+            animation.stop();
+        }
     }
 }
