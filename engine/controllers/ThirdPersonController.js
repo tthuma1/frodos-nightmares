@@ -279,23 +279,33 @@ export class ThirdPersonController {
         const legRight = this.gltfLoader.loadNode("legRight");
         const legLeft = this.gltfLoader.loadNode("legLeft");
         const armLeft = this.gltfLoader.loadNode("armLeft");
+        const armRight = this.gltfLoader.loadNode("armRight");
         const walkAnimationRight = legRight.getComponentOfType(RotateAnimator);
         const walkAnimationLeft = legLeft.getComponentOfType(RotateAnimator);
         const walkAnimationLeftArm = armLeft.getComponentOfType(RotateAnimator);
+        const walkAnimationRightArm = armRight.getComponentOfType(RotateAnimator);
+        const bodyAnimation = this.node.getComponentOfType(RotateAnimator);
         walkAnimationRight.play();
         walkAnimationLeft.play();
         walkAnimationLeftArm.play();
+        walkAnimationRightArm.play();
+        bodyAnimation.play();
     }
 
     stopWalkAnimation() {
         const legRight = this.gltfLoader.loadNode("legRight");
         const legLeft = this.gltfLoader.loadNode("legLeft");
         const armLeft = this.gltfLoader.loadNode("armLeft");
+        const armRight = this.gltfLoader.loadNode("armRight");
         const walkAnimationRight = legRight.getComponentOfType(RotateAnimator);
         const walkAnimationLeft = legLeft.getComponentOfType(RotateAnimator);
         const walkAnimationLeftArm = armLeft.getComponentOfType(RotateAnimator);
+        const walkAnimationRightArm = armRight.getComponentOfType(RotateAnimator);
+        const bodyAnimation = this.node.getComponentOfType(RotateAnimator);
         walkAnimationRight.stop();
         walkAnimationLeft.stop();
         walkAnimationLeftArm.stop();
+        walkAnimationRightArm.stop();
+        bodyAnimation.stop();
     }
 }
