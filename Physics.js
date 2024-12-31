@@ -193,7 +193,6 @@ export class Physics {
             console.log(playerTransform.translation)
             vec3.add(lanternTransform.translation, lanternTransform.translation, [0, 29*6.02 + 2, 0]);
             console.log(lanternTransform.translation)
-            quat.rotateX(lanternTransform.rotation, lanternTransform.rotation, Math.PI/2);
 
             const armRotation = this.leftArm.getComponentOfType(Transform).rotation;
             quat.rotateX(armRotation, armRotation, -Math.PI/2);
