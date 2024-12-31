@@ -125,6 +125,15 @@ async function startGame(instantStart) {
     });
     legLeft.addComponent(rotatorLeft);
 
+    const armLeft = gltfLoader.loadNode("armLeft");
+    const rotatorLeftArm = new RotateAnimator(armLeft, {
+        startRotation: [-20, 0, 0],
+        endRotation: [20, 0, 0],
+        duration: 0.3,
+        // startTime: 0.3,
+    });
+    armLeft.addComponent(rotatorLeftArm);
+
     const movingPlatform = gltfLoader.loadNode('MovingPlatform');
     movingPlatform.isMovingPlatform = true;
     movingPlatform.isStatic = true;
