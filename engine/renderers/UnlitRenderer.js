@@ -186,7 +186,6 @@ export class UnlitRenderer extends BaseRenderer {
         });
 
         const unprojectBindGroup = this.device.createBindGroup({
-            label: 'neki',
             visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
             layout: this.skyboxPipeline.getBindGroupLayout(0),
             entries: [
@@ -232,9 +231,9 @@ export class UnlitRenderer extends BaseRenderer {
         const materialBindGroup = this.device.createBindGroup({
             layout: this.pipeline.getBindGroupLayout(2),
             entries: [
-                { binding: 0, resource: { buffer: materialUniformBuffer },             visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, },
-                { binding: 1, resource: baseTexture.gpuTexture.createView() ,             visibility: GPUShaderStage.FRAGMENT,},
-                { binding: 2, resource: baseTexture.gpuSampler, visibility: GPUShaderStage.FRAGMENT },
+                { binding: 0, resource: { buffer: materialUniformBuffer } },
+                { binding: 1, resource: baseTexture.gpuTexture.createView() },
+                { binding: 2, resource: baseTexture.gpuSampler },
             ],
         });
 

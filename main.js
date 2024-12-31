@@ -104,19 +104,16 @@ async function startGame(instantStart) {
 
     // player.addComponent(new Transform({rotation: [1,0,0,1]}))
     const legRight = gltfLoader.loadNode("legRight");
-    const rotator = new RotateAnimator(legRight, {
+    const legLeft = gltfLoader.loadNode("legLeft");
+    const armRight = gltfLoader.loadNode("armRight");
+    const armLeft = gltfLoader.loadNode("armLeft");
+
+    legRight.addComponent(new RotateAnimator(legRight, {
         startRotation: [-20, 0, 0],
         endRotation: [20, 0, 0],
         duration: 0.3,
-        // startTime: 2
-    });
-    legRight.addComponent(rotator);
-    // setTimeout(() => {
-    //     console.log("a")
-    //     rotator.play();
-    // }, 1000);
+    }));
 
-    const legLeft = gltfLoader.loadNode("legLeft");
     const rotatorLeft = new RotateAnimator(legLeft, {
         startRotation: [-20, 0, 0],
         endRotation: [20, 0, 0],
@@ -125,7 +122,6 @@ async function startGame(instantStart) {
     });
     legLeft.addComponent(rotatorLeft);
 
-    const armLeft = gltfLoader.loadNode("armLeft");
     const rotatorLeftArm = new RotateAnimator(armLeft, {
         startRotation: [-20, 0, 0],
         endRotation: [20, 0, 0],
@@ -134,7 +130,6 @@ async function startGame(instantStart) {
     });
     armLeft.addComponent(rotatorLeftArm);
 
-    const armRight = gltfLoader.loadNode("armRight");
     const rotatorRightArm = new RotateAnimator(armRight, {
         startRotation: [-20, 0, 0],
         endRotation: [20, 0, 0],

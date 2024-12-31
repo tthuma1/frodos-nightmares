@@ -62,8 +62,10 @@ struct LightUniforms {
 @vertex
 fn vertex(input: VertexInput) -> VertexOutput {
     var output: VertexOutput;
-    output.clipPosition = camera.projectionMatrix * camera.viewMatrix * model.modelMatrix * vec4(input.position, 1);
-    output.position = (model.modelMatrix * vec4(input.position, 1)).xyz;
+    let position = model.modelMatrix * vec4(input.position, 1);
+
+    output.position = position.xyz;
+    output.clipPosition = camera.projectionMatrix * camera.viewMatrix * position;
     output.texcoords = input.texcoords;
     output.normal = model.normalMatrix * input.normal;
  
@@ -133,7 +135,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
             let colorPreLight = mix(reflection, refraction, 0);
             finalColor = vec4f(colorPreLight.rgb * diffuseLight + specularLight, colorPreLight.a);
         } else {
-            finalColor = vec4f(baseColor.rgb * diffuseLight + specularLight, 1);
+            finalColor = vec4f(baseColor.rgb * diffuseLight + specularLight, baseColor.a);
         }
 
         output.color += vec4(pow(finalColor.rgb, vec3(1 / 2.2)), finalColor.a);

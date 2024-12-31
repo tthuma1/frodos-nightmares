@@ -48,7 +48,6 @@ export class RotateAnimator {
             return;
         }
 
-        // console.log(t, this.startTime);
         const linearInterpolation = (t - this.startTime) / this.duration;
 
 
@@ -76,8 +75,5 @@ export class RotateAnimator {
         }
 
         quat.slerp(transform.rotation, this.startRotation, this.endRotation, interpolation);
-        // console.log(transform.rotation)
-        // console.log(this.startRotation, this.endRotation, interpolation)
     }
-
 }
