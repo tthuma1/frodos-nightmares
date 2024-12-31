@@ -228,10 +228,10 @@ export class ThirdPersonController {
             this.jumpVelocity = 0;
             this.isJumping = false;
             this.movingPlatform = node.isMovingPlatform ? node : null;
+            this.stopJumpAnimation();
         }
 
         this.jumpOffVelocity = null;
-        this.stopJumpAnimation();
     }
 
     keydownHandler(e) {

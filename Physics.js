@@ -7,7 +7,7 @@ import { MovingPlatform } from './engine/core/MovingPlatform.js';
 import { Sound } from './engine/core/Sound.js';
 
 export class Physics {
-    constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern) {
+    constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, gltfLoader) {
         this.scene = scene;
         this.player = player;
         this.key = key;
@@ -21,6 +21,9 @@ export class Physics {
         this.sound = new Sound({
             collect: { src: './sounds/collect.mp3', volume : 0.6 },
         });
+
+        this.gltfLoader = gltfLoader;
+        this.leftArm = gltfLoader.loadNode("armLeft");
     }
 
     update(t, dt) {
@@ -174,7 +177,7 @@ export class Physics {
 
     searchChest(chest) {
         chest.isSearchable = false;
-        if (chest.hasLantern) {
+        // if (chest.hasLantern) {
             const light = this.player.getComponentOfType(Light)
             light.color = [0.2, 0.07, 0.0];
 
@@ -188,9 +191,13 @@ export class Physics {
             console.log(lanternTransform.translation)
             const playerTransform = this.player.getComponentOfType(Transform)
             console.log(playerTransform.translation)
-            vec3.add(lanternTransform.translation, lanternTransform.translation, [0, 29*6.02, 0]);
+            vec3.add(lanternTransform.translation, lanternTransform.translation, [0, 29*6.02 + 2, 0]);
             console.log(lanternTransform.translation)
-        }
+            quat.rotateX(lanternTransform.rotation, lanternTransform.rotation, Math.PI/2);
+
+            const armRotation = this.leftArm.getComponentOfType(Transform).rotation;
+            quat.rotateX(armRotation, armRotation, -Math.PI/2);
+        // }
     }
 
     keyCollision(player, key) {

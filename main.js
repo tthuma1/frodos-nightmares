@@ -239,7 +239,7 @@ async function startGame(instantStart) {
 
     const lantern = gltfLoader.loadNode("Lantern");
 
-    const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, finalDoor, firstDoor, lantern);
+    const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, gltfLoader);
 
     function update(t, dt) {
         scene.traverse(node => {
