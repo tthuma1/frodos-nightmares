@@ -34,7 +34,7 @@ export class ThirdPersonController {
 
         this.jumpVelocity = 0;
         this.jumpForce = 7;
-        this.isJumping = false;
+        this.isJumping = true;
         this.gravity = -20;
 
         this.draggedNode = null;
@@ -121,6 +121,7 @@ export class ThirdPersonController {
             this.jumpVelocity = this.jumpForce;
             this.jumpOffVelocity = this.movingPlatform ? this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0] : null;
             
+            this.stopWalkAnimation();
             this.startJumpAnimation(t);
         }
         if (this.keys['KeyQ']) {
@@ -279,20 +280,22 @@ export class ThirdPersonController {
     }
 
     startWalkAnimation() {
-        const legRight = this.gltfLoader.loadNode("legRight");
-        const legLeft = this.gltfLoader.loadNode("legLeft");
-        const armLeft = this.gltfLoader.loadNode("armLeft");
-        const armRight = this.gltfLoader.loadNode("armRight");
-        const walkAnimationRight = legRight.getComponentOfType(RotateAnimator);
-        const walkAnimationLeft = legLeft.getComponentOfType(RotateAnimator);
-        const walkAnimationLeftArm = armLeft.getComponentOfType(RotateAnimator);
-        const walkAnimationRightArm = armRight.getComponentOfType(RotateAnimator);
-        const bodyAnimation = this.node.getComponentOfType(RotateAnimator);
-        walkAnimationRight.play();
-        walkAnimationLeft.play();
-        walkAnimationLeftArm.play();
-        walkAnimationRightArm.play();
-        bodyAnimation.play();
+        if (!this.isJumping) {
+            const legRight = this.gltfLoader.loadNode("legRight");
+            const legLeft = this.gltfLoader.loadNode("legLeft");
+            const armLeft = this.gltfLoader.loadNode("armLeft");
+            const armRight = this.gltfLoader.loadNode("armRight");
+            const walkAnimationRight = legRight.getComponentOfType(RotateAnimator);
+            const walkAnimationLeft = legLeft.getComponentOfType(RotateAnimator);
+            const walkAnimationLeftArm = armLeft.getComponentOfType(RotateAnimator);
+            const walkAnimationRightArm = armRight.getComponentOfType(RotateAnimator);
+            const bodyAnimation = this.node.getComponentOfType(RotateAnimator);
+            walkAnimationRight.play();
+            walkAnimationLeft.play();
+            walkAnimationLeftArm.play();
+            walkAnimationRightArm.play();
+            bodyAnimation.play();
+        }
     }
 
     stopWalkAnimation() {
@@ -314,14 +317,21 @@ export class ThirdPersonController {
 
     startJumpAnimation(time) {
         const armRight = this.gltfLoader.loadNode("armRight");
+        const armLeft = this.gltfLoader.loadNode("armLeft");
         const rightArmAnim = armRight.getComponentsOfType(RotateAnimator)[1];
+        const leftArmAnim = armLeft.getComponentsOfType(RotateAnimator)[1];
         rightArmAnim.startTime = time;
+        leftArmAnim.startTime = time;
         rightArmAnim.play();
+        leftArmAnim.play();
     }
 
     stopJumpAnimation() {
         const armRight = this.gltfLoader.loadNode("armRight");
+        const armLeft = this.gltfLoader.loadNode("armLeft");
         const rightArmAnim = armRight.getComponentsOfType(RotateAnimator)[1];
+        const leftArmAnim = armLeft.getComponentsOfType(RotateAnimator)[1];
         rightArmAnim.stop();
+        leftArmAnim.stop();
     }
 }
