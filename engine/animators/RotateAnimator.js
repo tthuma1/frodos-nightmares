@@ -1,4 +1,4 @@
-import { vec3 } from 'glm';
+import { vec3, quat } from 'glm';
 
 import { Transform } from '../core/Transform.js';
 
@@ -9,10 +9,12 @@ export class RotateAnimator {
         endRotation = [0, 0, 0, 1],
         startTime = 0,
         duration = 1,
-        loop = false,
+        loop = true,
     } = {}) {
         this.node = node;
 
+        quat.fromEuler(startRotation, ...startRotation);
+        quat.fromEuler(endRotation, ...endRotation);
         this.startRotation = startRotation;
         this.endRotation = endRotation;
 
@@ -20,7 +22,17 @@ export class RotateAnimator {
         this.duration = duration;
         this.loop = loop;
 
-        this.playing = true;
+        this.playing = false;
+        this.transform = new Transform({ rotation: [...startRotation] });
+
+        this.direction = 1;
+
+        this.node.addComponent(this.transform);
+    }
+
+    stop() {
+        this.playing = false;
+        this.transform.rotation = [0, 0, 0, 1];
     }
 
     play() {
@@ -37,18 +49,29 @@ export class RotateAnimator {
         }
 
         const linearInterpolation = (t - this.startTime) / this.duration;
-        const clampedInterpolation = Math.min(Math.max(linearInterpolation, 0), 1);
-        const loopedInterpolation = ((linearInterpolation % 1) + 1) % 1;
+        const clampedInterpolation = Math.min(Math.max(linearInterpolation, 0), 2);
+        const loopedInterpolation = this.getLoopedInterpolation(linearInterpolation);
         this.updateNode(this.loop ? loopedInterpolation : clampedInterpolation);
     }
 
+    getLoopedInterpolation(n) {
+        const range = Math.floor(n);
+        const valueInRange = n - range;
+        
+        if (range % 2 === 0) {
+            return valueInRange;
+        } else {
+            return 1 - valueInRange;
+        }
+    }
+    
+
     updateNode(interpolation) {
-        const transform = this.node.getComponentOfType(Transform);
+        const transform = this.transform;
         if (!transform) {
             return;
         }
 
         quat.slerp(transform.rotation, this.startRotation, this.endRotation, interpolation);
     }
-
 }

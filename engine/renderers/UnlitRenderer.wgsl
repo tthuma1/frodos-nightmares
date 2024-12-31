@@ -35,6 +35,7 @@ struct ModelUniforms {
 struct MaterialUniforms {
     baseFactor: vec4f,
     metalnessFactor: f32,
+    isMirror: f32,
 }
 
 struct LightUniforms {
@@ -46,6 +47,8 @@ struct LightUniforms {
 }
 
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
+@group(0) @binding(1) var uEnvironmentTexture: texture_cube<f32>;
+@group(0) @binding(2) var uEnvironmentSampler: sampler;
 
 @group(1) @binding(0) var<uniform> model: ModelUniforms;
 
@@ -59,14 +62,13 @@ struct LightUniforms {
 @vertex
 fn vertex(input: VertexInput) -> VertexOutput {
     var output: VertexOutput;
-
     let position = model.modelMatrix * vec4(input.position, 1);
 
     output.position = position.xyz;
     output.clipPosition = camera.projectionMatrix * camera.viewMatrix * position;
     output.texcoords = input.texcoords;
     output.normal = model.normalMatrix * input.normal;
-
+ 
     return output;
 }
 
@@ -80,6 +82,8 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     let surfacePosition = input.position;
     let N = normalize(input.normal);
     let V = normalize(camera.position - surfacePosition);
+    let R = reflect(-V, N);
+    let T = refract(-V, N, 0);
 
     // loop through all lights
     for (var i : u32 = 0; i < 2; i++) {
@@ -120,9 +124,21 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
         let specularLight = Il * blinn;
 
         let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
-        let finalColor = baseColor.rgb * diffuseLight + specularLight;
+        let reflectedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, R);
+        let refractedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, T);
 
-        output.color += pow(vec4(finalColor, 1), vec4(1 / 2.2));
+        let reflection = mix(baseColor, reflectedColor, 1);
+        let refraction = mix(baseColor, refractedColor, 0);
+
+        var finalColor : vec4f;
+        if (material.isMirror == 1) {
+            let colorPreLight = mix(reflection, refraction, 0);
+            finalColor = vec4f(colorPreLight.rgb * diffuseLight + specularLight, colorPreLight.a);
+        } else {
+            finalColor = vec4f(baseColor.rgb * diffuseLight + specularLight, baseColor.a);
+        }
+
+        output.color += vec4(pow(finalColor.rgb, vec3(1 / 2.2)), finalColor.a);
     }
 
     return output;

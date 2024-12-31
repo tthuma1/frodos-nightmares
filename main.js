@@ -24,11 +24,25 @@ import {Key} from "./engine/core/Key.js";
 import { MovingPlatform } from './engine/core/MovingPlatform.js';
 import { TouchController } from './engine/controllers/TouchController.js'
 import { quat, vec3, vec4, mat3, mat4 } from './lib/glm.js';
+import { RotateAnimator } from './engine/animators/RotateAnimator.js';
+import { ImageLoader } from './engine/loaders/ImageLoader.js';
 
 const gltfLoader = new GLTFLoader();
 const canvas = document.querySelector('canvas');
 const renderer = new UnlitRenderer(canvas);
 await renderer.initialize();
+
+const imageLoader = new ImageLoader();
+const environmentImages = await Promise.all([
+    'px.webp',
+    'nx.webp',
+    'py.webp',
+    'ny.webp',
+    'pz.webp',
+    'nz.webp',
+].map(url => imageLoader.load(url)));
+renderer.setEnvironment(environmentImages);
+
 
 async function startGame(instantStart) {
     await gltfLoader.load(new URL('./frodomap/frodomap.gltf', import.meta.url));
@@ -62,7 +76,7 @@ async function startGame(instantStart) {
     // camera.addComponent(new TouchController(camera, canvas));
     player.addComponent(camera)
     const lanternLight = new Light({
-        color: [0.001, 0.001, 0.001],
+        color: [0.01, 0.01, 0.01],
         type: 0,
         isActive: true,
         intensity: 3,
@@ -87,12 +101,72 @@ async function startGame(instantStart) {
 
     player.addComponent(new LightView());
 
+
+    // player.addComponent(new Transform({rotation: [1,0,0,1]}))
+    const legRight = gltfLoader.loadNode("legRight");
+    const legLeft = gltfLoader.loadNode("legLeft");
+    const armRight = gltfLoader.loadNode("armRight");
+    const armLeft = gltfLoader.loadNode("armLeft");
+
+    /*** begin walk animators ***/
+    legRight.addComponent(new RotateAnimator(legRight, {
+        startRotation: [-20, 0, 0],
+        endRotation: [20, 0, 0],
+        duration: 0.3,
+    }));
+    legLeft.addComponent(new RotateAnimator(legLeft, {
+        startRotation: [-20, 0, 0],
+        endRotation: [20, 0, 0],
+        duration: 0.3,
+        startTime: 0.3,
+    }));
+    armLeft.addComponent(new RotateAnimator(armLeft, {
+        startRotation: [-20, 0, 0],
+        endRotation: [20, 0, 0],
+        duration: 0.3,
+    }));
+    armRight.addComponent(new RotateAnimator(armRight, {
+        startRotation: [-20, 0, 0],
+        endRotation: [20, 0, 0],
+        duration: 0.3,
+        startTime: 0.3,
+    }));
+    player.addComponent(new RotateAnimator(player, {
+        startRotation: [0, 15, 0],
+        endRotation: [0, -15, 0],
+        duration: 0.3,
+    }))
+    /*** end walk animators ***/
+
+    /*** begin jump animators ***/
+    armRight.addComponent(new RotateAnimator(armRight, {
+        startRotation: [0, 0, 0],
+        endRotation: [0, 0, -60],
+        duration: 0.3,
+    }));
+    armLeft.addComponent(new RotateAnimator(armLeft, {
+        startRotation: [0, 0, 0],
+        endRotation: [0, 0, 60],
+        duration: 0.3,
+    }));
+    legRight.addComponent(new RotateAnimator(legRight, {
+        startRotation: [0, 0, 0],
+        endRotation: [0, 0, 20],
+        duration: 0.3,
+    }));
+    legLeft.addComponent(new RotateAnimator(legLeft, {
+        startRotation: [0, 0, 0],
+        endRotation: [0, 0, -20],
+        duration: 0.3,
+    }));
+    /*** end jump animators ***/
+
     const movingPlatform = gltfLoader.loadNode('MovingPlatform');
     movingPlatform.isMovingPlatform = true;
     movingPlatform.isStatic = true;
     movingPlatform.addComponent(new MovingPlatform(movingPlatform));
 
-    player.addComponent(new ThirdPersonController(player, canvas));
+    player.addComponent(new ThirdPersonController(player, canvas, gltfLoader));
 
     const draggableObjects =[
         'Cube.010',
@@ -158,6 +232,10 @@ async function startGame(instantStart) {
         const boxes = model.primitives.map(primitive => calculateAxisAlignedBoundingBox(primitive.mesh));
         node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
     });
+
+    const mirrorBall = gltfLoader.loadNode("MirrorBall")
+    const mirrorMaterial = mirrorBall.getComponentOfType(Model).primitives[0].material;
+    mirrorMaterial.isMirror = true;
 
     const lantern = gltfLoader.loadNode("Lantern");
 

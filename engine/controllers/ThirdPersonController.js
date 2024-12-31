@@ -1,14 +1,15 @@
-import { quat, vec3, mat4 } from 'glm';
+import { quat, vec2, vec3, mat4 } from 'glm';
 
 import { Transform } from '../core/Transform.js';
 import {Camera} from "../core/Camera.js";
 import { MovingPlatform } from '../core/MovingPlatform.js';
 import { Light } from '../core/Light.js';
 import { Sound } from '../core/Sound.js';
+import { RotateAnimator } from '../animators/RotateAnimator.js';
 
 export class ThirdPersonController {
 
-    constructor(node, domElement, {
+    constructor(node, domElement, gltfLoader, {
         pitch = 0,
         yaw = 0,
         velocity = [0, 0, 0],
@@ -18,6 +19,7 @@ export class ThirdPersonController {
     } = {}) {
         this.node = node;
         this.domElement = domElement;
+        this.gltfLoader = gltfLoader;
 
         this.keys = {};
 
@@ -32,7 +34,7 @@ export class ThirdPersonController {
 
         this.jumpVelocity = 0;
         this.jumpForce = 7;
-        this.isJumping = false;
+        this.isJumping = true;
         this.gravity = -20;
 
         this.draggedNode = null;
@@ -45,7 +47,9 @@ export class ThirdPersonController {
 
         this.initHandlers();
 
-        
+        this.walkAnimators = this.getWalkAnimators();
+        this.jumpAnimators = this.getJumpAnimators();
+
         this.sound = new Sound({
             walk: { src: './sounds/walk.mp3', volume : 0.15 },
             jump: { src: './sounds/jump.mp3', volume : 0.3 },
@@ -81,6 +85,7 @@ export class ThirdPersonController {
             if (this.draggedNode)
                 this.sound.play('drag');
             vec3.add(acc, acc, forward);
+            this.startWalkAnimation();
         }
         if (this.keys['KeyS']) {
             if (!this.isJumping)
@@ -88,6 +93,7 @@ export class ThirdPersonController {
             if (this.draggedNode)
                 this.sound.play('drag');
             vec3.sub(acc, acc, forward);
+            this.startWalkAnimation();
         }
         if (this.keys['KeyD']) {
             if (!this.isJumping)
@@ -95,6 +101,7 @@ export class ThirdPersonController {
             if (this.draggedNode)
                 this.sound.play('drag');
             vec3.add(acc, acc, right);
+            this.startWalkAnimation();
         }
         if (this.keys['KeyA']) {
             if (!this.isJumping)
@@ -102,12 +109,16 @@ export class ThirdPersonController {
             if (this.draggedNode)
                 this.sound.play('drag');
             vec3.sub(acc, acc, right);
+            this.startWalkAnimation();
         }
         if (this.keys['Space'] && !this.isJumping && !this.draggedNode) {
             this.sound.play('jump');
             this.isJumping = true;
             this.jumpVelocity = this.jumpForce;
             this.jumpOffVelocity = this.movingPlatform ? this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0] : null;
+            
+            this.stopWalkAnimation();
+            this.startJumpAnimation(t);
         }
         if (this.keys['KeyQ']) {
             if (!(this.lastLightSwitchTime && Date.now() - this.lastLightSwitchTime < 200)) { // last light switch was at least 200ms ago q
@@ -120,9 +131,13 @@ export class ThirdPersonController {
             this.stopDragging();
         }
 
+        if (vec2.length([this.velocity[0], this.velocity[2]]) < 0.1) {
+            this.stopWalkAnimation();
+        }
+
         // prevent switching tabs from breaking game
-        if (dt * this.gravity < -0.3) {
-            this.jumpVelocity = this.jumpVelocity - 0.3;
+        if (dt * this.gravity < -0.2) {
+            this.jumpVelocity = this.jumpVelocity - 0.2;
         } else {
             this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
         }
@@ -216,6 +231,7 @@ export class ThirdPersonController {
         }
 
         this.jumpOffVelocity = null;
+        this.stopJumpAnimation();
     }
 
     keydownHandler(e) {
@@ -249,11 +265,74 @@ export class ThirdPersonController {
         this.yaw = Math.atan2(velX, velZ);
     }
 
-    updateFlashlightDirection()
-    {
+    updateFlashlightDirection() {
         const light = this.node.getComponentsOfType(Light).find(x => x.type === 1);
         if (vec3.length(this.velocity) > 0.1) {
             light.direction = this.velocity.slice();
+        }
+    }
+
+    getWalkAnimators() {
+        const legRight = this.gltfLoader.loadNode("legRight");
+        const legLeft = this.gltfLoader.loadNode("legLeft");
+        const armLeft = this.gltfLoader.loadNode("armLeft");
+        const armRight = this.gltfLoader.loadNode("armRight");
+        const walkAnimationRight = legRight.getComponentOfType(RotateAnimator);
+        const walkAnimationLeft = legLeft.getComponentOfType(RotateAnimator);
+        const walkAnimationLeftArm = armLeft.getComponentOfType(RotateAnimator);
+        const walkAnimationRightArm = armRight.getComponentOfType(RotateAnimator);
+        const bodyAnimation = this.node.getComponentOfType(RotateAnimator);
+        return [
+            walkAnimationRight,
+            walkAnimationLeft,
+            walkAnimationLeftArm,
+            walkAnimationRightArm,
+            bodyAnimation,
+        ];
+    }
+
+    startWalkAnimation() {
+        if (!this.isJumping) {
+            for (const animation of this.walkAnimators) {
+                animation.play();
+            }
+        }
+    }
+
+    stopWalkAnimation() {
+        for (const animation of this.walkAnimators) {
+            animation.stop();
+        }
+    }
+
+    getJumpAnimators() {
+        const armRight = this.gltfLoader.loadNode("armRight");
+        const armLeft = this.gltfLoader.loadNode("armLeft");
+        const legLeft = this.gltfLoader.loadNode("legLeft");
+        const legRight = this.gltfLoader.loadNode("legRight");
+        const rightArmAnim = armRight.getComponentsOfType(RotateAnimator)[1];
+        const leftArmAnim = armLeft.getComponentsOfType(RotateAnimator)[1];
+        const leftLegAnim = legLeft.getComponentsOfType(RotateAnimator)[1];
+        const rightLegAnim = legRight.getComponentsOfType(RotateAnimator)[1];
+        return [
+            rightArmAnim,
+            leftArmAnim,
+            leftLegAnim,
+            rightLegAnim,
+        ];
+    }
+
+    startJumpAnimation(time) {
+        for (const animation of this.jumpAnimators) {
+            animation.startTime = time;
+            animation.play();
+        }
+    }
+
+    stopJumpAnimation() {
+        for (const animation of this.jumpAnimators) {
+            animation.startTime = time;
+            animation.stop();
         }
     }
 }
