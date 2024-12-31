@@ -35,6 +35,7 @@ struct ModelUniforms {
 struct MaterialUniforms {
     baseFactor: vec4f,
     metalnessFactor: f32,
+    isMirror: f32,
 }
 
 struct LightUniforms {
@@ -61,14 +62,11 @@ struct LightUniforms {
 @vertex
 fn vertex(input: VertexInput) -> VertexOutput {
     var output: VertexOutput;
-
-    let position = model.modelMatrix * vec4(input.position, 1);
-
-    output.position = position.xyz;
-    output.clipPosition = camera.projectionMatrix * camera.viewMatrix * position;
+    output.clipPosition = camera.projectionMatrix * camera.viewMatrix * model.modelMatrix * vec4(input.position, 1);
+    output.position = (model.modelMatrix * vec4(input.position, 1)).xyz;
     output.texcoords = input.texcoords;
     output.normal = model.normalMatrix * input.normal;
-
+ 
     return output;
 }
 
@@ -127,20 +125,21 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
         output.color += pow(vec4(finalColor, 1), vec4(1 / 2.2));
     }
 
-    // let R = reflect(-V, N);
-    // let T = refract(-V, N, 0);
+    if (material.isMirror == 1) {
+        let R = reflect(-V, N);
+        let T = refract(-V, N, 0);
 
-    // let baseColor = textureSample(baseTexture, baseSampler, input.texcoords);
-    // let reflectedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, R);
-    // let refractedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, T);
+        let baseColor = textureSample(baseTexture, baseSampler, input.texcoords);
+        let reflectedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, R);
+        let refractedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, T);
 
-    // let reflection = mix(baseColor, reflectedColor, 1);
-    // let refraction = mix(baseColor, refractedColor, 0);
+        let reflection = mix(baseColor, reflectedColor, 1);
+        let refraction = mix(baseColor, refractedColor, 0);
 
-    // let finalColor = mix(reflection, refraction, 0);
+        let finalColor = mix(reflection, refraction, 0);
 
-    // output.color = vec4(pow(finalColor.rgb, vec3(1 / 2.2)), finalColor.a);
-
+        output.color += vec4(pow(finalColor.rgb, vec3(1 / 2.2)), finalColor.a);
+    }
 
     return output;
 }

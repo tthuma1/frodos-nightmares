@@ -135,6 +135,7 @@ export class UnlitRenderer extends BaseRenderer {
 
         const modelBindGroup = this.device.createBindGroup({
             layout: this.pipeline.getBindGroupLayout(1),
+            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
             entries: [
                 { binding: 0, resource: { buffer: modelUniformBuffer } },
             ],
@@ -186,6 +187,7 @@ export class UnlitRenderer extends BaseRenderer {
 
         const unprojectBindGroup = this.device.createBindGroup({
             label: 'neki',
+            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
             layout: this.skyboxPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: unprojectUniformBuffer } }
@@ -230,9 +232,9 @@ export class UnlitRenderer extends BaseRenderer {
         const materialBindGroup = this.device.createBindGroup({
             layout: this.pipeline.getBindGroupLayout(2),
             entries: [
-                { binding: 0, resource: { buffer: materialUniformBuffer } },
-                { binding: 1, resource: baseTexture.gpuTexture.createView() },
-                { binding: 2, resource: baseTexture.gpuSampler },
+                { binding: 0, resource: { buffer: materialUniformBuffer },             visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, },
+                { binding: 1, resource: baseTexture.gpuTexture.createView() ,             visibility: GPUShaderStage.FRAGMENT,},
+                { binding: 2, resource: baseTexture.gpuSampler, visibility: GPUShaderStage.FRAGMENT },
             ],
         });
 
@@ -253,6 +255,7 @@ export class UnlitRenderer extends BaseRenderer {
 
         const lightBindGroup = this.device.createBindGroup({
             layout: this.pipeline.getBindGroupLayout(3),
+            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
             entries: [
                 { binding: 0, resource: { buffer: lightUniformBuffer } },
             ],
@@ -374,6 +377,7 @@ export class UnlitRenderer extends BaseRenderer {
         this.device.queue.writeBuffer(materialUniformBuffer, 0, new Float32Array([
             ...primitive.material.baseFactor,
             primitive.material.metalnessFactor,
+            primitive.material.isMirror ? 1 : 0,
         ]));
         this.renderPass.setBindGroup(2, materialBindGroup);
 
@@ -403,28 +407,5 @@ export class UnlitRenderer extends BaseRenderer {
                 [images[i].width, images[i].height],
             );
         }
-
-        // this.environmentSampler = this.device.createSampler({
-        //     minFilter: 'linear',
-        //     magFilter: 'linear',
-        // });
-
-        // this.environmentBindGroup = this.device.createBindGroup({
-        //     label: 'envjfisa',
-        //     layout: this.pipeline.getBindGroupLayout(3),
-        //     entries: [
-        //         { binding: 0, resource: this.environmentTexture.createView({ dimension: 'cube' }) },
-        //         { binding: 1, resource: this.environmentSampler },
-        //     ],
-        // });
-
-        // this.skyboxBindGroup = this.device.createBindGroup({
-        //     label:'skyboxneofa',
-        //     layout: this.skyboxPipeline.getBindGroupLayout(1),
-        //     entries: [
-        //         { binding: 0, resource: this.environmentTexture.createView({ dimension: 'cube' }) },
-        //         { binding: 1, resource: this.environmentSampler },
-        //     ],
-        // });
     }
 }

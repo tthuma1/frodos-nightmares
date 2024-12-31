@@ -42,7 +42,9 @@
 				39,
 				40,
 				41,
-				42
+				42,
+				43,
+				44
 			]
 		}
 	],
@@ -782,6 +784,35 @@
 				3.129915475845337,
 				-1.7637321949005127
 			]
+		},
+		{
+			"camera":1,
+			"name":"Camera.001",
+			"rotation":[
+				-0.20997293293476105,
+				0.38578000664711,
+				0.09062844514846802,
+				0.8937962055206299
+			],
+			"translation":[
+				2.4529638290405273,
+				1.652769684791565,
+				2.3085968494415283
+			]
+		},
+		{
+			"mesh":42,
+			"name":"MirrorBall",
+			"scale":[
+				0.309500515460968,
+				0.309500515460968,
+				0.309500515460968
+			],
+			"translation":[
+				-5.006160259246826,
+				0.5326442122459412,
+				3.5224523544311523
+			]
 		}
 	],
 	"cameras":[
@@ -790,6 +821,16 @@
 			"perspective":{
 				"aspectRatio":1.7777777777777777,
 				"yfov":0.3995964825153351,
+				"zfar":100,
+				"znear":0.10000000149011612
+			},
+			"type":"perspective"
+		},
+		{
+			"name":"Camera.001",
+			"perspective":{
+				"aspectRatio":1.7777777777777777,
+				"yfov":1,
 				"zfar":100,
 				"znear":0.10000000149011612
 			},
@@ -1210,6 +1251,17 @@
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":37
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Material.024",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":38
 				},
 				"metallicFactor":0,
 				"roughnessFactor":0.5
@@ -1826,6 +1878,20 @@
 					"material":37
 				}
 			]
+		},
+		{
+			"name":"Sphere.001",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":150,
+						"NORMAL":151,
+						"TEXCOORD_0":152
+					},
+					"indices":153,
+					"material":38
+				}
+			]
 		}
 	],
 	"textures":[
@@ -1903,19 +1969,15 @@
 		},
 		{
 			"sampler":0,
-			"source":9
-		},
-		{
-			"sampler":0,
 			"source":15
 		},
 		{
 			"sampler":0,
-			"source":13
+			"source":16
 		},
 		{
 			"sampler":0,
-			"source":16
+			"source":13
 		},
 		{
 			"sampler":0,
@@ -1927,7 +1989,19 @@
 		},
 		{
 			"sampler":0,
+			"source":19
+		},
+		{
+			"sampler":0,
 			"source":3
+		},
+		{
+			"sampler":0,
+			"source":20
+		},
+		{
+			"sampler":0,
+			"source":19
 		},
 		{
 			"sampler":0,
@@ -1935,15 +2009,7 @@
 		},
 		{
 			"sampler":0,
-			"source":18
-		},
-		{
-			"sampler":0,
-			"source":19
-		},
-		{
-			"sampler":0,
-			"source":19
+			"source":10
 		},
 		{
 			"sampler":0,
@@ -1955,31 +2021,35 @@
 		},
 		{
 			"sampler":0,
-			"source":18
-		},
-		{
-			"sampler":0,
-			"source":18
-		},
-		{
-			"sampler":0,
-			"source":18
-		},
-		{
-			"sampler":0,
-			"source":18
-		},
-		{
-			"sampler":0,
-			"source":18
-		},
-		{
-			"sampler":0,
-			"source":18
+			"source":19
 		},
 		{
 			"sampler":0,
 			"source":19
+		},
+		{
+			"sampler":0,
+			"source":19
+		},
+		{
+			"sampler":0,
+			"source":19
+		},
+		{
+			"sampler":0,
+			"source":19
+		},
+		{
+			"sampler":0,
+			"source":19
+		},
+		{
+			"sampler":0,
+			"source":10
+		},
+		{
+			"sampler":0,
+			"source":18
 		}
 	],
 	"images":[
@@ -1995,48 +2065,48 @@
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-1",
 			"uri":"Untitled-1.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-2",
 			"uri":"Untitled-2.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-3",
 			"uri":"Untitled-3.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-4",
 			"uri":"Untitled-4.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-5",
 			"uri":"Untitled-5.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
-			"uri":"Untitled-6.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-7",
 			"uri":"Untitled-7.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-6",
+			"uri":"Untitled-6.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"Untitled-8",
 			"uri":"Untitled-8.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"herringbone_parquet",
-			"uri":"herringbone_parquet.png"
+			"name":"herringbone_parquet_webp",
+			"uri":"herringbone_parquet_webp.png"
 		},
 		{
 			"mimeType":"image/png",
@@ -2060,6 +2130,11 @@
 		},
 		{
 			"mimeType":"image/png",
+			"name":"Untitled",
+			"uri":"Untitled-10.png"
+		},
+		{
+			"mimeType":"image/png",
 			"name":"PantsBrown",
 			"uri":"PantsBrown.png"
 		},
@@ -2080,8 +2155,8 @@
 		},
 		{
 			"mimeType":"image/png",
-			"name":"herringbone_parquet.webp",
-			"uri":"herringbone_parquet_webp.png"
+			"name":"herringbone_parquet",
+			"uri":"herringbone_parquet.png"
 		}
 	],
 	"accessors":[
@@ -3428,6 +3503,40 @@
 			"componentType":5126,
 			"count":24,
 			"type":"VEC2"
+		},
+		{
+			"bufferView":150,
+			"componentType":5126,
+			"count":559,
+			"max":[
+				0.9999997019767761,
+				1,
+				0.9999993443489075
+			],
+			"min":[
+				-0.9999990463256836,
+				-1,
+				-1
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":151,
+			"componentType":5126,
+			"count":559,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":152,
+			"componentType":5126,
+			"count":559,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":153,
+			"componentType":5123,
+			"count":2880,
+			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
@@ -4330,6 +4439,30 @@
 			"byteLength":192,
 			"byteOffset":682160,
 			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":6708,
+			"byteOffset":682352,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":6708,
+			"byteOffset":689060,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":4472,
+			"byteOffset":695768,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":5760,
+			"byteOffset":700240,
+			"target":34963
 		}
 	],
 	"samplers":[
@@ -4340,7 +4473,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":682352,
+			"byteLength":706000,
 			"uri":"frodomap.bin"
 		}
 	]

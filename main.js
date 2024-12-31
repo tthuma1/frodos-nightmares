@@ -73,7 +73,7 @@ async function startGame(instantStart) {
     const finalDoor = gltfLoader.loadNode("doors");
     const firstDoor = gltfLoader.loadNode("doors.001")
 
-    camera.addComponent(new TouchController(camera, canvas));
+    // camera.addComponent(new TouchController(camera, canvas));
     player.addComponent(camera)
     const lanternLight = new Light({
         color: [0.01, 0.01, 0.01],
@@ -186,6 +186,10 @@ async function startGame(instantStart) {
         const boxes = model.primitives.map(primitive => calculateAxisAlignedBoundingBox(primitive.mesh));
         node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
     });
+
+    const mirrorBall = gltfLoader.loadNode("MirrorBall")
+    const mirrorMaterial = mirrorBall.getComponentOfType(Model).primitives[0].material;
+    mirrorMaterial.isMirror = true;
 
     const lantern = gltfLoader.loadNode("Lantern");
 
