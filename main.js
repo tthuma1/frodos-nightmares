@@ -108,48 +108,47 @@ async function startGame(instantStart) {
     const armRight = gltfLoader.loadNode("armRight");
     const armLeft = gltfLoader.loadNode("armLeft");
 
+    /*** begin walk animators ***/
     legRight.addComponent(new RotateAnimator(legRight, {
         startRotation: [-20, 0, 0],
         endRotation: [20, 0, 0],
         duration: 0.3,
     }));
-
-    const rotatorLeft = new RotateAnimator(legLeft, {
+    legLeft.addComponent(new RotateAnimator(legLeft, {
         startRotation: [-20, 0, 0],
         endRotation: [20, 0, 0],
         duration: 0.3,
         startTime: 0.3,
-    });
-    legLeft.addComponent(rotatorLeft);
-
-    const rotatorLeftArm = new RotateAnimator(armLeft, {
+    }));
+    armLeft.addComponent(new RotateAnimator(armLeft, {
         startRotation: [-20, 0, 0],
         endRotation: [20, 0, 0],
         duration: 0.3,
-        // startTime: 0.3,
-    });
-    armLeft.addComponent(rotatorLeftArm);
-
-    const rotatorRightArm = new RotateAnimator(armRight, {
+    }));
+    armRight.addComponent(new RotateAnimator(armRight, {
         startRotation: [-20, 0, 0],
         endRotation: [20, 0, 0],
         duration: 0.3,
         startTime: 0.3,
-    });
-    armRight.addComponent(rotatorRightArm);
+    }));
+    player.addComponent(new RotateAnimator(player, {
+        startRotation: [0, 15, 0],
+        endRotation: [0, -15, 0],
+        duration: 0.3,
+    }))
+    /*** end walk animators ***/
 
-    const jumpRightArmAnim = new RotateAnimator(armRight, {
+    /*** begin jump animators ***/
+    armRight.addComponent(new RotateAnimator(armRight, {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, -60],
         duration: 0.3,
-    });
-    armRight.addComponent(jumpRightArmAnim);
-    const jumpLeftArmAnim = new RotateAnimator(armLeft, {
+    }));
+    armLeft.addComponent(new RotateAnimator(armLeft, {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, 60],
         duration: 0.3,
-    });
-    armLeft.addComponent(jumpLeftArmAnim);
+    }));
     legRight.addComponent(new RotateAnimator(legRight, {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, 20],
@@ -160,13 +159,7 @@ async function startGame(instantStart) {
         endRotation: [0, 0, -20],
         duration: 0.3,
     }));
-
-    player.addComponent(new RotateAnimator(player, {
-        startRotation: [0, 15, 0],
-        endRotation: [0, -15, 0],
-        duration: 0.3,
-    }))
-
+    /*** end jump animators ***/
 
     const movingPlatform = gltfLoader.loadNode('MovingPlatform');
     movingPlatform.isMovingPlatform = true;
