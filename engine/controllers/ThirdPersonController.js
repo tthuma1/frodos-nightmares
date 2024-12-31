@@ -120,6 +120,8 @@ export class ThirdPersonController {
             this.isJumping = true;
             this.jumpVelocity = this.jumpForce;
             this.jumpOffVelocity = this.movingPlatform ? this.movingPlatform.getComponentOfType(MovingPlatform).velocity[0] : null;
+            
+            this.startJumpAnimation(t);
         }
         if (this.keys['KeyQ']) {
             if (!(this.lastLightSwitchTime && Date.now() - this.lastLightSwitchTime < 200)) { // last light switch was at least 200ms ago q
@@ -235,6 +237,7 @@ export class ThirdPersonController {
         }
 
         this.jumpOffVelocity = null;
+        this.stopJumpAnimation();
     }
 
     keydownHandler(e) {
@@ -307,5 +310,18 @@ export class ThirdPersonController {
         walkAnimationLeftArm.stop();
         walkAnimationRightArm.stop();
         bodyAnimation.stop();
+    }
+
+    startJumpAnimation(time) {
+        const armRight = this.gltfLoader.loadNode("armRight");
+        const rightArmAnim = armRight.getComponentsOfType(RotateAnimator)[1];
+        rightArmAnim.startTime = time;
+        rightArmAnim.play();
+    }
+
+    stopJumpAnimation() {
+        const armRight = this.gltfLoader.loadNode("armRight");
+        const rightArmAnim = armRight.getComponentsOfType(RotateAnimator)[1];
+        rightArmAnim.stop();
     }
 }

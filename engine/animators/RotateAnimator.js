@@ -48,6 +48,7 @@ export class RotateAnimator {
             return;
         }
 
+        // console.log(t, this.startTime);
         const linearInterpolation = (t - this.startTime) / this.duration;
 
 
