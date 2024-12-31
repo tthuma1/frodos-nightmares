@@ -44,7 +44,8 @@
 				41,
 				42,
 				43,
-				44
+				44,
+				45
 			]
 		}
 	],
@@ -809,9 +810,29 @@
 				0.309500515460968
 			],
 			"translation":[
-				-5.006160259246826,
+				-0.2297869622707367,
 				0.5326442122459412,
-				3.5224523544311523
+				-4.985660552978516
+			]
+		},
+		{
+			"mesh":43,
+			"name":"WeatherStation",
+			"rotation":[
+				0.7226468324661255,
+				0,
+				0,
+				0.6912174224853516
+			],
+			"scale":[
+				0.1829390674829483,
+				0.18293911218643188,
+				0.18293911218643188
+			],
+			"translation":[
+				-0.5220012664794922,
+				1.0757009983062744,
+				-5.2811360359191895
 			]
 		}
 	],
@@ -1262,6 +1283,17 @@
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":38
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Material.027",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":39
 				},
 				"metallicFactor":0,
 				"roughnessFactor":0.5
@@ -1892,6 +1924,20 @@
 					"material":38
 				}
 			]
+		},
+		{
+			"name":"Text",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":154,
+						"NORMAL":155,
+						"TEXCOORD_0":156
+					},
+					"indices":157,
+					"material":39
+				}
+			]
 		}
 	],
 	"textures":[
@@ -2050,6 +2096,10 @@
 		{
 			"sampler":0,
 			"source":18
+		},
+		{
+			"sampler":0,
+			"source":13
 		}
 	],
 	"images":[
@@ -3537,6 +3587,40 @@
 			"componentType":5123,
 			"count":2880,
 			"type":"SCALAR"
+		},
+		{
+			"bufferView":154,
+			"componentType":5126,
+			"count":15623,
+			"max":[
+				3.3596694469451904,
+				0.019999999552965164,
+				1.02903413772583
+			],
+			"min":[
+				-0.03055737353861332,
+				-0.019999999552965164,
+				-0.7020000219345093
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":155,
+			"componentType":5126,
+			"count":15623,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":156,
+			"componentType":5126,
+			"count":15623,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":157,
+			"componentType":5123,
+			"count":78024,
+			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
@@ -4463,6 +4547,30 @@
 			"byteLength":5760,
 			"byteOffset":700240,
 			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":187476,
+			"byteOffset":706000,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":187476,
+			"byteOffset":893476,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":124984,
+			"byteOffset":1080952,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":156048,
+			"byteOffset":1205936,
+			"target":34963
 		}
 	],
 	"samplers":[
@@ -4473,7 +4581,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":706000,
+			"byteLength":1361984,
 			"uri":"frodomap.bin"
 		}
 	]
