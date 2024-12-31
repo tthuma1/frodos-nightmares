@@ -103,24 +103,34 @@ async function startGame(instantStart) {
 
 
     // player.addComponent(new Transform({rotation: [1,0,0,1]}))
-    const rotator = new RotateAnimator(player, {
-        startRotation: [-10, 0, 0],
-        endRotation: [10, 0, 0],
-        duration: 0.5,
+    const legRight = gltfLoader.loadNode("legRight");
+    const rotator = new RotateAnimator(legRight, {
+        startRotation: [-20, 0, 0],
+        endRotation: [20, 0, 0],
+        duration: 0.3,
         // startTime: 2
     });
-    player.addComponent(rotator);
+    legRight.addComponent(rotator);
     // setTimeout(() => {
     //     console.log("a")
     //     rotator.play();
     // }, 1000);
+
+    const legLeft = gltfLoader.loadNode("legLeft");
+    const rotatorLeft = new RotateAnimator(legLeft, {
+        startRotation: [-20, 0, 0],
+        endRotation: [20, 0, 0],
+        duration: 0.3,
+        startTime: 0.3,
+    });
+    legLeft.addComponent(rotatorLeft);
 
     const movingPlatform = gltfLoader.loadNode('MovingPlatform');
     movingPlatform.isMovingPlatform = true;
     movingPlatform.isStatic = true;
     movingPlatform.addComponent(new MovingPlatform(movingPlatform));
 
-    player.addComponent(new ThirdPersonController(player, canvas));
+    player.addComponent(new ThirdPersonController(player, canvas, gltfLoader));
 
     const draggableObjects =[
         'Cube.010',

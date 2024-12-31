@@ -9,7 +9,7 @@ import { RotateAnimator } from '../animators/RotateAnimator.js';
 
 export class ThirdPersonController {
 
-    constructor(node, domElement, {
+    constructor(node, domElement, gltfLoader, {
         pitch = 0,
         yaw = 0,
         velocity = [0, 0, 0],
@@ -19,6 +19,7 @@ export class ThirdPersonController {
     } = {}) {
         this.node = node;
         this.domElement = domElement;
+        this.gltfLoader = gltfLoader;
 
         this.keys = {};
 
@@ -73,7 +74,9 @@ export class ThirdPersonController {
         const forward = [-sin, 0, -cos];
         const right = [cos, 0, -sin];
 
-        const walkAnimation = this.node.getComponentOfType(RotateAnimator);
+        // const legRight = this.gltfLoader.loadNode("legRight");
+        // const legLeft = this.gltfLoader.loadNode("legLeft");
+        // const walkAnimation = legRight.getComponentOfType(RotateAnimator);
         // Map user input to the acceleration vector.
         const acc = vec3.create();
         if (this.keys['KeyW']) {
@@ -82,7 +85,8 @@ export class ThirdPersonController {
             if (this.draggedNode)
                 this.sound.play('drag');
             vec3.add(acc, acc, forward);
-            walkAnimation.play();
+            this.startWalkAnimation();
+            // walkAnimation.play();
         }
         if (this.keys['KeyS']) {
             if (!this.isJumping)
@@ -90,7 +94,8 @@ export class ThirdPersonController {
             if (this.draggedNode)
                 this.sound.play('drag');
             vec3.sub(acc, acc, forward);
-            walkAnimation.play();
+            this.startWalkAnimation();
+            // walkAnimation.play();
         }
         if (this.keys['KeyD']) {
             if (!this.isJumping)
@@ -98,7 +103,8 @@ export class ThirdPersonController {
             if (this.draggedNode)
                 this.sound.play('drag');
             vec3.add(acc, acc, right);
-            walkAnimation.play();
+            this.startWalkAnimation();
+            // walkAnimation.play();
         }
         if (this.keys['KeyA']) {
             if (!this.isJumping)
@@ -106,7 +112,8 @@ export class ThirdPersonController {
             if (this.draggedNode)
                 this.sound.play('drag');
             vec3.sub(acc, acc, right);
-            walkAnimation.play();
+            this.startWalkAnimation();
+            // walkAnimation.play();
         }
         if (this.keys['Space'] && !this.isJumping && !this.draggedNode) {
             this.sound.play('jump');
@@ -126,11 +133,14 @@ export class ThirdPersonController {
         }
 
         if (vec2.length([this.velocity[0], this.velocity[2]]) < 0.1) {
-            walkAnimation.stop();
+            this.stopWalkAnimation();
+            // walkAnimation.stop();
         }
 
         // prevent switching tabs from breaking game
+        // console.log(dt);
         if (dt * this.gravity < -0.2) {
+            console.log("a")
             this.jumpVelocity = this.jumpVelocity - 0.2;
         } else {
             this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
@@ -258,11 +268,28 @@ export class ThirdPersonController {
         this.yaw = Math.atan2(velX, velZ);
     }
 
-    updateFlashlightDirection()
-    {
+    updateFlashlightDirection() {
         const light = this.node.getComponentsOfType(Light).find(x => x.type === 1);
         if (vec3.length(this.velocity) > 0.1) {
             light.direction = this.velocity.slice();
         }
+    }
+
+    startWalkAnimation() {
+        const legRight = this.gltfLoader.loadNode("legRight");
+        const legLeft = this.gltfLoader.loadNode("legLeft");
+        const walkAnimationRight = legRight.getComponentOfType(RotateAnimator);
+        const walkAnimationLeft = legLeft.getComponentOfType(RotateAnimator);
+        walkAnimationRight.play();
+        walkAnimationLeft.play();
+    }
+
+    stopWalkAnimation() {
+        const legRight = this.gltfLoader.loadNode("legRight");
+        const legLeft = this.gltfLoader.loadNode("legLeft");
+        const walkAnimationRight = legRight.getComponentOfType(RotateAnimator);
+        const walkAnimationLeft = legLeft.getComponentOfType(RotateAnimator);
+        walkAnimationRight.stop();
+        walkAnimationLeft.stop();
     }
 }
