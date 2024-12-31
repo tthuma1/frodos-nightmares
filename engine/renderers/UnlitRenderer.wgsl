@@ -96,10 +96,6 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
         let L = normalize(light.position - surfacePosition);
         let H = normalize(L + V);
 
-    let reflectedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, L);
-    let refractedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, H);
-
-
         let lambert = max(dot(N, L), 0.0) * diffuse;
         let blinn = pow(max(dot(H, N), 0.0), shininess) * material.metalnessFactor;
 
@@ -130,6 +126,21 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
 
         output.color += pow(vec4(finalColor, 1), vec4(1 / 2.2));
     }
+
+    // let R = reflect(-V, N);
+    // let T = refract(-V, N, 0);
+
+    // let baseColor = textureSample(baseTexture, baseSampler, input.texcoords);
+    // let reflectedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, R);
+    // let refractedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, T);
+
+    // let reflection = mix(baseColor, reflectedColor, 1);
+    // let refraction = mix(baseColor, refractedColor, 0);
+
+    // let finalColor = mix(reflection, refraction, 0);
+
+    // output.color = vec4(pow(finalColor.rgb, vec3(1 / 2.2)), finalColor.a);
+
 
     return output;
 }
