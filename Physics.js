@@ -9,7 +9,7 @@ import { RotateAnimator } from './engine/animators/RotateAnimator.js';
 import { LinearAnimator } from './engine/animators/LinearAnimator.js';
 
 export class Physics {
-    constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, gltfLoader) {
+    constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, gltfLoader, lanternLight) {
         this.scene = scene;
         this.player = player;
         this.key = key;
@@ -26,6 +26,7 @@ export class Physics {
 
         this.gltfLoader = gltfLoader;
         this.leftArm = gltfLoader.loadNode("armLeft");
+        this.lanternLight = lanternLight;
     }
 
     update(t, dt) {
@@ -179,7 +180,7 @@ export class Physics {
 
     searchChest(chest) {
         chest.isSearchable = false;
-        if (chest.hasLantern) {
+        // if (chest.hasLantern) {
             const lanternComponent = this.player.children.find(x => x.getComponentOfType(Light)).getComponentOfType(Light);
             lanternComponent.color = [0.2, 0.07, 0.0];
 
@@ -218,7 +219,13 @@ export class Physics {
             quat.rotateX(armRotation, armRotation, -Math.PI/2);
 
             this.leftArm.removeComponentsOfType(RotateAnimator);
-        }
+
+            this.lanternLight.addComponent(new Transform({
+                translation: [1.5, 0.5, 1.5],
+            }));
+
+            this.updatePlayerAABB();
+        // }
     }
 
     keyCollision(player, key) {
@@ -289,5 +296,9 @@ export class Physics {
             min: [box.min[0] - 0.5, box.min[1] - 0.5, box.min[2] - 0.5],
             max: [box.max[0] + 0.5, box.max[1] + 0.5, box.max[2] + 0.5],
         }
+    }
+
+    updatePlayerAABB() {
+        this.player.aabb.max[2] = this.lantern.aabb.max[2];
     }
 }
