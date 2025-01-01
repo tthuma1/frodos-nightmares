@@ -317,9 +317,11 @@ export class UnlitRenderer extends BaseRenderer {
         for(let i = 0; i < lightComponents.length; i++) {
             const lightComponent = lightComponents[i];
             const lightPosition = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(light));
-            lightPosition[0] += 0.3;
-            lightPosition[1] += 0.5;
-            lightPosition[2] += 0.5;
+            if (lightComponent.type == 0) {
+                lightPosition[0] += 0.3;
+                lightPosition[1] += 0.5;
+                lightPosition[2] += 0.5;
+            }
             const lightColor = vec3.scale(vec3.create(), lightComponent.color, lightComponent.intensity);
             this.device.queue.writeBuffer(lightUniformBuffer, i * lightUniformSize, new Float32Array([
                 ...lightColor, 0, // light position je poravnan na 16 bytov

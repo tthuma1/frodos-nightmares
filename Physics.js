@@ -177,7 +177,7 @@ export class Physics {
 
     searchChest(chest) {
         chest.isSearchable = false;
-        // if (chest.hasLantern) {
+        if (chest.hasLantern) {
             const light = this.player.getComponentOfType(Light)
             light.color = [0.2, 0.07, 0.0];
 
@@ -191,12 +191,12 @@ export class Physics {
             console.log(lanternTransform.translation)
             const playerTransform = this.player.getComponentOfType(Transform)
             console.log(playerTransform.translation)
-            vec3.add(lanternTransform.translation, lanternTransform.translation, [0, 29*6.02 + 2, 0]);
+            vec3.add(lanternTransform.translation, lanternTransform.translation, [0, 29*6.02 - 1.3, 0]);
             console.log(lanternTransform.translation)
 
             const armRotation = this.leftArm.getComponentOfType(Transform).rotation;
             quat.rotateX(armRotation, armRotation, -Math.PI/2);
-        // }
+        }
     }
 
     keyCollision(player, key) {

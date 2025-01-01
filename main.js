@@ -79,7 +79,7 @@ async function startGame(instantStart) {
         color: [0.01, 0.01, 0.01],
         type: 0,
         isActive: true,
-        intensity: 3,
+        intensity: 2,
     });
     const flashLight = new Light({
         color: [0.5, 0.5, 0.5],
@@ -144,11 +144,11 @@ async function startGame(instantStart) {
         endRotation: [0, 0, -60],
         duration: 0.3,
     }));
-    armLeft.addComponent(new RotateAnimator(armLeft, {
-        startRotation: [0, 0, 0],
-        endRotation: [0, 0, 60],
-        duration: 0.3,
-    }));
+    // armLeft.addComponent(new RotateAnimator(armLeft, {
+    //     startRotation: [0, 0, 0],
+    //     endRotation: [0, 0, 60],
+    //     duration: 0.3,
+    // }));
     legRight.addComponent(new RotateAnimator(legRight, {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, 20],
