@@ -179,8 +179,8 @@ export class Physics {
     searchChest(chest) {
         chest.isSearchable = false;
         if (chest.hasLantern) {
-            const light = this.player.getComponentOfType(Light)
-            light.color = [0.2, 0.07, 0.0];
+            const lanternComponent = this.player.children.find(x => x.getComponentOfType(Light)).getComponentOfType(Light);
+            lanternComponent.color = [0.2, 0.07, 0.0];
 
             const doorTransform = this.firstDoor.getComponentOfType(Transform);
             const rotation = quat.create();

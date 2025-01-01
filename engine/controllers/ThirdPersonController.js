@@ -266,9 +266,11 @@ export class ThirdPersonController {
     }
 
     updateFlashlightDirection() {
-        const light = this.node.getComponentsOfType(Light).find(x => x.type === 1);
+        const lights = this.node.children.filter(x => x.getComponentOfType(Light))
+        const flashLight = lights.find(x => x.getComponentOfType(Light).type === 1);
+        const flashLightComponent = flashLight.getComponentOfType(Light);
         if (vec3.length(this.velocity) > 0.1) {
-            light.direction = this.velocity.slice();
+            flashLightComponent.direction = this.velocity.slice();
         }
     }
 

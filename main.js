@@ -75,24 +75,27 @@ async function startGame(instantStart) {
 
     // camera.addComponent(new TouchController(camera, canvas));
     player.addComponent(camera)
-    const lanternLight = new Light({
+    const lanternLight = new Node();
+    lanternLight.addComponent(new Light({
         color: [0.01, 0.01, 0.01],
         type: 0,
         isActive: true,
         intensity: 2,
-    });
-    const flashLight = new Light({
+    }));
+    const flashLight = new Node();
+    flashLight.addComponent(new Light({
         color: [0.5, 0.5, 0.5],
         type: 1,
         isActive: false,
         intensity: 3,
-    });
+    }));
 
-    player.addComponent(lanternLight);
-    player.addComponent(flashLight);
+    player.addChild(lanternLight);
+    player.addChild(flashLight);
+
     player.currentLight = 0;
     player.switchLight = () => {
-        const lights = player.getComponentsOfType(Light);
+        const lights = [lanternLight.getComponentOfType(Light), flashLight.getComponentOfType(Light)];
         const nextLight = !player.currentLight ? 1 : 0;
         lights[player.currentLight].isActive = false;
         lights[nextLight].isActive = true;
