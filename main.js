@@ -102,7 +102,6 @@ async function startGame(instantStart) {
     };
 
 
-    // player.addComponent(new Transform({rotation: [1,0,0,1]}))
     const legRight = gltfLoader.loadNode("legRight");
     const legLeft = gltfLoader.loadNode("legLeft");
     const armRight = gltfLoader.loadNode("armRight");

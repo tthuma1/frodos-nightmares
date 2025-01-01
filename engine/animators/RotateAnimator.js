@@ -5,11 +5,12 @@ import { Transform } from '../core/Transform.js';
 export class RotateAnimator {
 
     constructor(node, {
-        startRotation = [0, 0, 0, 1],
-        endRotation = [0, 0, 0, 1],
+        startRotation = [0, 0, 0], // in euler angles (degrees), not quaternions, not radians
+        endRotation = [0, 0, 0],
         startTime = 0,
         duration = 1,
         loop = true,
+        transform = null,
     } = {}) {
         this.node = node;
 
@@ -23,11 +24,14 @@ export class RotateAnimator {
         this.loop = loop;
 
         this.playing = false;
-        this.transform = new Transform({ rotation: [...startRotation] });
+        if (transform) {
+            this.transform = transform;
+        } else {
+            this.transform = new Transform({ rotation: [...startRotation] });
+            this.node.addComponent(this.transform);
+        }
 
         this.direction = 1;
-
-        this.node.addComponent(this.transform);
     }
 
     stop() {
@@ -47,6 +51,7 @@ export class RotateAnimator {
         if (!this.playing) {
             return;
         }
+
 
         const linearInterpolation = (t - this.startTime) / this.duration;
         const clampedInterpolation = Math.min(Math.max(linearInterpolation, 0), 2);
