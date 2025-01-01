@@ -6,6 +6,7 @@ import { ThirdPersonController } from './engine/controllers/ThirdPersonControlle
 import { MovingPlatform } from './engine/core/MovingPlatform.js';
 import { Sound } from './engine/core/Sound.js';
 import { RotateAnimator } from './engine/animators/RotateAnimator.js';
+import { LinearAnimator } from './engine/animators/LinearAnimator.js';
 
 export class Physics {
     constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, gltfLoader) {
@@ -183,10 +184,19 @@ export class Physics {
             lanternComponent.color = [0.2, 0.07, 0.0];
 
             const doorTransform = this.firstDoor.getComponentOfType(Transform);
-            vec3.add(doorTransform.translation, doorTransform.translation, [-0.5, 0, -0.5])
+            console.log(vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.5, 0, -0.5]));
+            const doorLinearAnimator = new LinearAnimator(this.firstDoor, {
+                startPosition: doorTransform.translation.slice(),
+                endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.25, 0, -0.25]),
+                loop: false,
+                duration: 1,
+                startTime: performance.now() / 1000,
+                transform: doorTransform,
+            });
+            this.firstDoor.addComponent(doorLinearAnimator);
+            doorLinearAnimator.play();
 
 
-            this.firstDoor.isfirstdoor=true;
             const doorAnimator = new RotateAnimator(this.firstDoor, {
                 endRotation: [0, -45, 0],
                 loop: false,
