@@ -44,7 +44,8 @@
 				47,
 				48,
 				49,
-				50
+				50,
+				51
 			]
 		}
 	],
@@ -900,6 +901,26 @@
 				1.0757009983062744,
 				-5.2811360359191895
 			]
+		},
+		{
+			"mesh":50,
+			"name":"Cube",
+			"rotation":[
+				0,
+				0,
+				-0.7071068286895752,
+				0.7071068286895752
+			],
+			"scale":[
+				1,
+				1,
+				0.06963903456926346
+			],
+			"translation":[
+				-7.7225446701049805,
+				2.043994426727295,
+				-5.282103538513184
+			]
 		}
 	],
 	"cameras":[
@@ -1350,6 +1371,17 @@
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":39
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Material.019",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":40
 				},
 				"metallicFactor":0,
 				"roughnessFactor":0.5
@@ -2114,6 +2146,20 @@
 					"material":39
 				}
 			]
+		},
+		{
+			"name":"Cube.038",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":198,
+						"NORMAL":199,
+						"TEXCOORD_0":200
+					},
+					"indices":18,
+					"material":40
+				}
+			]
 		}
 	],
 	"textures":[
@@ -2276,6 +2322,10 @@
 		{
 			"sampler":0,
 			"source":17
+		},
+		{
+			"sampler":0,
+			"source":21
 		}
 	],
 	"images":[
@@ -2383,6 +2433,11 @@
 			"mimeType":"image/png",
 			"name":"herringbone_parquet",
 			"uri":"herringbone_parquet.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"frodoimage1-2",
+			"uri":"frodoimage1-2.png"
 		}
 	],
 	"accessors":[
@@ -4137,6 +4192,34 @@
 			"componentType":5123,
 			"count":78024,
 			"type":"SCALAR"
+		},
+		{
+			"bufferView":198,
+			"componentType":5126,
+			"count":24,
+			"max":[
+				1,
+				1,
+				1
+			],
+			"min":[
+				-1,
+				-1,
+				-1
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":199,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":200,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC2"
 		}
 	],
 	"bufferViews":[
@@ -5327,6 +5410,24 @@
 			"byteLength":156048,
 			"byteOffset":1206336,
 			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":1362384,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":1362672,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":192,
+			"byteOffset":1362960,
+			"target":34962
 		}
 	],
 	"samplers":[
@@ -5337,7 +5438,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":1362384,
+			"byteLength":1363152,
 			"uri":"frodomap.bin"
 		}
 	]
