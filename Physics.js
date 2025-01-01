@@ -180,7 +180,7 @@ export class Physics {
 
     searchChest(chest) {
         chest.isSearchable = false;
-        // if (chest.hasLantern) {
+        if (chest.hasLantern) {
             const lanternComponent = this.player.children.find(x => x.getComponentOfType(Light)).getComponentOfType(Light);
             lanternComponent.color = [0.2, 0.07, 0.0];
 
@@ -225,7 +225,7 @@ export class Physics {
             }));
 
             this.updatePlayerAABB();
-        // }
+        }
     }
 
     keyCollision(player, key) {

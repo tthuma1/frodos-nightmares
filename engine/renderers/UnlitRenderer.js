@@ -41,6 +41,8 @@ export class UnlitRenderer extends BaseRenderer {
 
     constructor(canvas) {
         super(canvas);
+
+        this.lastLightFlicker = 0;
     }
 
     async initialize() {
@@ -317,12 +319,13 @@ export class UnlitRenderer extends BaseRenderer {
         for(let i = 0; i < lightComponents.length; i++) {
             const lightComponent = lightComponents[i];
             const lightPosition = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(lights[i]));
-            // if (lightComponent.type == 0) {
-            //     lightPosition[0] += 0.3;
-            //     lightPosition[1] += 0.5;
-            //     lightPosition[2] += 0.5;
-            // }
             const lightColor = vec3.scale(vec3.create(), lightComponent.color, lightComponent.intensity);
+            const time = performance.now();
+            // don't flicker before lantern is collected
+            if (lightComponent.color[0] != 0.01 && lightComponent.type === 0 && time - this.lastLightFlicker > 100) {
+                lightComponent.intensity = Math.random() * 0.3 + 1.8;
+                this.lastLightFlicker = time;
+            }
             this.device.queue.writeBuffer(lightUniformBuffer, i * lightUniformSize, new Float32Array([
                 ...lightColor, 0, // light position je poravnan na 16 bytov
                 ...lightPosition,
