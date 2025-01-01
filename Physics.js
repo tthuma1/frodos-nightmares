@@ -5,6 +5,7 @@ import {Key} from "./engine/core/Key.js";
 import { ThirdPersonController } from './engine/controllers/ThirdPersonController.js';
 import { MovingPlatform } from './engine/core/MovingPlatform.js';
 import { Sound } from './engine/core/Sound.js';
+import { RotateAnimator } from './engine/animators/RotateAnimator.js';
 
 export class Physics {
     constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, gltfLoader) {
@@ -196,6 +197,8 @@ export class Physics {
 
             const armRotation = this.leftArm.getComponentOfType(Transform).rotation;
             quat.rotateX(armRotation, armRotation, -Math.PI/2);
+
+            this.leftArm.removeComponentsOfType(RotateAnimator);
         }
     }
 

@@ -314,12 +314,17 @@ export class ThirdPersonController {
         const leftArmAnim = armLeft.getComponentsOfType(RotateAnimator)[1];
         const leftLegAnim = legLeft.getComponentsOfType(RotateAnimator)[1];
         const rightLegAnim = legRight.getComponentsOfType(RotateAnimator)[1];
-        return [
+
+        const ret = [
             rightArmAnim,
-            // leftArmAnim,
             leftLegAnim,
             rightLegAnim,
         ];
+        if (leftArmAnim) {
+            ret.push(leftArmAnim);
+        }
+
+        return ret;
     }
 
     startJumpAnimation(time) {

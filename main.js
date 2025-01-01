@@ -144,11 +144,11 @@ async function startGame(instantStart) {
         endRotation: [0, 0, -60],
         duration: 0.3,
     }));
-    // armLeft.addComponent(new RotateAnimator(armLeft, {
-    //     startRotation: [0, 0, 0],
-    //     endRotation: [0, 0, 60],
-    //     duration: 0.3,
-    // }));
+    armLeft.addComponent(new RotateAnimator(armLeft, {
+        startRotation: [0, 0, 0],
+        endRotation: [0, 0, 60],
+        duration: 0.3,
+    }));
     legRight.addComponent(new RotateAnimator(legRight, {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, 20],
