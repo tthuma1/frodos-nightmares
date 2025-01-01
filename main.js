@@ -8,7 +8,6 @@ import {
     Texture,
     Transform,
     Light,
-    LightView
 } from 'engine/core.js';
 import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
 import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
@@ -101,8 +100,6 @@ async function startGame(instantStart) {
         lights[nextLight].isActive = true;
         player.currentLight = nextLight;
     };
-
-    player.addComponent(new LightView());
 
 
     // player.addComponent(new Transform({rotation: [1,0,0,1]}))
