@@ -22,17 +22,13 @@ Lantern v roki
 - [ ] stairs
 - [ ] prepad
 - [x] luči - lahko lantern ali pa luči v hiši
-- [ ] animations
+- [x] animations
 ---
 Luka:
-- [ ] color puzzle
+- [x] color puzzle
 ---
 Tilen:
 - [ ] shadow mapping
 ---
 Tim:
-- [ ] mipmaps
-- [ ] player naj se obraca kot flashlight
 - [ ] ko poberes kljuc imas cutscene - vrata se odprejo
-- [ ] “you won” text ko prides ven
-- [ ] background texture cez cel svet
