@@ -8,7 +8,6 @@ import {
     Texture,
     Transform,
     Light,
-    LightView
 } from 'engine/core.js';
 import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
 import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
@@ -75,34 +74,34 @@ async function startGame(instantStart) {
 
     // camera.addComponent(new TouchController(camera, canvas));
     player.addComponent(camera)
-    const lanternLight = new Light({
+    const lanternLight = new Node();
+    lanternLight.addComponent(new Light({
         color: [0.01, 0.01, 0.01],
         type: 0,
         isActive: true,
-        intensity: 3,
-    });
-    const flashLight = new Light({
+        intensity: 2,
+    }));
+    const flashLight = new Node();
+    flashLight.addComponent(new Light({
         color: [0.5, 0.5, 0.5],
         type: 1,
         isActive: false,
         intensity: 3,
-    });
+    }));
 
-    player.addComponent(lanternLight);
-    player.addComponent(flashLight);
+    player.addChild(lanternLight);
+    player.addChild(flashLight);
+
     player.currentLight = 0;
     player.switchLight = () => {
-        const lights = player.getComponentsOfType(Light);
+        const lights = [lanternLight.getComponentOfType(Light), flashLight.getComponentOfType(Light)];
         const nextLight = !player.currentLight ? 1 : 0;
         lights[player.currentLight].isActive = false;
         lights[nextLight].isActive = true;
         player.currentLight = nextLight;
     };
 
-    player.addComponent(new LightView());
 
-
-    // player.addComponent(new Transform({rotation: [1,0,0,1]}))
     const legRight = gltfLoader.loadNode("legRight");
     const legLeft = gltfLoader.loadNode("legLeft");
     const armRight = gltfLoader.loadNode("armRight");
@@ -239,7 +238,7 @@ async function startGame(instantStart) {
 
     const lantern = gltfLoader.loadNode("Lantern");
 
-    const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, finalDoor, firstDoor, lantern);
+    const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, gltfLoader, lanternLight);
 
     function update(t, dt) {
         scene.traverse(node => {

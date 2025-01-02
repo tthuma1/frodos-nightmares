@@ -228,10 +228,10 @@ export class ThirdPersonController {
             this.jumpVelocity = 0;
             this.isJumping = false;
             this.movingPlatform = node.isMovingPlatform ? node : null;
+            this.stopJumpAnimation();
         }
 
         this.jumpOffVelocity = null;
-        this.stopJumpAnimation();
     }
 
     keydownHandler(e) {
@@ -266,9 +266,11 @@ export class ThirdPersonController {
     }
 
     updateFlashlightDirection() {
-        const light = this.node.getComponentsOfType(Light).find(x => x.type === 1);
+        const lights = this.node.children.filter(x => x.getComponentOfType(Light))
+        const flashLight = lights.find(x => x.getComponentOfType(Light).type === 1);
+        const flashLightComponent = flashLight.getComponentOfType(Light);
         if (vec3.length(this.velocity) > 0.1) {
-            light.direction = this.velocity.slice();
+            flashLightComponent.direction = this.velocity.slice();
         }
     }
 
@@ -314,23 +316,28 @@ export class ThirdPersonController {
         const leftArmAnim = armLeft.getComponentsOfType(RotateAnimator)[1];
         const leftLegAnim = legLeft.getComponentsOfType(RotateAnimator)[1];
         const rightLegAnim = legRight.getComponentsOfType(RotateAnimator)[1];
-        return [
+
+        const ret = [
             rightArmAnim,
-            leftArmAnim,
             leftLegAnim,
             rightLegAnim,
         ];
+        if (leftArmAnim) {
+            ret.push(leftArmAnim);
+        }
+
+        return ret;
     }
 
     startJumpAnimation(time) {
-        for (const animation of this.jumpAnimators) {
+        for (const animation of this.getJumpAnimators()) {
             animation.startTime = time;
             animation.play();
         }
     }
 
     stopJumpAnimation() {
-        for (const animation of this.jumpAnimators) {
+        for (const animation of this.getJumpAnimators()) {
             animation.startTime = time;
             animation.stop();
         }

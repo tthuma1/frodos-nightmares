@@ -5,9 +5,11 @@ import {Key} from "./engine/core/Key.js";
 import { ThirdPersonController } from './engine/controllers/ThirdPersonController.js';
 import { MovingPlatform } from './engine/core/MovingPlatform.js';
 import { Sound } from './engine/core/Sound.js';
+import { RotateAnimator } from './engine/animators/RotateAnimator.js';
+import { LinearAnimator } from './engine/animators/LinearAnimator.js';
 
 export class Physics {
-    constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern) {
+    constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, gltfLoader, lanternLight) {
         this.scene = scene;
         this.player = player;
         this.key = key;
@@ -21,6 +23,10 @@ export class Physics {
         this.sound = new Sound({
             collect: { src: './sounds/collect.mp3', volume : 0.6 },
         });
+
+        this.gltfLoader = gltfLoader;
+        this.leftArm = gltfLoader.loadNode("armLeft");
+        this.lanternLight = lanternLight;
     }
 
     update(t, dt) {
@@ -175,21 +181,50 @@ export class Physics {
     searchChest(chest) {
         chest.isSearchable = false;
         if (chest.hasLantern) {
-            const light = this.player.getComponentOfType(Light)
-            light.color = [0.2, 0.07, 0.0];
+            const lanternComponent = this.player.children.find(x => x.getComponentOfType(Light)).getComponentOfType(Light);
+            lanternComponent.color = [0.2, 0.07, 0.0];
 
             const doorTransform = this.firstDoor.getComponentOfType(Transform);
-            const rotation = quat.create();
-            quat.rotateY(rotation, rotation, -Math.PI/2);
-            doorTransform.rotation = rotation;
-            vec3.add(doorTransform.translation, doorTransform.translation, [-0.5, 0, -0.5])
+            console.log(vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.5, 0, -0.5]));
+            const doorLinearAnimator = new LinearAnimator(this.firstDoor, {
+                startPosition: doorTransform.translation.slice(),
+                endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.25, 0, -0.25]),
+                loop: false,
+                duration: 1,
+                startTime: performance.now() / 1000,
+                transform: doorTransform,
+            });
+            this.firstDoor.addComponent(doorLinearAnimator);
+            doorLinearAnimator.play();
+
+
+            const doorAnimator = new RotateAnimator(this.firstDoor, {
+                endRotation: [0, -45, 0],
+                loop: false,
+                duration: 1,
+                startTime: performance.now() / 1000,
+                transform: doorTransform,
+            });
+            this.firstDoor.addComponent(doorAnimator);
+            doorAnimator.play();
 
             const lanternTransform = this.lantern.getComponentOfType(Transform)
             console.log(lanternTransform.translation)
             const playerTransform = this.player.getComponentOfType(Transform)
             console.log(playerTransform.translation)
-            vec3.add(lanternTransform.translation, lanternTransform.translation, [0, 29*6.02, 0]);
+            vec3.add(lanternTransform.translation, lanternTransform.translation, [0, 29*6.02 - 1.3, 0]);
             console.log(lanternTransform.translation)
+
+            const armRotation = this.leftArm.getComponentOfType(Transform).rotation;
+            quat.rotateX(armRotation, armRotation, -Math.PI/2);
+
+            this.leftArm.removeComponentsOfType(RotateAnimator);
+
+            this.lanternLight.addComponent(new Transform({
+                translation: [1.5, 0.5, 1.5],
+            }));
+
+            this.updatePlayerAABB();
         }
     }
 
@@ -261,5 +296,9 @@ export class Physics {
             min: [box.min[0] - 0.5, box.min[1] - 0.5, box.min[2] - 0.5],
             max: [box.max[0] + 0.5, box.max[1] + 0.5, box.max[2] + 0.5],
         }
+    }
+
+    updatePlayerAABB() {
+        this.player.aabb.max[2] = this.lantern.aabb.max[2];
     }
 }

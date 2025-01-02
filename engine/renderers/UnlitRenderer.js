@@ -41,6 +41,8 @@ export class UnlitRenderer extends BaseRenderer {
 
     constructor(canvas) {
         super(canvas);
+
+        this.lastLightFlicker = 0;
     }
 
     async initialize() {
@@ -310,14 +312,20 @@ export class UnlitRenderer extends BaseRenderer {
         this.device.queue.writeBuffer(unprojectUniformBuffer, 0, unprojectMatrix);
         this.renderPass.setBindGroup(0, cameraBindGroup);
 
-        const light = scene.find(node => node.getComponentOfType(Light));
-        const lightComponents = light.getComponentsOfType(Light);
+        const lights = scene.filter(node => node.getComponentOfType(Light));
+        const lightComponents = lights.map(x => x.getComponentOfType(Light));
         const { lightUniformBuffer, lightBindGroup } = this.prepareLight(lightComponents);
         const lightUniformSize = 48;
         for(let i = 0; i < lightComponents.length; i++) {
             const lightComponent = lightComponents[i];
-            const lightPosition = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(light));
+            const lightPosition = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(lights[i]));
             const lightColor = vec3.scale(vec3.create(), lightComponent.color, lightComponent.intensity);
+            const time = performance.now();
+            // don't flicker before lantern is collected
+            if (lightComponent.color[0] != 0.01 && lightComponent.type === 0 && time - this.lastLightFlicker > 100) {
+                lightComponent.intensity = Math.random() * 0.3 + 1.8;
+                this.lastLightFlicker = time;
+            }
             this.device.queue.writeBuffer(lightUniformBuffer, i * lightUniformSize, new Float32Array([
                 ...lightColor, 0, // light position je poravnan na 16 bytov
                 ...lightPosition,
