@@ -32,9 +32,12 @@ export class Physics {
         this.gltfLoader = gltfLoader;
         this.leftArm = gltfLoader.loadNode("armLeft");
         this.lanternLight = lanternLight;
+
+        this.isDragColliding = false;
     }
 
     update(t, dt) {
+        this.isDragColliding = false;
         this.scene.traverse(node => {
             if (node !== this.player && node.isStatic && node !== this.controller.draggedNode) {
                 this.resolveCollision(this.player, node)
@@ -55,6 +58,13 @@ export class Physics {
 
         if (!this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle){
             this.checkBlockPuzzle()
+        }
+
+        const startDragText = document.getElementById("startDrag");
+        if (this.isDragColliding) {
+            startDragText.style.display = 'block';
+        } else {
+            startDragText.style.display = 'none';
         }
     }
 
@@ -195,8 +205,8 @@ export class Physics {
         const isDragColliding = this.aabbIntersection(aBox, bDragBox);
         if(isDragColliding) {
             this.displayDragText(aBox, bDragBox, b);
-
         }
+
         if (!isColliding) {
             if (b.isClimbable && personController) personController.isPlayerOnLadder = false;
             return;
@@ -224,6 +234,8 @@ export class Physics {
                 lightAnimator.play();
                 this.lanternLight.getComponentOfType(Light).isActive = true;
             }, 4000)
+        } else if (b.isFloorOutside) {
+            this.endFunction();
         }
 
         //Handles ladder logic, a = player, b = ladder
@@ -271,22 +283,18 @@ export class Physics {
             this.controller.jumpVelocity < 1e-4
         ) {
             if (b.isDraggable) {
-                startDragText.style.display = "block";
                 startDragText.innerText = "Press E to start dragging."
                 if (this.controller.keys['KeyE']) {
                     this.controller.startDragging(b);
                 }
+                this.isDragColliding = true;
             } else if (b.isSearchable) {
-                startDragText.style.display = "block";
                 startDragText.innerText = "Press E to search chest."
                 if (this.controller.keys['KeyE']) {
                     this.searchChest(b)
                 }
-            } else {
-                startDragText.style.display = "none";
+                this.isDragColliding = true;
             }
-        } else {
-            startDragText.style.display = "none";
         }
     }
 
@@ -329,7 +337,6 @@ export class Physics {
         this.openDoor(door)
         this.scene.removeChild(key)
         this.sound.play('collect');
-        //this.endFunction();
     }
 
     blocksCircleCollision(block, circle) {

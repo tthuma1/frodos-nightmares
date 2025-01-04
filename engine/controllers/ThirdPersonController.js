@@ -53,6 +53,8 @@ export class ThirdPersonController {
 
         this.isPlayerOnLadder = false;
 
+        this.maxZ = null;
+
         this.sound = new Sound({
             walk: { src: './sounds/walk.mp3', volume : 0.15 },
             jump: { src: './sounds/jump.mp3', volume : 0.3 },
@@ -182,11 +184,12 @@ export class ThirdPersonController {
 
         const transform = this.node.getComponentOfType(Transform);
         if (transform) {
-
+            const playerTranslationCopy = transform.translation.slice();
             this.translateWithVelocity(transform.translation, dt);
 
             // translate camera with player
             const cameraTranslation = this.node.components[2].getComponentOfType(Transform).translation;
+            const cameraTranslationCopy = cameraTranslation.slice();
             this.translateWithVelocity(cameraTranslation, dt);
 
             // translate dragged object
@@ -203,6 +206,11 @@ export class ThirdPersonController {
             quat.rotateY(rotation, rotation, this.yaw);
             quat.rotateX(rotation, rotation, this.pitch);
             transform.rotation = rotation;
+
+            if (this.maxZ !== null && transform.translation[2] > this.maxZ) {
+                transform.translation[2] = playerTranslationCopy[2];
+                cameraTranslation[2] = cameraTranslationCopy[2];
+            }
         }
     }
 

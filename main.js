@@ -178,7 +178,8 @@ async function startGame(instantStart) {
     movingPlatform.isStatic = true;
     movingPlatform.addComponent(new MovingPlatform(movingPlatform));
 
-    player.addComponent(new ThirdPersonController(player, canvas, gltfLoader));
+    const controller = new ThirdPersonController(player, canvas, gltfLoader);
+    player.addComponent(controller);
 
     const draggableObjects =[
         'Cube.010',
@@ -218,6 +219,7 @@ async function startGame(instantStart) {
         'wall20',
         'wall21',
         'wall22',
+        'FloorOutside',
     ];
 
     const searchableObjects = [
@@ -255,15 +257,8 @@ async function startGame(instantStart) {
 
     gltfLoader.loadNode('Trampoline').isTrampoline = true;
 
-    scene.traverse(node => {
-        const model = node.getComponentOfType(Model);
-        if (!model) {
-            return;
-        }
-
-        const boxes = model.primitives.map(primitive => calculateAxisAlignedBoundingBox(primitive.mesh));
-        node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
-    });
+    gltfLoader.loadNode('FloorOutside').isFloorOutside = true;
+    gltfLoader.loadNode('floor').isFloorInside = true;
 
     const mirrorBall = gltfLoader.loadNode("MirrorBall")
     const mirrorMaterial = mirrorBall.getComponentOfType(Model).primitives[0].material;
@@ -272,6 +267,20 @@ async function startGame(instantStart) {
     const lantern = gltfLoader.loadNode("Lantern");
 
     const physics = new Physics(scene, player, firstKey, finalKey, blockToCircleDict, movingPlatform, finalDoor, firstDoor, keyDoor, lantern, flashLight, gltfLoader, lanternLight);
+
+    scene.traverse(node => {
+        const model = node.getComponentOfType(Model);
+        if (!model) {
+            return;
+        }
+
+        const boxes = model.primitives.map(primitive => calculateAxisAlignedBoundingBox(primitive.mesh));
+        node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
+
+        if (node.isFloorInside) {
+            controller.maxZ = physics.getTransformedAABB(node).max[2] - 0.5;
+        }
+    });
 
     function update(t, dt) {
         scene.traverse(node => {
