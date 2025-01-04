@@ -236,6 +236,10 @@ export class ThirdPersonController {
 
     finishJump(node)
     {
+        if (node.isBreakable) {
+            return;
+        }
+
         if (node.isTrampoline) {
             this.jumpVelocity = 10;
             this.movingPlatform = null;

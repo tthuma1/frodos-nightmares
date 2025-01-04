@@ -104,9 +104,9 @@
 				0.9951757192611694
 			],
 			"translation":[
-				4.150023937225342,
-				15.71777629852295,
-				12.092741012573242
+				1.0796563625335693,
+				17.291202545166016,
+				11.52005386352539
 			]
 		},
 		{
@@ -480,7 +480,7 @@
 				0.2914770543575287
 			],
 			"translation":[
-				0.33480262756347656,
+				0.33480072021484375,
 				-174.73260498046875,
 				-1.7873141765594482
 			]
@@ -492,7 +492,7 @@
 			"mesh":22,
 			"name":"armLeft",
 			"translation":[
-				1.2920513153076172,
+				1.2920465469360352,
 				-2.2821273803710938,
 				0.4460916221141815
 			]
@@ -501,7 +501,7 @@
 			"mesh":23,
 			"name":"armRight",
 			"translation":[
-				-1.1926345825195312,
+				-1.1926393508911133,
 				-1.9821014404296875,
 				0.5043494701385498
 			]
@@ -529,8 +529,8 @@
 				1.0901241302490234
 			],
 			"translation":[
-				-0.24204444885253906,
-				0.2654151916503906,
+				-0.2420487403869629,
+				0.265411376953125,
 				0.07701832056045532
 			]
 		},
@@ -541,8 +541,8 @@
 			"mesh":26,
 			"name":"legLeft",
 			"translation":[
-				0.5796661376953125,
-				-4.263751983642578,
+				0.5796632766723633,
+				-4.2637481689453125,
 				0.403435081243515
 			]
 		},
@@ -555,8 +555,8 @@
 				1.090713620185852
 			],
 			"translation":[
-				-0.2165851593017578,
-				0.3805580139160156,
+				-0.21658611297607422,
+				0.38055419921875,
 				0.12757211923599243
 			]
 		},
@@ -567,8 +567,8 @@
 			"mesh":28,
 			"name":"legRight",
 			"translation":[
-				-0.5907497406005859,
-				-4.252758026123047,
+				-0.5907526016235352,
+				-4.2527618408203125,
 				0.39172956347465515
 			]
 		},
@@ -581,7 +581,7 @@
 				1.1284840106964111
 			],
 			"translation":[
-				-0.019403457641601562,
+				-0.019401073455810547,
 				0.48291015625,
 				0.05069161206483841
 			]
@@ -618,8 +618,8 @@
 				0.17154009640216827
 			],
 			"translation":[
-				4.150023937225342,
-				11.388053894042969,
+				1.1953754425048828,
+				12.71031379699707,
 				0.02136993408203125
 			]
 		},
@@ -1099,10 +1099,10 @@
 			"scale":[
 				-6.150330543518066,
 				-0.40443044900894165,
-				-2.0416147708892822
+				-1.9614580869674683
 			],
 			"translation":[
-				-7.538538455963135,
+				-7.4764838218688965,
 				9.83410930633545,
 				0
 			]
@@ -1914,7 +1914,6 @@
 				"baseColorTexture":{
 					"index":48
 				},
-				"metallicFactor":0,
 				"roughnessFactor":0.5
 			}
 		},
@@ -3210,10 +3209,6 @@
 		},
 		{
 			"sampler":0,
-			"source":9
-		},
-		{
-			"sampler":0,
 			"source":14
 		},
 		{
@@ -3230,11 +3225,15 @@
 		},
 		{
 			"sampler":0,
-			"source":16
+			"source":18
 		},
 		{
 			"sampler":0,
-			"source":18
+			"source":17
+		},
+		{
+			"sampler":0,
+			"source":19
 		},
 		{
 			"sampler":0,
@@ -3242,19 +3241,19 @@
 		},
 		{
 			"sampler":0,
+			"source":20
+		},
+		{
+			"sampler":0,
+			"source":19
+		},
+		{
+			"sampler":0,
 			"source":10
 		},
 		{
 			"sampler":0,
-			"source":18
-		},
-		{
-			"sampler":0,
-			"source":19
-		},
-		{
-			"sampler":0,
-			"source":19
+			"source":10
 		},
 		{
 			"sampler":0,
@@ -3266,23 +3265,7 @@
 		},
 		{
 			"sampler":0,
-			"source":18
-		},
-		{
-			"sampler":0,
-			"source":18
-		},
-		{
-			"sampler":0,
-			"source":18
-		},
-		{
-			"sampler":0,
-			"source":18
-		},
-		{
-			"sampler":0,
-			"source":18
+			"source":19
 		},
 		{
 			"sampler":0,
@@ -3290,7 +3273,19 @@
 		},
 		{
 			"sampler":0,
-			"source":15
+			"source":19
+		},
+		{
+			"sampler":0,
+			"source":19
+		},
+		{
+			"sampler":0,
+			"source":19
+		},
+		{
+			"sampler":0,
+			"source":10
 		},
 		{
 			"sampler":0,
@@ -3298,7 +3293,11 @@
 		},
 		{
 			"sampler":0,
-			"source":20
+			"source":17
+		},
+		{
+			"sampler":0,
+			"source":21
 		},
 		{
 			"sampler":0,
@@ -3346,7 +3345,7 @@
 		},
 		{
 			"sampler":0,
-			"source":21
+			"source":22
 		},
 		{
 			"sampler":0,
@@ -3370,15 +3369,15 @@
 		},
 		{
 			"sampler":0,
-			"source":19
+			"source":10
 		},
 		{
 			"sampler":0,
-			"source":19
+			"source":10
 		},
 		{
 			"sampler":0,
-			"source":19
+			"source":10
 		},
 		{
 			"sampler":0,
@@ -3402,48 +3401,48 @@
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-1",
 			"uri":"Untitled-1.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-2",
 			"uri":"Untitled-2.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-3",
 			"uri":"Untitled-3.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-4",
 			"uri":"Untitled-4.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-5",
 			"uri":"Untitled-5.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
-			"uri":"Untitled-6.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-7",
 			"uri":"Untitled-7.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"Untitled",
+			"name":"Untitled-6",
+			"uri":"Untitled-6.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"Untitled-8",
 			"uri":"Untitled-8.png"
 		},
 		{
 			"mimeType":"image/png",
-			"name":"herringbone_parquet",
-			"uri":"herringbone_parquet.png"
+			"name":"herringbone_parquet_webp",
+			"uri":"herringbone_parquet_webp.png"
 		},
 		{
 			"mimeType":"image/png",
@@ -3459,6 +3458,11 @@
 			"mimeType":"image/png",
 			"name":"Untitled",
 			"uri":"Untitled-9.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"Untitled",
+			"uri":"Untitled-10.png"
 		},
 		{
 			"mimeType":"image/png",
@@ -3487,18 +3491,13 @@
 		},
 		{
 			"mimeType":"image/png",
-			"name":"herringbone_parquet.webp",
-			"uri":"herringbone_parquet_webp.png"
+			"name":"herringbone_parquet",
+			"uri":"herringbone_parquet.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"frodoimage1-2",
 			"uri":"frodoimage1-2.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"ladder.png",
-			"uri":"ladder_png.png"
 		},
 		{
 			"mimeType":"image/png",

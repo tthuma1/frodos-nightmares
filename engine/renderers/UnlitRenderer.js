@@ -322,8 +322,8 @@ export class UnlitRenderer extends BaseRenderer {
             const lightColor = vec3.scale(vec3.create(), lightComponent.color, lightComponent.intensity);
             const time = performance.now();
             // don't flicker before lantern is collected
-            if (lightComponent.color[0] != 0.01 && lightComponent.type === 0 && time - this.lastLightFlicker > 100) {
-                lightComponent.intensity = Math.random() * 0.3 + 1.8;
+            if (lightComponent.color[0] - 0.01 > 1e-3 && lightComponent.type === 0 && time - this.lastLightFlicker > 100) {
+                lightComponent.intensity = Math.random() * 0.4 + 1.8;
                 this.lastLightFlicker = time;
             }
             this.device.queue.writeBuffer(lightUniformBuffer, i * lightUniformSize, new Float32Array([

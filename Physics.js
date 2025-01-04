@@ -26,6 +26,7 @@ export class Physics {
         this.sound = new Sound({
             collect: { src: './sounds/collect.mp3', volume : 0.6 },
             floorBreak: {src: './sounds/floorBreak.mp3', volume: 0.5 },
+            doorCreek: {src: './sounds/doorCreek.mp3', volume: 0.6 },
         });
 
         this.gltfLoader = gltfLoader;
@@ -71,6 +72,7 @@ export class Physics {
 
     openDoor(door) {
         this.controller.doorAnimation = true;
+        this.controller.stopWalkAnimation();
         const camera = this.scene.find(node => node.getComponentOfType(Camera));
 
         const doorTransform = door.getComponentOfType(Transform);
@@ -114,6 +116,8 @@ export class Physics {
             });
             door.addComponent(doorAnimator);
             doorAnimator.play();
+
+            this.sound.play("doorCreek");
         }, 1000);
 
         let moveCameraToPlayerAnimator = null
@@ -182,7 +186,11 @@ export class Physics {
 
         const bDragBox = this.toDragBox(bBox);
         // Check if there is collision.
-        const isColliding = this.aabbIntersection(aBox, bBox);
+        let isColliding = this.aabbIntersection(aBox, bBox);
+        if (b.isBreakable) {
+            const bBreakBox = this.toBreakBox(bBox);
+            isColliding = this.aabbIntersection(aBox, bBreakBox);
+        }
 
         const isDragColliding = this.aabbIntersection(aBox, bDragBox);
         if(isDragColliding) {
@@ -375,6 +383,13 @@ export class Physics {
         return {
             min: [box.min[0] - 0.5, box.min[1] - 0.5, box.min[2] - 0.5],
             max: [box.max[0] + 0.5, box.max[1] + 0.5, box.max[2] + 0.5],
+        }
+    }
+
+    toBreakBox(box) {
+        return {
+            min: [box.min[0] + 0.5, box.min[1] + 0.5, box.min[2] + 0.5],
+            max: [box.max[0] - 0.5, box.max[1] - 0.5, box.max[2] - 0.5],
         }
     }
 
