@@ -9,7 +9,7 @@ import { RotateAnimator } from './engine/animators/RotateAnimator.js';
 import { LinearAnimator } from './engine/animators/LinearAnimator.js';
 
 export class Physics {
-    constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, gltfLoader, lanternLight) {
+    constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, flashlight, gltfLoader, lanternLight) {
         this.scene = scene;
         this.player = player;
         this.key = key;
@@ -20,6 +20,7 @@ export class Physics {
         this.finalDoor = finalDoor;
         this.firstDoor = firstDoor;
         this.lantern = lantern;
+        this.flashlight = flashlight;
         this.sound = new Sound({
             collect: { src: './sounds/collect.mp3', volume : 0.6 },
         });
@@ -117,6 +118,13 @@ export class Physics {
 
         if (!isColliding) {
             return;
+        }
+
+        if (b.isBreakable) {
+            const floorTransform = b.getComponentOfType(Transform)
+            floorTransform.translation = [-100, -100, -100];
+            this.flashlight.getComponentOfType(Light).isActive = false;
+            this.lanternLight.getComponentOfType(Light).isActive = true;
         }
 
         const minDirection = this.getMinDirection(aBox, bBox);

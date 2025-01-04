@@ -49,7 +49,7 @@ async function startGame(instantStart) {
     const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
     const player = gltfLoader.loadNode("Player");
     player.isPlayer = true;
-    const key = gltfLoader.loadNode('key');
+    const key = gltfLoader.loadNode('key1');
     key.addComponent(new Key())
     const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 
@@ -78,14 +78,14 @@ async function startGame(instantStart) {
     lanternLight.addComponent(new Light({
         color: [0.01, 0.01, 0.01],
         type: 0,
-        isActive: true,
+        isActive: false,
         intensity: 2,
     }));
     const flashLight = new Node();
     flashLight.addComponent(new Light({
         color: [0.5, 0.5, 0.5],
         type: 1,
-        isActive: false,
+        isActive: true,
         intensity: 3,
     }));
 
@@ -176,20 +176,27 @@ async function startGame(instantStart) {
 
     const staticObject = [
         'Trampoline',
-        'Floor',
+        'floor',
         'Cube.005',
         'Cube.006',
         'Cube.008',
-        'wall2',
-        'wall3.001',
         'Cube.001',
         'Cube.009',
         'doors',
-        'wall3.003',
         'doors.001',
+        'wall1',
+        'wall2',
+        'wall3',
         'wall4',
-        'wall3.002',
-        'wall3.004',
+        'wall5',
+        'wall6',
+        'wall7',
+        'wall8',
+        'wall10',
+        'wall11',
+        'wall13',
+        'wall14',
+        'wall15',
     ];
 
     const searchableObjects = [
@@ -209,6 +216,9 @@ async function startGame(instantStart) {
         gltfLoader.loadNode(obj).isStatic = true;
         gltfLoader.loadNode(obj).isDraggable = true;
     }
+
+    gltfLoader.loadNode("BreakingFloor").isBreakable = true;
+    gltfLoader.loadNode("BreakingFloor").isStatic = true;
 
     const lanternIndex = Math.floor(Math.random() * searchableObjects.length);
 
@@ -238,7 +248,7 @@ async function startGame(instantStart) {
 
     const lantern = gltfLoader.loadNode("Lantern");
 
-    const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, gltfLoader, lanternLight);
+    const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, flashLight, gltfLoader, lanternLight);
 
     function update(t, dt) {
         scene.traverse(node => {
