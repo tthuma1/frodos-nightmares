@@ -311,6 +311,7 @@ export class Physics {
             }));
 
             this.updatePlayerAABB();
+            this.player.canSwitchLight = true;
         }
     }
 

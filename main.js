@@ -97,7 +97,12 @@ async function startGame(instantStart) {
     player.addChild(flashLight);
 
     player.currentLight = 0;
+    player.canSwitchLight = false;
     player.switchLight = () => {
+        if (!player.canSwitchLight) {
+            return;
+        }
+
         const lights = [lanternLight.getComponentOfType(Light), flashLight.getComponentOfType(Light)];
         const nextLight = !player.currentLight ? 1 : 0;
         lights[player.currentLight].isActive = false;
