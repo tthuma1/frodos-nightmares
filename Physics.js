@@ -25,6 +25,7 @@ export class Physics {
         this.flashlight = flashlight;
         this.sound = new Sound({
             collect: { src: './sounds/collect.mp3', volume : 0.6 },
+            floorBreak: {src: './sounds/floorBreak.mp3', volume: 0.5 },
         });
 
         this.gltfLoader = gltfLoader;
@@ -195,12 +196,28 @@ export class Physics {
 
         //Handles breaking floor logic
         if (b.isBreakable) {
+            this.sound.play("floorBreak");
+            this.flashlight.getComponentOfType(Light).isActive = false;
+
             const floorTransform = b.getComponentOfType(Transform)
             floorTransform.translation = [-100, -100, -100];
-            this.flashlight.getComponentOfType(Light).isActive = false;
-            this.lanternLight.getComponentOfType(Light).isActive = true;
 
+            const lantern = this.lanternLight.getComponentOfType(Light)
+            setTimeout(() => {
+                const lightAnimator = new LinearAnimator(lantern, {
+                    startPosition: vec3.clone([0, 0, 0]),
+                    endPosition: vec3.clone([0.01, 0.01, 0.01]),
+                    loop: false,
+                    duration: 1,
+                    startTime: performance.now() / 1000,
+                    transform: lantern.color,
+                });
+                this.player.addComponent(lightAnimator);
+                lightAnimator.play();
+                this.lanternLight.getComponentOfType(Light).isActive = true;
+            }, 4000)
         }
+
         //Handles ladder logic, a = player, b = ladder
         if (personController) {
             personController.isPlayerOnLadder = b.isClimbable;
@@ -299,9 +316,9 @@ export class Physics {
             return;
         }
 
-        this.firstKey.getComponentOfType(Key).collectKey()
+        key.getComponentOfType(Key).collectKey()
         this.openDoor(door)
-        this.scene.removeChild(this.firstKey)
+        this.scene.removeChild(key)
         this.sound.play('collect');
         //this.endFunction();
     }

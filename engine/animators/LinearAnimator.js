@@ -56,6 +56,7 @@
 import { vec3, quat } from 'glm';
 
 import { Transform } from '../core/Transform.js';
+import {Light} from "../core/Light.js";
 
 export class LinearAnimator {
 
@@ -131,7 +132,11 @@ export class LinearAnimator {
             return;
         }
 
-        vec3.lerp(transform.translation, this.startPosition, this.endPosition, interpolation);
+        if (this.node instanceof Light) {
+            vec3.lerp(transform, this.startPosition, this.endPosition, interpolation);
+        } else {
+            vec3.lerp(transform.translation, this.startPosition, this.endPosition, interpolation);
+        }
     }
 }
 
