@@ -49,8 +49,10 @@ async function startGame(instantStart) {
     const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
     const player = gltfLoader.loadNode("Player");
     player.isPlayer = true;
-    const key = gltfLoader.loadNode('key1');
-    key.addComponent(new Key())
+    const firstKey = gltfLoader.loadNode('key1');
+    const finalKey = gltfLoader.loadNode('key2');
+    firstKey.addComponent(new Key())
+    finalKey.addComponent(new Key())
     const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 
     // BOXES
@@ -71,6 +73,7 @@ async function startGame(instantStart) {
     // doors
     const finalDoor = gltfLoader.loadNode("doors");
     const firstDoor = gltfLoader.loadNode("doors.001")
+    const keyDoor = gltfLoader.loadNode("doors.002")
 
     // camera.addComponent(new TouchController(camera, canvas));
     player.addComponent(camera)
@@ -184,6 +187,7 @@ async function startGame(instantStart) {
         'Cube.009',
         'doors',
         'doors.001',
+        'doors.002',
         'wall1',
         'wall2',
         'wall3',
@@ -197,6 +201,13 @@ async function startGame(instantStart) {
         'wall13',
         'wall14',
         'wall15',
+        'wall16',
+        'wall17',
+        'wall18',
+        'wall19',
+        'wall20',
+        'wall21',
+        'wall22',
     ];
 
     const searchableObjects = [
@@ -205,7 +216,6 @@ async function startGame(instantStart) {
         'chest.03',
         'chest.04',
         'chest.05',
-        'chest.06',
     ]
 
     for (const obj of staticObject) {
@@ -219,6 +229,9 @@ async function startGame(instantStart) {
 
     gltfLoader.loadNode("BreakingFloor").isBreakable = true;
     gltfLoader.loadNode("BreakingFloor").isStatic = true;
+
+    gltfLoader.loadNode("Ladder").isClimbable = true;
+    gltfLoader.loadNode("Ladder").isStatic = true;
 
     const lanternIndex = Math.floor(Math.random() * searchableObjects.length);
 
@@ -248,7 +261,7 @@ async function startGame(instantStart) {
 
     const lantern = gltfLoader.loadNode("Lantern");
 
-    const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, flashLight, gltfLoader, lanternLight);
+    const physics = new Physics(scene, player, firstKey, finalKey, blockToCircleDict, movingPlatform, finalDoor, firstDoor, keyDoor, lantern, flashLight, gltfLoader, lanternLight);
 
     function update(t, dt) {
         scene.traverse(node => {

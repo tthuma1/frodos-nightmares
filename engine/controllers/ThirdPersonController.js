@@ -50,6 +50,8 @@ export class ThirdPersonController {
         this.walkAnimators = this.getWalkAnimators();
         this.jumpAnimators = this.getJumpAnimators();
 
+        this.isPlayerOnLadder = false;
+
         this.sound = new Sound({
             walk: { src: './sounds/walk.mp3', volume : 0.15 },
             jump: { src: './sounds/jump.mp3', volume : 0.3 },
@@ -80,13 +82,18 @@ export class ThirdPersonController {
         // Map user input to the acceleration vector.
         const acc = vec3.create();
         if (this.keys['KeyW']) {
-            if (!this.isJumping)
-                this.sound.play('walk');
-            if (this.draggedNode)
-                this.sound.play('drag');
-            vec3.add(acc, acc, forward);
-            this.startWalkAnimation();
+            if (this.isPlayerOnLadder) {
+                this.jumpVelocity = this.jumpForce;
+            } else {
+                if (!this.isJumping)
+                    this.sound.play('walk');
+                if (this.draggedNode)
+                    this.sound.play('drag');
+                vec3.add(acc, acc, forward);
+                this.startWalkAnimation();
+            }
         }
+
         if (this.keys['KeyS']) {
             if (!this.isJumping)
                 this.sound.play('walk');
@@ -95,6 +102,7 @@ export class ThirdPersonController {
             vec3.sub(acc, acc, forward);
             this.startWalkAnimation();
         }
+
         if (this.keys['KeyD']) {
             if (!this.isJumping)
                 this.sound.play('walk');
@@ -103,6 +111,7 @@ export class ThirdPersonController {
             vec3.add(acc, acc, right);
             this.startWalkAnimation();
         }
+
         if (this.keys['KeyA']) {
             if (!this.isJumping)
                 this.sound.play('walk');
@@ -111,6 +120,7 @@ export class ThirdPersonController {
             vec3.sub(acc, acc, right);
             this.startWalkAnimation();
         }
+
         if (this.keys['Space'] && !this.isJumping && !this.draggedNode) {
             this.sound.play('jump');
             this.isJumping = true;
@@ -135,11 +145,11 @@ export class ThirdPersonController {
             this.stopWalkAnimation();
         }
 
-        // prevent switching tabs from breaking game
-        if (dt * this.gravity < -0.2) {
-            this.jumpVelocity = this.jumpVelocity - 0.2;
+        // Apply slower gravity when on ladder and not pressing 'A'
+        if (this.isPlayerOnLadder && !this.keys['KeyA']) {
+            this.jumpVelocity += dt * (this.gravity * 0.2);
         } else {
-            this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
+            this.jumpVelocity += dt * this.gravity;
         }
 
         // Update velocity based on acceleration.
@@ -152,6 +162,8 @@ export class ThirdPersonController {
             !this.keys['KeyA'])
         {
             const decay = Math.exp(dt * Math.log(1 - this.decay));
+
+
             vec3.scale(this.velocity, this.velocity, decay);
         }
 

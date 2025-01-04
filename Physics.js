@@ -1,6 +1,6 @@
 import { vec3, mat4, quat } from 'glm';
 import { getGlobalModelMatrix } from 'engine/core/SceneUtils.js';
-import {Light, Transform} from 'engine/core.js';
+import {Camera, Light, Transform} from 'engine/core.js';
 import {Key} from "./engine/core/Key.js";
 import { ThirdPersonController } from './engine/controllers/ThirdPersonController.js';
 import { MovingPlatform } from './engine/core/MovingPlatform.js';
@@ -9,16 +9,17 @@ import { RotateAnimator } from './engine/animators/RotateAnimator.js';
 import { LinearAnimator } from './engine/animators/LinearAnimator.js';
 
 export class Physics {
-    constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, flashlight, gltfLoader, lanternLight) {
+    constructor(scene, player, firstKey, finalKey, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, keyDoor, lantern, flashlight, gltfLoader, lanternLight) {
         this.scene = scene;
         this.player = player;
-        this.key = key;
+        this.firstKey = firstKey;
         this.controller = this.player.getComponentOfType(ThirdPersonController);
         this.blocksToCircleDict = blocksToCircleDict;
         this.solvedPuzzle = false;
         this.movingPlatform = movingPlatform;
         this.finalDoor = finalDoor;
         this.firstDoor = firstDoor;
+        this.keyDoor = keyDoor;
         this.lantern = lantern;
         this.flashlight = flashlight;
         this.sound = new Sound({
@@ -41,30 +42,75 @@ export class Physics {
             }
         })
 
-        if (this.key.getComponentOfType(Key).isCollected === false) {
-            this.keyCollision(this.player, this.key)
+        if (!this.firstKey.getComponentOfType(Key).isCollected) {
+            this.keyCollision(this.player, this.firstKey, this.keyDoor)
         }
-        
+
+        if (!this.firstKey.getComponentOfType(Key).isCollected) {
+            this.keyCollision(this.player, this.firstKey, this.finalDoor)
+        }
+
         if (!this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle){
-            let counter = 0;
-            for (const [block, circle] of this.blocksToCircleDict){
-                if (this.blocksCircleCollision(block, circle))
-                    counter++;
-            }
-
-            if (counter === 3) { // set to 3 when not testing
-                this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle = true;
-
-                const transform = this.finalDoor.getComponentOfType(Transform);
-                const rotation = quat.create();
-                quat.rotateY(rotation, rotation, Math.PI/2);
-                transform.rotation = rotation;
-
-                const boundingBox = this.getTransformedAABB(this.finalDoor);
-                const width = boundingBox.max[0] - boundingBox.min[0];
-                const offPosition = [width/2, 0, -width/2];
-            }
+            this.checkBlockPuzzle()
         }
+    }
+
+    checkBlockPuzzle() {
+        let counter = 0;
+        for (const [block, circle] of this.blocksToCircleDict){
+            if (this.blocksCircleCollision(block, circle))
+                counter++;
+        }
+
+        if (counter === 3) {
+            this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle = true;
+        }
+    }
+
+    openDoor(door) {
+        const camera = this.scene.find(node => node.getComponentOfType(Camera));
+
+        const doorTransform = door.getComponentOfType(Transform);
+        const cameraTransform = camera.getComponentOfType(Transform)
+
+        console.log(vec3.add(vec3.create(), doorTransform.translation.slice(), [-2, 4, 10]));
+        const moveToDoorAnimator = new LinearAnimator(camera, {
+            startPosition: cameraTransform.translation.slice(),
+            endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-2, 4, 10]),
+            loop: false,
+            duration: 1,
+            startTime: performance.now() / 1000,
+            transform: cameraTransform,
+        });
+        camera.addComponent(moveToDoorAnimator)
+        moveToDoorAnimator.play()
+
+        console.log(cameraTransform.translation)
+        setTimeout(() => {
+            console.log(cameraTransform.translation)
+        }, 1000);
+
+        console.log(vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.5, 0, -0.5]));
+        const doorLinearAnimator = new LinearAnimator(door, {
+            startPosition: doorTransform.translation.slice(),
+            endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.25, 0, -0.25]),
+            loop: false,
+            duration: 1,
+            startTime: performance.now() / 1000,
+            transform: doorTransform,
+        });
+        door.addComponent(doorLinearAnimator);
+        doorLinearAnimator.play();
+
+        const doorAnimator = new RotateAnimator(door, {
+            endRotation: [0, -45, 0],
+            loop: false,
+            duration: 1,
+            startTime: performance.now() / 1000,
+            transform: doorTransform,
+        });
+        door.addComponent(doorAnimator);
+        doorAnimator.play();
     }
 
     intervalIntersection(min1, max1, min2, max2) {
@@ -102,30 +148,36 @@ export class Physics {
     }
 
     resolveCollision(a, b) {
+        const personController = a.getComponentOfType(ThirdPersonController)
+
         // Get global space AABBs.
         const aBox = this.getTransformedAABB(a);
         const bBox = this.getTransformedAABB(b);
 
         const bDragBox = this.toDragBox(bBox);
-
         // Check if there is collision.
         const isColliding = this.aabbIntersection(aBox, bBox);
-        const isDragColliding = this.aabbIntersection(aBox, bDragBox);
 
+        const isDragColliding = this.aabbIntersection(aBox, bDragBox);
         if(isDragColliding) {
             this.displayDragText(aBox, bDragBox, b);
-        }
 
+        }
         if (!isColliding) {
+            if (b.isClimbable) personController.isPlayerOnLadder = false;
             return;
         }
 
+        //Handles breaking floor logic
         if (b.isBreakable) {
             const floorTransform = b.getComponentOfType(Transform)
             floorTransform.translation = [-100, -100, -100];
             this.flashlight.getComponentOfType(Light).isActive = false;
             this.lanternLight.getComponentOfType(Light).isActive = true;
+
         }
+        //Handles ladder logic, a = player, b = ladder
+        personController.isPlayerOnLadder = b.isClimbable;
 
         const minDirection = this.getMinDirection(aBox, bBox);
 
@@ -192,36 +244,10 @@ export class Physics {
             const lanternComponent = this.player.children.find(x => x.getComponentOfType(Light)).getComponentOfType(Light);
             lanternComponent.color = [0.2, 0.07, 0.0];
 
-            const doorTransform = this.firstDoor.getComponentOfType(Transform);
-            console.log(vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.5, 0, -0.5]));
-            const doorLinearAnimator = new LinearAnimator(this.firstDoor, {
-                startPosition: doorTransform.translation.slice(),
-                endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.25, 0, -0.25]),
-                loop: false,
-                duration: 1,
-                startTime: performance.now() / 1000,
-                transform: doorTransform,
-            });
-            this.firstDoor.addComponent(doorLinearAnimator);
-            doorLinearAnimator.play();
-
-
-            const doorAnimator = new RotateAnimator(this.firstDoor, {
-                endRotation: [0, -45, 0],
-                loop: false,
-                duration: 1,
-                startTime: performance.now() / 1000,
-                transform: doorTransform,
-            });
-            this.firstDoor.addComponent(doorAnimator);
-            doorAnimator.play();
+            this.openDoor(this.firstDoor)
 
             const lanternTransform = this.lantern.getComponentOfType(Transform)
-            console.log(lanternTransform.translation)
-            const playerTransform = this.player.getComponentOfType(Transform)
-            console.log(playerTransform.translation)
             vec3.add(lanternTransform.translation, lanternTransform.translation, [0, 29*6.02 - 1.3, 0]);
-            console.log(lanternTransform.translation)
 
             const armRotation = this.leftArm.getComponentOfType(Transform).rotation;
             quat.rotateX(armRotation, armRotation, -Math.PI/2);
@@ -236,7 +262,7 @@ export class Physics {
         }
     }
 
-    keyCollision(player, key) {
+    keyCollision(player, key, door) {
         const playerBox = this.getTransformedAABB(player);
         const keyBox = this.getTransformedAABB(key);
 
@@ -245,8 +271,10 @@ export class Physics {
         if (!isColliding) {
             return;
         }
-        this.key.getComponentOfType(Key).collectKey()
-        this.scene.removeChild(this.key)
+
+        this.firstKey.getComponentOfType(Key).collectKey()
+        this.openDoor(door)
+        this.scene.removeChild(this.firstKey)
         this.sound.play('collect');
         //this.endFunction();
     }
@@ -254,7 +282,7 @@ export class Physics {
     blocksCircleCollision(block, circle) {
         const blockBox = this.getTransformedAABB(block);
         const circleBox = this.getTransformedAABB(circle);
-        
+
         const isColliding = this.aabbIntersection(blockBox, circleBox);
         if (!isColliding) {
             return false;
@@ -267,7 +295,7 @@ export class Physics {
         // Move node A minimally to avoid collision.
         const diffa = vec3.sub(vec3.create(), bBox.max, aBox.min);
         const diffb = vec3.sub(vec3.create(), aBox.max, bBox.min);
-        
+
 
         let minDiff = Infinity;
         let minDirection = [0, 0, 0];
