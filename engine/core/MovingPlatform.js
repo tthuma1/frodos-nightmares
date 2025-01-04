@@ -5,13 +5,24 @@ export class MovingPlatform {
     constructor(node) {
         this.node = node;
         this.velocity = [0, 0, 0];
-        this.solvedPuzzle = false;
+        this._solvedPuzzle = false;
+        this.startTime = 0;
+    }
+
+    get solvedPuzzle() {
+        return this._solvedPuzzle;
+    }
+
+    set solvedPuzzle(val) {
+        this._solvedPuzzle = val;
+        if (val) {
+            this.startTime = performance.now() / 1000;
+        }
     }
 
     update(t, dt) {
-        if (this.solvedPuzzle){
-            const time = performance.now() / 1000;
-            this.velocity[0] = Math.sin(time) * 5;
+        if (this._solvedPuzzle){
+            this.velocity[0] = Math.sin((t - this.startTime)) * -3;
 
             const transform = this.node.getComponentOfType(Transform);
             vec3.scaleAndAdd(transform.translation, transform.translation, this.velocity, dt);

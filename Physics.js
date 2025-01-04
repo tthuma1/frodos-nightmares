@@ -189,7 +189,7 @@ export class Physics {
 
         }
         if (!isColliding) {
-            if (b.isClimbable) personController.isPlayerOnLadder = false;
+            if (b.isClimbable && personController) personController.isPlayerOnLadder = false;
             return;
         }
 
@@ -202,7 +202,9 @@ export class Physics {
 
         }
         //Handles ladder logic, a = player, b = ladder
-        personController.isPlayerOnLadder = b.isClimbable;
+        if (personController) {
+            personController.isPlayerOnLadder = b.isClimbable;
+        }
 
         const minDirection = this.getMinDirection(aBox, bBox);
 

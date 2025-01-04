@@ -25,6 +25,7 @@ import { TouchController } from './engine/controllers/TouchController.js'
 import { quat, vec3, vec4, mat3, mat4 } from './lib/glm.js';
 import { RotateAnimator } from './engine/animators/RotateAnimator.js';
 import { ImageLoader } from './engine/loaders/ImageLoader.js';
+import * as EasingFunctions from 'engine/animators/EasingFunctions.js';
 
 const gltfLoader = new GLTFLoader();
 const canvas = document.querySelector('canvas');
@@ -145,21 +146,25 @@ async function startGame(instantStart) {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, -60],
         duration: 0.3,
+        easeFunction: EasingFunctions.polyEaseInOut,
     }));
     armLeft.addComponent(new RotateAnimator(armLeft, {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, 60],
         duration: 0.3,
+        easeFunction: EasingFunctions.polyEaseInOut,
     }));
     legRight.addComponent(new RotateAnimator(legRight, {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, 20],
         duration: 0.3,
+        easeFunction: EasingFunctions.polyEaseInOut,
     }));
     legLeft.addComponent(new RotateAnimator(legLeft, {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, -20],
         duration: 0.3,
+        easeFunction: EasingFunctions.polyEaseInOut,
     }));
     /*** end jump animators ***/
 
