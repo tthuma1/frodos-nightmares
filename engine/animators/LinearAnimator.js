@@ -104,7 +104,6 @@ export class LinearAnimator {
             return;
         }
 
-
         const linearInterpolation = (t - this.startTime) / this.duration;
         let clampedInterpolation = Math.min(Math.max(linearInterpolation, 0), 2);
         if (!this.loop) {

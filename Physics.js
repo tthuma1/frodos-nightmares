@@ -13,6 +13,7 @@ export class Physics {
         this.scene = scene;
         this.player = player;
         this.firstKey = firstKey;
+        this.finalKey = finalKey;
         this.controller = this.player.getComponentOfType(ThirdPersonController);
         this.blocksToCircleDict = blocksToCircleDict;
         this.solvedPuzzle = false;
@@ -46,8 +47,8 @@ export class Physics {
             this.keyCollision(this.player, this.firstKey, this.keyDoor)
         }
 
-        if (!this.firstKey.getComponentOfType(Key).isCollected) {
-            this.keyCollision(this.player, this.firstKey, this.finalDoor)
+        if (!this.finalKey.getComponentOfType(Key).isCollected) {
+            this.keyCollision(this.player, this.finalKey, this.finalDoor)
         }
 
         if (!this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle){
@@ -68,12 +69,14 @@ export class Physics {
     }
 
     openDoor(door) {
+        this.controller.doorAnimation = true;
         const camera = this.scene.find(node => node.getComponentOfType(Camera));
 
         const doorTransform = door.getComponentOfType(Transform);
         const cameraTransform = camera.getComponentOfType(Transform)
 
-        console.log(vec3.add(vec3.create(), doorTransform.translation.slice(), [-2, 4, 10]));
+        const initialCameraTranslation = cameraTransform.translation.slice()
+
         const moveToDoorAnimator = new LinearAnimator(camera, {
             startPosition: cameraTransform.translation.slice(),
             endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-2, 4, 10]),
@@ -85,32 +88,54 @@ export class Physics {
         camera.addComponent(moveToDoorAnimator)
         moveToDoorAnimator.play()
 
-        console.log(cameraTransform.translation)
         setTimeout(() => {
             console.log(cameraTransform.translation)
         }, 1000);
 
-        console.log(vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.5, 0, -0.5]));
-        const doorLinearAnimator = new LinearAnimator(door, {
-            startPosition: doorTransform.translation.slice(),
-            endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.25, 0, -0.25]),
-            loop: false,
-            duration: 1,
-            startTime: performance.now() / 1000,
-            transform: doorTransform,
-        });
-        door.addComponent(doorLinearAnimator);
-        doorLinearAnimator.play();
+        setTimeout(() => {
+            const doorLinearAnimator = new LinearAnimator(door, {
+                startPosition: doorTransform.translation.slice(),
+                endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.5, 0, -0.5]),
+                loop: false,
+                duration: 1,
+                startTime: performance.now() / 1000,
+                transform: doorTransform,
+            });
+            door.addComponent(doorLinearAnimator);
+            doorLinearAnimator.play();
 
-        const doorAnimator = new RotateAnimator(door, {
-            endRotation: [0, -45, 0],
-            loop: false,
-            duration: 1,
-            startTime: performance.now() / 1000,
-            transform: doorTransform,
-        });
-        door.addComponent(doorAnimator);
-        doorAnimator.play();
+            const doorAnimator = new RotateAnimator(door, {
+                endRotation: [0, -90, 0],
+                loop: false,
+                duration: 1,
+                startTime: performance.now() / 1000,
+                transform: doorTransform,
+            });
+            door.addComponent(doorAnimator);
+            doorAnimator.play();
+        }, 1000);
+
+        let moveCameraToPlayerAnimator = null
+
+        setTimeout(() => {
+           moveCameraToPlayerAnimator = new LinearAnimator(door, {
+               startPosition: cameraTransform.translation.slice(),
+               endPosition: initialCameraTranslation,
+               loop: false,
+               duration: 1,
+               startTime: performance.now() / 1000,
+               transform: cameraTransform,
+           })
+
+            camera.addComponent(moveCameraToPlayerAnimator);
+           moveCameraToPlayerAnimator.play()
+        }, 2000);
+
+        setTimeout(() => {
+            camera.removeComponent(moveToDoorAnimator);
+            camera.removeComponent(moveCameraToPlayerAnimator);
+            this.controller.doorAnimation = false;
+        }, 3000);
     }
 
     intervalIntersection(min1, max1, min2, max2) {

@@ -52,9 +52,11 @@ export class RotateAnimator {
             return;
         }
 
-
         const linearInterpolation = (t - this.startTime) / this.duration;
-        const clampedInterpolation = Math.min(Math.max(linearInterpolation, 0), 2);
+        let clampedInterpolation = Math.min(Math.max(linearInterpolation, 0), 2);
+        if (!this.loop) {
+            clampedInterpolation = Math.min(clampedInterpolation, 1);
+        }
         const loopedInterpolation = this.getLoopedInterpolation(linearInterpolation);
         this.updateNode(this.loop ? loopedInterpolation : clampedInterpolation);
     }

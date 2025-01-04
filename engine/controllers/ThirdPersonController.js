@@ -39,6 +39,7 @@ export class ThirdPersonController {
 
         this.draggedNode = null;
         this.lastDragTime = 0;
+        this.doorAnimation = false;
 
         this.movingPlatform = null;
         this.jumpOffVelocity = null; // velocity that moving platform had when you jumped off it
@@ -73,6 +74,10 @@ export class ThirdPersonController {
     }
 
     update(t, dt) {
+        if (this.doorAnimation) {
+            return;
+        }
+
         // Calculate forward and right vectors.
         const cos = Math.cos(0);
         const sin = Math.sin(0);
