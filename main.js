@@ -26,6 +26,7 @@ import { quat, vec3, vec4, mat3, mat4 } from './lib/glm.js';
 import { RotateAnimator } from './engine/animators/RotateAnimator.js';
 import { ImageLoader } from './engine/loaders/ImageLoader.js';
 import * as EasingFunctions from 'engine/animators/EasingFunctions.js';
+import { Sound } from 'engine/core/Sound.js';
 
 const gltfLoader = new GLTFLoader();
 const canvas = document.querySelector('canvas');
@@ -42,7 +43,6 @@ const environmentImages = await Promise.all([
     'nz.webp',
 ].map(url => imageLoader.load(url)));
 renderer.setEnvironment(environmentImages);
-
 
 async function startGame(instantStart) {
     await gltfLoader.load(new URL('./frodomap/frodomap.gltf', import.meta.url));
@@ -317,6 +317,11 @@ async function startGame(instantStart) {
         document.getElementById("start-btn").addEventListener("click", () => {
             document.getElementById("game").style.display = "block";
             document.getElementById("menu").style.display = "none";
+            const sound = new Sound({
+                bgMusic: { src: './sounds/bgMusic.mp3', volume : 0.5 },
+            });
+            sound.play("bgMusic");
+
             updateSystem.start();
         }, { once: true });
     }

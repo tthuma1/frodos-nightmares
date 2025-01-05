@@ -25,8 +25,8 @@ export class Physics {
         this.flashlight = flashlight;
         this.sound = new Sound({
             collect: { src: './sounds/collect.mp3', volume : 0.6 },
-            floorBreak: {src: './sounds/floorBreak.mp3', volume: 0.5 },
-            doorCreek: {src: './sounds/doorCreek.mp3', volume: 0.6 },
+            floorBreak: {src: './sounds/floorBreak.mp3', volume: 0.2 },
+            doorCreek: {src: './sounds/doorCreek.mp3', volume: 0.4 },
         });
 
         this.gltfLoader = gltfLoader;
