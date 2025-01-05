@@ -93,6 +93,7 @@ export class ThirdPersonController {
         if (this.keys['KeyW']) {
             if (this.isPlayerOnLadder) {
                 this.jumpVelocity = 3;
+                this.stopWalkAnimation();
             } else {
                 if (!this.isJumping)
                     this.sound.play('walk');
@@ -106,6 +107,7 @@ export class ThirdPersonController {
         if (this.keys['KeyS']) {
             if (this.isPlayerOnLadder && !this.isPlayerOnFloor) {
                 this.jumpVelocity = -3;
+                this.stopWalkAnimation();
             } else {
                 if (!this.isJumping)
                     this.sound.play('walk');
