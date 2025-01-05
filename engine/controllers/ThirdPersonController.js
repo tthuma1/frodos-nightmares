@@ -36,6 +36,7 @@ export class ThirdPersonController {
         this.jumpForce = 7;
         this.isJumping = true;
         this.gravity = -20;
+        this.ladderGravity = -10;
 
         this.draggedNode = null;
         this.lastDragTime = 0;
@@ -52,6 +53,7 @@ export class ThirdPersonController {
         this.jumpAnimators = this.getJumpAnimators();
 
         this.isPlayerOnLadder = false;
+        this.isPlayerOnFloor = false;
 
         this.maxZ = null;
 
@@ -90,7 +92,7 @@ export class ThirdPersonController {
         const acc = vec3.create();
         if (this.keys['KeyW']) {
             if (this.isPlayerOnLadder) {
-                this.jumpVelocity = this.jumpForce;
+                this.jumpVelocity = 3;
             } else {
                 if (!this.isJumping)
                     this.sound.play('walk');
@@ -102,12 +104,16 @@ export class ThirdPersonController {
         }
 
         if (this.keys['KeyS']) {
-            if (!this.isJumping)
-                this.sound.play('walk');
-            if (this.draggedNode)
-                this.sound.play('drag');
-            vec3.sub(acc, acc, forward);
-            this.startWalkAnimation();
+            if (this.isPlayerOnLadder && !this.isPlayerOnFloor) {
+                this.jumpVelocity = -3;
+            } else {
+                if (!this.isJumping)
+                    this.sound.play('walk');
+                if (this.draggedNode)
+                    this.sound.play('drag');
+                vec3.sub(acc, acc, forward);
+                this.startWalkAnimation();
+            }
         }
 
         if (this.keys['KeyD']) {
@@ -152,11 +158,10 @@ export class ThirdPersonController {
             this.stopWalkAnimation();
         }
 
-        // Apply slower gravity when on ladder and not pressing 'A'
-        if (this.isPlayerOnLadder && !this.keys['KeyA']) {
-            this.jumpVelocity += dt * (this.gravity * 0.2);
-        } else {
+        if (!this.isPlayerOnLadder) {
             this.jumpVelocity += dt * this.gravity;
+        } else if (dt * this.gravity < -0.2) {
+            this.jumpVelocity += -0.2; // prevent gravity bug when switching tabs
         }
 
         // Update velocity based on acceleration.
@@ -169,9 +174,11 @@ export class ThirdPersonController {
             !this.keys['KeyA'])
         {
             const decay = Math.exp(dt * Math.log(1 - this.decay));
-
-
             vec3.scale(this.velocity, this.velocity, decay);
+
+            if (this.isPlayerOnLadder) {
+                this.jumpVelocity *= decay;
+            }
         }
 
         // Limit speed to prevent accelerating to infinity and beyond.
@@ -248,6 +255,8 @@ export class ThirdPersonController {
             return;
         }
 
+        this.isPlayerOnFloor = true;
+
         if (node.isTrampoline) {
             this.jumpVelocity = 10;
             this.movingPlatform = null;
@@ -289,16 +298,22 @@ export class ThirdPersonController {
     }
 
     updateYaw() {
-        const velX = this.velocity[0];
-        const velZ = this.velocity[2];
-        this.yaw = Math.atan2(velX, velZ);
+        if (!this.isPlayerOnLadder) {
+            const velX = this.velocity[0];
+            const velZ = this.velocity[2];
+            this.yaw = Math.atan2(velX, velZ);
+        } else {
+            this.yaw = Math.PI;
+        }
     }
 
     updateFlashlightDirection() {
         const lights = this.node.children.filter(x => x.getComponentOfType(Light))
         const flashLight = lights.find(x => x.getComponentOfType(Light).type === 1);
         const flashLightComponent = flashLight.getComponentOfType(Light);
-        if (vec3.length(this.velocity) > 0.1) {
+        if (this.isPlayerOnLadder) {
+            flashLightComponent.direction = [0, 0, -1];
+        } else if (vec3.length(this.velocity) > 0.1) {
             flashLightComponent.direction = this.velocity.slice();
         }
     }
@@ -323,7 +338,7 @@ export class ThirdPersonController {
     }
 
     startWalkAnimation() {
-        if (!this.isJumping) {
+        if (!this.isJumping && !this.isPlayerOnLadder) {
             for (const animation of this.walkAnimators) {
                 animation.play();
             }
@@ -359,6 +374,8 @@ export class ThirdPersonController {
     }
 
     startJumpAnimation(time) {
+        if (this.isPlayerOnLadder) return;
+
         for (const animation of this.getJumpAnimators()) {
             animation.startTime = time;
             animation.play();

@@ -38,6 +38,8 @@ export class Physics {
 
     update(t, dt) {
         this.isDragColliding = false;
+        this.controller.isPlayerOnLadder = false;
+        this.controller.isPlayerOnFloor = false;
         this.scene.traverse(node => {
             if (node !== this.player && node.isStatic && node !== this.controller.draggedNode) {
                 this.resolveCollision(this.player, node)
@@ -188,8 +190,6 @@ export class Physics {
     }
 
     resolveCollision(a, b) {
-        const personController = a.getComponentOfType(ThirdPersonController)
-
         // Get global space AABBs.
         const aBox = this.getTransformedAABB(a);
         const bBox = this.getTransformedAABB(b);
@@ -203,12 +203,15 @@ export class Physics {
         }
 
         const isDragColliding = this.aabbIntersection(aBox, bDragBox);
-        if(isDragColliding) {
+        if (isDragColliding) {
             this.displayDragText(aBox, bDragBox, b);
+
+            if (b.isClimbable) {
+                this.controller.isPlayerOnLadder = true;
+            }
         }
 
         if (!isColliding) {
-            if (b.isClimbable && personController) personController.isPlayerOnLadder = false;
             return;
         }
 
@@ -236,11 +239,6 @@ export class Physics {
             }, 4000)
         } else if (b.isFloorOutside) {
             this.endFunction();
-        }
-
-        //Handles ladder logic, a = player, b = ladder
-        if (personController) {
-            personController.isPlayerOnLadder = b.isClimbable;
         }
 
         const minDirection = this.getMinDirection(aBox, bBox);
