@@ -282,6 +282,9 @@ async function startGame(instantStart) {
         }
     });
 
+    gltfLoader.loadNode("wall8").aabb.max[2] += 0.5;
+    gltfLoader.loadNode("wall1").aabb.max[2] += 0.5;
+
     function update(t, dt) {
         scene.traverse(node => {
             for (const component of node.components) {
