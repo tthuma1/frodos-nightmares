@@ -96,7 +96,9 @@
 				101,
 				102,
 				103,
-				104
+				104,
+				105,
+				106
 			]
 		}
 	],
@@ -916,7 +918,7 @@
 			"translation":[
 				-0.5220012664794922,
 				1.0757009983062744,
-				-5.2811360359191895
+				-5.179490089416504
 			]
 		},
 		{
@@ -1836,6 +1838,46 @@
 				10.239017486572266,
 				-2.256726026535034
 			]
+		},
+		{
+			"mesh":104,
+			"name":"Cube.002",
+			"rotation":[
+				0,
+				0,
+				-0.7071068286895752,
+				0.7071068286895752
+			],
+			"scale":[
+				1,
+				1,
+				0.06963903456926346
+			],
+			"translation":[
+				-2.5337207317352295,
+				1.8159770965576172,
+				-5.282103538513184
+			]
+		},
+		{
+			"mesh":105,
+			"name":"Cube.003",
+			"rotation":[
+				0,
+				0,
+				-0.7071068286895752,
+				0.7071068286895752
+			],
+			"scale":[
+				1,
+				1,
+				0.06963903456926346
+			],
+			"translation":[
+				3.2856390476226807,
+				1.8159770965576172,
+				-5.282103538513184
+			]
 		}
 	],
 	"cameras":[
@@ -2701,6 +2743,28 @@
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":77
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Material.100",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":78
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Material.101",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":79
 				},
 				"metallicFactor":0,
 				"roughnessFactor":0.5
@@ -4230,6 +4294,34 @@
 					"material":9
 				}
 			]
+		},
+		{
+			"name":"Cube.046",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":372,
+						"NORMAL":373,
+						"TEXCOORD_0":374
+					},
+					"indices":14,
+					"material":78
+				}
+			]
+		},
+		{
+			"name":"Cube.053",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":375,
+						"NORMAL":376,
+						"TEXCOORD_0":377
+					},
+					"indices":14,
+					"material":79
+				}
+			]
 		}
 	],
 	"textures":[
@@ -4544,6 +4636,14 @@
 		{
 			"sampler":1,
 			"source":26
+		},
+		{
+			"sampler":1,
+			"source":27
+		},
+		{
+			"sampler":1,
+			"source":28
 		}
 	],
 	"images":[
@@ -4681,6 +4781,16 @@
 			"mimeType":"image/jpeg",
 			"name":"log-texture",
 			"uri":"log-texture.jpg"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"frodoimage3",
+			"uri":"frodoimage3.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"frodoimage2",
+			"uri":"frodoimage2.png"
 		}
 	],
 	"accessors":[
@@ -8029,6 +8139,62 @@
 			"componentType":5123,
 			"count":3288,
 			"type":"SCALAR"
+		},
+		{
+			"bufferView":372,
+			"componentType":5126,
+			"count":24,
+			"max":[
+				1,
+				1,
+				1
+			],
+			"min":[
+				-1,
+				-1,
+				-1
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":373,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":374,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":375,
+			"componentType":5126,
+			"count":24,
+			"max":[
+				1,
+				1,
+				1
+			],
+			"min":[
+				-1,
+				-1,
+				-1
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":376,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":377,
+			"componentType":5126,
+			"count":24,
+			"type":"VEC2"
 		}
 	],
 	"bufferViews":[
@@ -10263,6 +10429,42 @@
 			"byteLength":6576,
 			"byteOffset":1729052,
 			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":1735628,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":1735916,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":192,
+			"byteOffset":1736204,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":1736396,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":288,
+			"byteOffset":1736684,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":192,
+			"byteOffset":1736972,
+			"target":34962
 		}
 	],
 	"samplers":[
@@ -10279,7 +10481,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":1735628,
+			"byteLength":1737164,
 			"uri":"frodomap.bin"
 		}
 	]
