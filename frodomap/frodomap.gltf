@@ -92,7 +92,11 @@
 				97,
 				98,
 				99,
-				100
+				100,
+				101,
+				102,
+				103,
+				104
 			]
 		}
 	],
@@ -1772,6 +1776,66 @@
 				6.70220947265625,
 				-5.565370082855225
 			]
+		},
+		{
+			"mesh":100,
+			"name":"vase1",
+			"rotation":[
+				0.7071068286895752,
+				0,
+				0,
+				0.7071068286895752
+			],
+			"translation":[
+				6.982923984527588,
+				10.239017486572266,
+				-2.256726026535034
+			]
+		},
+		{
+			"mesh":101,
+			"name":"vase2",
+			"rotation":[
+				0.7071068286895752,
+				0,
+				0,
+				0.7071068286895752
+			],
+			"translation":[
+				6.982923984527588,
+				10.239017486572266,
+				-2.256726026535034
+			]
+		},
+		{
+			"mesh":102,
+			"name":"vase3",
+			"rotation":[
+				0.7071068286895752,
+				0,
+				0,
+				0.7071068286895752
+			],
+			"translation":[
+				6.982923984527588,
+				10.239017486572266,
+				-2.256726026535034
+			]
+		},
+		{
+			"mesh":103,
+			"name":"vase4",
+			"rotation":[
+				0.7071068286895752,
+				0,
+				0,
+				0.7071068286895752
+			],
+			"translation":[
+				6.982923984527588,
+				10.239017486572266,
+				-2.256726026535034
+			]
 		}
 	],
 	"cameras":[
@@ -1893,7 +1957,6 @@
 				"baseColorTexture":{
 					"index":9
 				},
-				"metallicFactor":0,
 				"roughnessFactor":0.5
 			}
 		},
@@ -4109,6 +4172,62 @@
 					},
 					"indices":277,
 					"material":77
+				}
+			]
+		},
+		{
+			"name":"vase01_lp",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":356,
+						"NORMAL":357,
+						"TEXCOORD_0":358
+					},
+					"indices":359,
+					"material":9
+				}
+			]
+		},
+		{
+			"name":"vase03_lp",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":360,
+						"NORMAL":361,
+						"TEXCOORD_0":362
+					},
+					"indices":363,
+					"material":9
+				}
+			]
+		},
+		{
+			"name":"vase04_lp",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":364,
+						"NORMAL":365,
+						"TEXCOORD_0":366
+					},
+					"indices":367,
+					"material":9
+				}
+			]
+		},
+		{
+			"name":"vaso02_lp",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":368,
+						"NORMAL":369,
+						"TEXCOORD_0":370
+					},
+					"indices":371,
+					"material":9
 				}
 			]
 		}
@@ -7774,6 +7893,142 @@
 			"componentType":5126,
 			"count":42,
 			"type":"VEC2"
+		},
+		{
+			"bufferView":356,
+			"componentType":5126,
+			"count":648,
+			"max":[
+				-0.02013400010764599,
+				-1.3326530456542969,
+				0.022255999967455864
+			],
+			"min":[
+				-1.2904260158538818,
+				-2.600438117980957,
+				-1.6250020265579224
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":357,
+			"componentType":5126,
+			"count":648,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":358,
+			"componentType":5126,
+			"count":648,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":359,
+			"componentType":5123,
+			"count":3288,
+			"type":"SCALAR"
+		},
+		{
+			"bufferView":360,
+			"componentType":5126,
+			"count":700,
+			"max":[
+				-0.9332339763641357,
+				-0.9199240207672119,
+				0.02204200066626072
+			],
+			"min":[
+				-1.7405890226364136,
+				-1.7018970251083374,
+				-1.2323260307312012
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":361,
+			"componentType":5126,
+			"count":700,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":362,
+			"componentType":5126,
+			"count":700,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":363,
+			"componentType":5123,
+			"count":3588,
+			"type":"SCALAR"
+		},
+		{
+			"bufferView":364,
+			"componentType":5126,
+			"count":648,
+			"max":[
+				0.08192399889230728,
+				-0.2650359869003296,
+				0.0004780000017490238
+			],
+			"min":[
+				-0.9687749743461609,
+				-1.313662052154541,
+				-1.0021690130233765
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":365,
+			"componentType":5126,
+			"count":648,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":366,
+			"componentType":5126,
+			"count":648,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":367,
+			"componentType":5123,
+			"count":3288,
+			"type":"SCALAR"
+		},
+		{
+			"bufferView":368,
+			"componentType":5126,
+			"count":648,
+			"max":[
+				-0.9987649917602539,
+				-0.05482000112533569,
+				-0.007621999830007553
+			],
+			"min":[
+				-1.7285460233688354,
+				-0.7831609845161438,
+				-0.8414149880409241
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":369,
+			"componentType":5126,
+			"count":648,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":370,
+			"componentType":5126,
+			"count":648,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":371,
+			"componentType":5123,
+			"count":3288,
+			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
@@ -9912,6 +10167,102 @@
 			"byteLength":336,
 			"byteOffset":1623780,
 			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":7776,
+			"byteOffset":1624116,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":7776,
+			"byteOffset":1631892,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":5184,
+			"byteOffset":1639668,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":6576,
+			"byteOffset":1644852,
+			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":8400,
+			"byteOffset":1651428,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":8400,
+			"byteOffset":1659828,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":5600,
+			"byteOffset":1668228,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":7176,
+			"byteOffset":1673828,
+			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":7776,
+			"byteOffset":1681004,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":7776,
+			"byteOffset":1688780,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":5184,
+			"byteOffset":1696556,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":6576,
+			"byteOffset":1701740,
+			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":7776,
+			"byteOffset":1708316,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":7776,
+			"byteOffset":1716092,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":5184,
+			"byteOffset":1723868,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":6576,
+			"byteOffset":1729052,
+			"target":34963
 		}
 	],
 	"samplers":[
@@ -9928,7 +10279,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":1624116,
+			"byteLength":1735628,
 			"uri":"frodomap.bin"
 		}
 	]
