@@ -300,7 +300,7 @@ export class Physics {
         chest.isSearchable = false;
         if (chest.hasLantern) {
             const lanternComponent = this.player.children.find(x => x.getComponentOfType(Light)).getComponentOfType(Light);
-            lanternComponent.color = [0.2, 0.07, 0.0];
+            lanternComponent.color = [0.2, 0.07, 0.01];
 
             this.openDoor(this.firstDoor)
 
@@ -318,6 +318,7 @@ export class Physics {
 
             this.updatePlayerAABB();
             this.player.canSwitchLight = true;
+            this.controller.hasLantern = true;
         }
     }
 

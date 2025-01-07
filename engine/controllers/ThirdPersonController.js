@@ -63,6 +63,14 @@ export class ThirdPersonController {
             bounce: { src: './sounds/bounce.mp3', volume : 0.4} ,
             drag: {src: './sounds/drag.mp3', volume : 0.25 },
         });
+
+        const cameraTranslation = this.node.components[2].getComponentOfType(Transform).translation;
+        const playerTranslation = this.node.getComponentOfType(Transform).translation;
+        this.zDiffCameraPlayer = cameraTranslation[2] - playerTranslation[2];
+
+        this.armRight = this.gltfLoader.loadNode("armRight");
+        this.armLeft = this.gltfLoader.loadNode("armLeft");
+        this.hasLantern = false;
     }
 
     initHandlers() {
@@ -80,6 +88,10 @@ export class ThirdPersonController {
     update(t, dt) {
         if (this.doorAnimation) {
             return;
+        }
+
+        if (this.jumpVelocity < -1) {
+            this.isJumping = true;
         }
 
         // Calculate forward and right vectors.
@@ -193,12 +205,10 @@ export class ThirdPersonController {
 
         const transform = this.node.getComponentOfType(Transform);
         if (transform) {
-            const playerTranslationCopy = transform.translation.slice();
             this.translateWithVelocity(transform.translation, dt);
 
             // translate camera with player
             const cameraTranslation = this.node.components[2].getComponentOfType(Transform).translation;
-            const cameraTranslationCopy = cameraTranslation.slice();
             this.translateWithVelocity(cameraTranslation, dt);
 
             // translate dragged object
@@ -217,9 +227,15 @@ export class ThirdPersonController {
             transform.rotation = rotation;
 
             if (this.maxZ !== null && transform.translation[2] > this.maxZ) {
-                transform.translation[2] = playerTranslationCopy[2];
-                cameraTranslation[2] = cameraTranslationCopy[2];
+                transform.translation[2] = this.maxZ;
+                cameraTranslation[2] = this.maxZ + this.zDiffCameraPlayer;
             }
+        }
+
+        if (this.isPlayerOnLadder) {
+            this.transformLadderHands();
+        } else {
+            this.transformNormalHands();
         }
     }
 
@@ -261,9 +277,10 @@ export class ThirdPersonController {
 
         if (node.isTrampoline) {
             this.jumpVelocity = 10;
+            this.isJumping = true;
             this.movingPlatform = null;
             this.sound.play('bounce');
-
+            this.startJumpAnimation(performance.now() / 1000);
         } else {
             this.jumpVelocity = 0;
             this.isJumping = false;
@@ -388,6 +405,27 @@ export class ThirdPersonController {
         for (const animation of this.getJumpAnimators()) {
             animation.startTime = time;
             animation.stop();
+        }
+    }
+
+    transformLadderHands() {
+        const rightTransform = this.armLeft.getComponentOfType(Transform);
+        const leftTransform = this.armRight.getComponentOfType(Transform);
+
+        rightTransform.rotation = quat.rotateX(quat.create(), quat.create(), Math.PI)
+        leftTransform.rotation = quat.rotateX(quat.create(), quat.create(), Math.PI);
+    }
+
+    transformNormalHands() {
+        const rightTransform = this.armLeft.getComponentOfType(Transform);
+        const leftTransform = this.armRight.getComponentOfType(Transform);
+
+        if (this.hasLantern) {
+            rightTransform.rotation = quat.rotateX(quat.create(), quat.create(), -Math.PI / 2);
+            leftTransform.rotation = quat.rotateX(quat.create(), quat.create(), 0)
+        } else {
+            rightTransform.rotation = quat.rotateX(quat.create(), quat.create(), 0)
+            leftTransform.rotation = quat.rotateX(quat.create(), quat.create(), 0);
         }
     }
 }

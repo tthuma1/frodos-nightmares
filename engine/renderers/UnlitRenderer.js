@@ -307,8 +307,6 @@ export class UnlitRenderer extends BaseRenderer {
         this.device.queue.writeBuffer(cameraUniformBuffer, 0, viewMatrix);
         this.device.queue.writeBuffer(cameraUniformBuffer, 64, projectionMatrix);
         this.device.queue.writeBuffer(cameraUniformBuffer, 128, cameraPosition);
-        this.device.queue.writeBuffer(cameraUniformBuffer, 128, cameraPosition);
-        this.device.queue.writeBuffer(cameraUniformBuffer, 128, cameraPosition);
         this.device.queue.writeBuffer(unprojectUniformBuffer, 0, unprojectMatrix);
         this.renderPass.setBindGroup(0, cameraBindGroup);
 
