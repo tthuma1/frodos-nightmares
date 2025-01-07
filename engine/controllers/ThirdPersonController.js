@@ -221,10 +221,12 @@ export class ThirdPersonController {
 
             // Update rotation based on the Euler angles.
             const rotation = quat.create();
-            this.updateYaw();
-            quat.rotateY(rotation, rotation, this.yaw);
-            quat.rotateX(rotation, rotation, this.pitch);
-            transform.rotation = rotation;
+            if (!this.isPlayerOnLadder && vec3.length(this.velocity) > 1e-3) {
+                this.updateYaw();
+                quat.rotateY(rotation, rotation, this.yaw);
+                quat.rotateX(rotation, rotation, this.pitch);
+                transform.rotation = rotation;
+            }
 
             if (this.maxZ !== null && transform.translation[2] > this.maxZ) {
                 transform.translation[2] = this.maxZ;
