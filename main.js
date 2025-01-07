@@ -220,6 +220,7 @@ async function startGame(instantStart) {
         'wall21',
         'wall22',
         'FloorOutside',
+        // 'vase',
     ];
 
     const searchableObjects = [
