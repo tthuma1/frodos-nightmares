@@ -9,7 +9,7 @@ import { RotateAnimator } from './engine/animators/RotateAnimator.js';
 import { LinearAnimator } from './engine/animators/LinearAnimator.js';
 
 export class Physics {
-    constructor(scene, player, firstKey, finalKey, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, keyDoor, lantern, flashlight, gltfLoader, lanternLight) {
+    constructor(scene, player, firstKey, finalKey, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, keyDoor, lantern, flashlight, gltfLoader, lanternLight, externalLights) {
         this.scene = scene;
         this.player = player;
         this.firstKey = firstKey;
@@ -34,6 +34,8 @@ export class Physics {
         this.lanternLight = lanternLight;
 
         this.isDragColliding = false;
+
+        this.externalLights = externalLights;
     }
 
     update(t, dt) {
@@ -223,7 +225,13 @@ export class Physics {
             const floorTransform = b.getComponentOfType(Transform)
             floorTransform.translation = [-100, -100, -100];
 
+            for (const externalLight of this.externalLights) {
+                const lightComponent = externalLight.getComponentOfType(Light);
+                lightComponent.intensity = 0;
+            }
+
             const lantern = this.lanternLight.getComponentOfType(Light)
+
             setTimeout(() => {
                 const lightAnimator = new LinearAnimator(lantern, {
                     startPosition: vec3.clone([0, 0, 0]),
@@ -236,6 +244,11 @@ export class Physics {
                 this.player.addComponent(lightAnimator);
                 lightAnimator.play();
                 this.lanternLight.getComponentOfType(Light).isActive = true;
+
+                for (const externalLight of this.externalLights) {
+                    const lightComponent = externalLight.getComponentOfType(Light);
+                    lightComponent.intensity = 1;
+                }
             }, 4000)
         } else if (b.isFloorOutside) {
             this.endFunction();

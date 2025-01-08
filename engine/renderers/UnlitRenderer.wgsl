@@ -56,7 +56,7 @@ struct LightUniforms {
 @group(2) @binding(1) var baseTexture: texture_2d<f32>;
 @group(2) @binding(2) var baseSampler: sampler;
 
-@group(3) @binding(0) var<uniform> lights: array<LightUniforms, 2>;
+@group(3) @binding(0) var<uniform> lights: array<LightUniforms, 3>;
 
 
 @vertex
@@ -86,7 +86,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     let T = refract(-V, N, 0);
 
     // loop through all lights
-    for (var i : u32 = 0; i < 2; i++) {
+    for (var i : u32 = 0; i < 3; i++) {
         let light = lights[i];
         if (light.isActive == 0) {
             continue;
