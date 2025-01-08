@@ -12,7 +12,7 @@ import {
 import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
 import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
 import { UpdateSystem } from 'engine/systems/UpdateSystem.js';
-import { UnlitRenderer } from 'engine/renderers/UnlitRenderer.js';
+import { LitRenderer } from 'engine/renderers/LitRenderer.js';
 import { ThirdPersonController } from "./engine/controllers/ThirdPersonController.js";
 import { Physics } from './Physics.js';
 import {
@@ -30,7 +30,7 @@ import { Sound } from 'engine/core/Sound.js';
 
 const gltfLoader = new GLTFLoader();
 const canvas = document.querySelector('canvas');
-const renderer = new UnlitRenderer(canvas);
+const renderer = new LitRenderer(canvas);
 await renderer.initialize();
 
 const imageLoader = new ImageLoader();

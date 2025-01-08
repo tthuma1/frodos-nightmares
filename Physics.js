@@ -156,13 +156,13 @@ export class Physics {
 
             camera.addComponent(moveCameraToPlayerAnimator);
            moveCameraToPlayerAnimator.play()
-        }, 2000);
+        }, 2300);
 
         setTimeout(() => {
             camera.removeComponent(moveToDoorAnimator);
             camera.removeComponent(moveCameraToPlayerAnimator);
             this.controller.doorAnimation = false;
-        }, 3000);
+        }, 3300);
     }
 
     intervalIntersection(min1, max1, min2, max2) {
