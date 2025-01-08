@@ -154,7 +154,8 @@
 				137,
 				138,
 				139,
-				140
+				140,
+				141
 			]
 		}
 	],
@@ -2515,6 +2516,20 @@
 				13.269495010375977,
 				-5.586375713348389
 			]
+		},
+		{
+			"mesh":138,
+			"name":"globe",
+			"scale":[
+				0.40613219141960144,
+				0.40613219141960144,
+				0.40613219141960144
+			],
+			"translation":[
+				-3.9473791122436523,
+				0.8945068120956421,
+				1.022789478302002
+			]
 		}
 	],
 	"cameras":[
@@ -2679,7 +2694,6 @@
 				"baseColorTexture":{
 					"index":13
 				},
-				"metallicFactor":0,
 				"roughnessFactor":0.5
 			}
 		},
@@ -2952,7 +2966,6 @@
 				"baseColorTexture":{
 					"index":38
 				},
-				"metallicFactor":0,
 				"roughnessFactor":0.5
 			}
 		},
@@ -3206,6 +3219,17 @@
 					"index":61
 				},
 				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Material.026",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":62
+				},
+				"metallicFactor":0.800000011920929,
 				"roughnessFactor":0.5
 			}
 		}
@@ -5236,6 +5260,22 @@
 					"material":61
 				}
 			]
+		},
+		{
+			"name":"uploads_files_2707499_globe",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":509,
+						"NORMAL":510,
+						"TEXCOORD_0":511,
+						"COLOR_0":512,
+						"COLOR_1":513
+					},
+					"indices":514,
+					"material":62
+				}
+			]
 		}
 	],
 	"textures":[
@@ -5486,6 +5526,10 @@
 		{
 			"sampler":1,
 			"source":33
+		},
+		{
+			"sampler":1,
+			"source":34
 		}
 	],
 	"images":[
@@ -5658,6 +5702,11 @@
 			"mimeType":"image/png",
 			"name":"window",
 			"uri":"window.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"globe",
+			"uri":"globe.png"
 		}
 	],
 	"accessors":[
@@ -10198,6 +10247,54 @@
 			"componentType":5123,
 			"count":156,
 			"type":"SCALAR"
+		},
+		{
+			"bufferView":509,
+			"componentType":5126,
+			"count":211,
+			"max":[
+				1.2120137214660645,
+				1.009789228439331,
+				0.9990160465240479
+			],
+			"min":[
+				-1.0024189949035645,
+				-1.6530656814575195,
+				-0.999016523361206
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":510,
+			"componentType":5126,
+			"count":211,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":511,
+			"componentType":5126,
+			"count":211,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":512,
+			"componentType":5121,
+			"count":211,
+			"normalized":true,
+			"type":"VEC4"
+		},
+		{
+			"bufferView":513,
+			"componentType":5123,
+			"count":211,
+			"normalized":true,
+			"type":"VEC4"
+		},
+		{
+			"bufferView":514,
+			"componentType":5123,
+			"count":1209,
+			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
@@ -13254,6 +13351,42 @@
 			"byteLength":312,
 			"byteOffset":2077404,
 			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":2532,
+			"byteOffset":2077716,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":2532,
+			"byteOffset":2080248,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":1688,
+			"byteOffset":2082780,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":844,
+			"byteOffset":2084468,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":1688,
+			"byteOffset":2085312,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":2418,
+			"byteOffset":2087000,
+			"target":34963
 		}
 	],
 	"samplers":[
@@ -13270,7 +13403,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":2077716,
+			"byteLength":2089420,
 			"uri":"frodomap.bin"
 		}
 	]
