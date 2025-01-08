@@ -239,6 +239,11 @@ async function startGame(instantStart) {
         'vase2',
         'vase3',
         'vase4',
+        'chest_upper1',
+        'chest_upper2',
+        'chest_upper3',
+        'chest_upper4',
+        'chest_upper5',
     ];
 
     const searchableObjects = [

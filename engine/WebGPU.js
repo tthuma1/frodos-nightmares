@@ -28,7 +28,7 @@ export function createTextureFromSource(device, {
     const texture = device.createTexture({
         format,
         size,
-        mipLevelCount: mpc,
+        mipLevelCount: 1, //mpc,
         usage: usage |
             GPUTextureUsage.TEXTURE_BINDING |
             GPUTextureUsage.COPY_DST |
@@ -39,7 +39,7 @@ export function createTextureFromSource(device, {
         { texture },
         size,
     );
-    generateMipmaps2D(device, texture);
+    // generateMipmaps2D(device, texture);
     return texture;
 }
 
@@ -59,7 +59,7 @@ export function createTextureFromData(device, {
     const texture = device.createTexture({
         format,
         size,
-        mipLevelCount: mpc,
+        mipLevelCount: 1,//mpc,
         usage: usage | GPUTextureUsage.COPY_DST,
     });
     device.queue.writeTexture(
@@ -68,7 +68,7 @@ export function createTextureFromData(device, {
         { bytesPerRow, rowsPerImage },
         size,
     );
-    generateMipmaps2D(device, texture);
+    // generateMipmaps2D(device, texture);
     return texture;
 }
 

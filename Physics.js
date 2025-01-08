@@ -309,6 +309,16 @@ export class Physics {
 
     searchChest(chest) {
         chest.isSearchable = false;
+        const chestAnim = new RotateAnimator(chest.children[0], {
+            endRotation: [0, 0, -55],
+            loop: false,
+            duration: 0.7,
+            startTime: performance.now() / 1000,
+            transform: chest.children[0].getComponentOfType(Transform),
+        });
+        chest.children[0].addComponent(chestAnim);
+        chestAnim.play();
+
         if (chest.hasLantern) {
             const lanternComponent = this.player.children.find(x => x.getComponentOfType(Light)).getComponentOfType(Light);
             lanternComponent.color = [0.2, 0.07, 0.01];
