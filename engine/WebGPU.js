@@ -1,4 +1,5 @@
 import { mipLevelCountF, generateMipmaps2D } from './WebGPUMipmaps.js';
+import { createTextureFromSource } from './webgpu-utils/texture-utils.js';
 
 
 export function createBuffer(device, { data, usage }) {
@@ -16,32 +17,32 @@ export function createBuffer(device, { data, usage }) {
     return buffer;
 }
 
-export function createTextureFromSource(device, {
-    source,
-    format = 'rgba8unorm',
-    usage = 0,
-    mipLevelCount = 1,
-    flipY = false,
-}) {
-    const size = [source.width, source.height, 1];
-    const mpc = mipLevelCountF(size);
-    const texture = device.createTexture({
-        format,
-        size,
-        mipLevelCount: 1, //mpc,
-        usage: usage |
-            GPUTextureUsage.TEXTURE_BINDING |
-            GPUTextureUsage.COPY_DST |
-            GPUTextureUsage.RENDER_ATTACHMENT,
-    });
-    device.queue.copyExternalImageToTexture(
-        { source, flipY },
-        { texture },
-        size,
-    );
-    // generateMipmaps2D(device, texture);
-    return texture;
-}
+// export function createTextureFromSource(device, {
+//     source,
+//     format = 'rgba8unorm',
+//     usage = 0,
+//     mipLevelCount = 1,
+//     flipY = false,
+// }) {
+//     const size = [source.width, source.height, 1];
+//     const mpc = mipLevelCountF(size);
+//     const texture = device.createTexture({
+//         format,
+//         size,
+//         mipLevelCount: mpc,
+//         usage: usage |
+//             GPUTextureUsage.TEXTURE_BINDING |
+//             GPUTextureUsage.COPY_DST |
+//             GPUTextureUsage.RENDER_ATTACHMENT,
+//     });
+//     device.queue.copyExternalImageToTexture(
+//         { source, flipY },
+//         { texture },
+//         size,
+//     );
+//     generateMipmaps2D(device, texture);
+//     return texture;
+// }
 
 export function createTextureFromData(device, {
     data,
@@ -55,11 +56,10 @@ export function createTextureFromData(device, {
     flipY = false,
 }) {
     size = [...size, 1];
-    const mpc = mipLevelCountF(size);
     const texture = device.createTexture({
         format,
         size,
-        mipLevelCount: 1,//mpc,
+        mipLevelCount: 1,
         usage: usage | GPUTextureUsage.COPY_DST,
     });
     device.queue.writeTexture(
@@ -68,13 +68,14 @@ export function createTextureFromData(device, {
         { bytesPerRow, rowsPerImage },
         size,
     );
-    // generateMipmaps2D(device, texture);
     return texture;
 }
 
 export function createTexture(device, options) {
     if (options.source) {
-        return createTextureFromSource(device, options);
+        return createTextureFromSource(device, options.source, {
+            mips: true,
+        });
     } else {
         return createTextureFromData(device, options);
     }

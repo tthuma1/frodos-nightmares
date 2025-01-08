@@ -165,7 +165,7 @@ export class LitRenderer extends BaseRenderer {
         });
 
         this.skyboxBindGroup = this.device.createBindGroup({
-            label:'skyboxneofa',
+            label:'skybox',
             layout: this.skyboxPipeline.getBindGroupLayout(1),
             entries: [
                 { binding: 0, resource: this.environmentTexture.createView({ dimension: 'cube' }) },
