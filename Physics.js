@@ -36,6 +36,7 @@ export class Physics {
         this.isDragColliding = false;
 
         this.externalLights = externalLights;
+        this.doorsOpened = -1;
     }
 
     update(t, dt) {
@@ -85,6 +86,13 @@ export class Physics {
     }
 
     openDoor(door) {
+        if (this.doorsOpened !== -1) {
+            const externalLightComponent = this.externalLights[this.doorsOpened].getComponentOfType(Light);
+            externalLightComponent.isActive = true;
+        }
+        console.log(this.externalLights)
+        this.doorsOpened += 1;
+
         this.controller.doorAnimation = true;
         this.controller.stopWalkAnimation();
         const camera = this.scene.find(node => node.getComponentOfType(Camera));
@@ -225,11 +233,6 @@ export class Physics {
             const floorTransform = b.getComponentOfType(Transform)
             floorTransform.translation = [-100, -100, -100];
 
-            for (const externalLight of this.externalLights) {
-                const lightComponent = externalLight.getComponentOfType(Light);
-                lightComponent.intensity = 0;
-            }
-
             const lantern = this.lanternLight.getComponentOfType(Light)
 
             setTimeout(() => {
@@ -244,11 +247,6 @@ export class Physics {
                 this.player.addComponent(lightAnimator);
                 lightAnimator.play();
                 this.lanternLight.getComponentOfType(Light).isActive = true;
-
-                for (const externalLight of this.externalLights) {
-                    const lightComponent = externalLight.getComponentOfType(Light);
-                    lightComponent.intensity = 1;
-                }
             }, 4000)
         } else if (b.isFloorOutside) {
             this.endFunction();

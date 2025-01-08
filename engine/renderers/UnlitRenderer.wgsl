@@ -56,7 +56,7 @@ struct LightUniforms {
 @group(2) @binding(1) var baseTexture: texture_2d<f32>;
 @group(2) @binding(2) var baseSampler: sampler;
 
-@group(3) @binding(0) var<uniform> lights: array<LightUniforms, 3>;
+@group(3) @binding(0) var<uniform> lights: array<LightUniforms, 4>;
 
 
 @vertex
@@ -84,9 +84,18 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     let V = normalize(camera.position - surfacePosition);
     let R = reflect(-V, N);
     let T = refract(-V, N, 0);
+    let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
+
+    var numLightsActive : u32 = 0;
+    for (var i : u32 = 0; i < 4; i++) {
+        let light = lights[i];
+        if (light.isActive == 1) {
+            numLightsActive++;
+        }
+    }
 
     // loop through all lights
-    for (var i : u32 = 0; i < 3; i++) {
+    for (var i : u32 = 0; i < 4; i++) {
         let light = lights[i];
         if (light.isActive == 0) {
             continue;
@@ -119,11 +128,9 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
             Il = light.color * Ad * Af;
         }
 
-        let ambientLight = vec3f(0.008);
-        let diffuseLight = Il * lambert + ambientLight;
+        let diffuseLight = Il * lambert;
         let specularLight = Il * blinn;
 
-        let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
         let reflectedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, R);
         let refractedColor = textureSample(uEnvironmentTexture, uEnvironmentSampler, T);
 
@@ -139,6 +146,11 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
         }
 
         output.color += vec4(pow(finalColor.rgb, vec3(1 / 2.2)), finalColor.a);
+    }
+
+    if (numLightsActive > 0) {
+        let ambient = 0.12;
+        output.color += vec4f(baseColor.rgb * ambient, output.color.a);
     }
 
     return output;

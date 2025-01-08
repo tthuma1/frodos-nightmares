@@ -96,11 +96,18 @@ async function startGame(instantStart) {
     player.addChild(lanternLight);
     player.addChild(flashLight);
 
-    const luc1 = gltfLoader.loadNode("luc1");
-    luc1.addComponent(new Light({
+    const light1 = gltfLoader.loadNode("light1");
+    light1.addComponent(new Light({
         color: [0.01, 0.01, 0.01],
         type: 0,
-        isActive: true,
+        isActive: false,
+        intensity: 1,
+    }));
+    const light2 = gltfLoader.loadNode("light2");
+    light2.addComponent(new Light({
+        color: [0.01, 0.01, 0.01],
+        type: 0,
+        isActive: false,
         intensity: 1,
     }));
 
@@ -278,7 +285,7 @@ async function startGame(instantStart) {
 
     const lantern = gltfLoader.loadNode("Lantern");
 
-    const externalLights = [luc1];
+    const externalLights = [light1, light2];
     const physics = new Physics(scene, player, firstKey, finalKey, blockToCircleDict, movingPlatform, finalDoor, firstDoor, keyDoor, lantern, flashLight, gltfLoader, lanternLight, externalLights);
 
     scene.traverse(node => {
