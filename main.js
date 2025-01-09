@@ -347,7 +347,7 @@ async function startGame(instantStart) {
             document.getElementById("game").style.display = "block";
             document.getElementById("menu").style.display = "none";
             const sound = new Sound({
-                bgMusic: { src: './sounds/bgMusic.mp3', volume : 0.5 },
+                bgMusic: { src: './sounds/bgMusic.mp3', volume: 0.5, loop: true },
             });
             sound.play("bgMusic");
 
