@@ -1,4 +1,4 @@
-import { quat, vec2, vec3, mat4 } from 'glm';
+import { quat, vec2, vec3, vec4, mat4 } from 'glm';
 
 import { Transform } from '../core/Transform.js';
 import {Camera} from "../core/Camera.js";
@@ -6,10 +6,18 @@ import { MovingPlatform } from '../core/MovingPlatform.js';
 import { Light } from '../core/Light.js';
 import { Sound } from '../core/Sound.js';
 import { RotateAnimator } from '../animators/RotateAnimator.js';
+import {
+    getGlobalViewMatrix,
+    getProjectionMatrix,
+    getGlobalModelMatrix,
+} from '../core/SceneUtils.js';
+import { getTransformedAABB } from '../../Physics.js';
+import { LinearAnimator } from '../animators/LinearAnimator.js';
+
 
 export class ThirdPersonController {
 
-    constructor(node, domElement, gltfLoader, {
+    constructor(node, domElement, gltfLoader, camera, {
         pitch = 0,
         yaw = 0,
         velocity = [0, 0, 0],
@@ -47,8 +55,6 @@ export class ThirdPersonController {
 
         this.lastLightSwitchTime = 0;
 
-        this.initHandlers();
-
         this.walkAnimators = this.getWalkAnimators();
         this.jumpAnimators = this.getJumpAnimators();
 
@@ -71,55 +77,121 @@ export class ThirdPersonController {
         this.armRight = this.gltfLoader.loadNode("armRight");
         this.armLeft = this.gltfLoader.loadNode("armLeft");
         this.hasLantern = false;
+
+        this.camera = camera;
+        this.button = this.gltfLoader.loadNode("button");
+        this.fence = this.gltfLoader.loadNode("fence");
     }
 
-    initHandlers() {
 
+    initHandlers() {
         this.keydownHandler = this.keydownHandler.bind(this);
         this.keyupHandler = this.keyupHandler.bind(this);
+        this.clickHandler = this.calculateRayWithButton.bind(this);
 
         const element = this.domElement;
         const doc = element.ownerDocument;
 
         doc.addEventListener('keydown', this.keydownHandler);
         doc.addEventListener('keyup', this.keyupHandler);
-        doc.addEventListener("click", (event) => {
-            const canvas = document.querySelector('canvas');
-            const rect = canvas.getBoundingClientRect();
-        
-            // Map mouse position to normalized device coordinates (-1 to 1)
-            const ndcX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            const ndcY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-        
-            // Store NDC coordinates for raycasting
-            console.log("NDC Coordinates:", { ndcX, ndcY });
-            this.ndcX = ndcX;
-            this.ndcY = ndcY;
-        });
-        
+        doc.addEventListener("click", this.clickHandler);
     }
 
-createRayFromCamera(ndcX, ndcY, camera, projectionMatrix) {
-    // Inverse of the projection * view matrix
-    const invProjView = mat4.create();
-    mat4.multiply(invProjView, projectionMatrix, camera.viewMatrix);
-    mat4.invert(invProjView, invProjView);
+    removeHandlers() {
+        const element = this.domElement;
+        const doc = element.ownerDocument;
 
-    // Start and end points in NDC space (z = -1 for near plane, +1 for far plane)
-    const nearPoint = vec3.fromValues(ndcX, ndcY, -1);
-    const farPoint = vec3.fromValues(ndcX, ndcY, 1);
+        doc.removeEventListener('keydown', this.keydownHandler);
+        doc.removeEventListener('keyup', this.keyupHandler);
+        doc.removeEventListener("click", this.clickHandler);
+    }
 
-    // Transform to world space
-    vec3.transformMat4(nearPoint, nearPoint, invProjView);
-    vec3.transformMat4(farPoint, farPoint, invProjView);
+    calculateRayWithButton(event) {
+        const canvas = document.querySelector('canvas');
+        const rect = canvas.getBoundingClientRect();
+    
+        const ndcX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        const ndcY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-    // Create ray
-    const direction = vec3.sub(vec3.create(), farPoint, nearPoint);
-    vec3.normalize(direction, direction);
 
-    return { origin: nearPoint, direction };
-}
+        const rayDirection = this.getRayDirection(ndcX, ndcY);
+        const rayOrigin = mat4.getTranslation(
+            vec3.create(),
+            getGlobalModelMatrix(this.camera)
+        );
 
+        const isClicked = this.checkRayButtonCollision(rayOrigin, rayDirection);
+        console.log(isClicked);
+
+        // todo: handle multiple clicks
+        if (isClicked) {
+            const fenceTransform = this.fence.getComponentOfType(Transform);
+            const fenceTranslation = fenceTransform.translation;
+            const fenceAnim = new LinearAnimator(this.fence, {
+                startPosition: fenceTranslation.slice(),
+                endPosition: vec3.add(vec3.create(), fenceTranslation.slice(), [0, -2.5, 0]),
+                loop: false,
+                duration: 2,
+                startTime: performance.now() / 1000,
+                transform: fenceTransform,
+            });
+            this.fence.addComponent(fenceAnim);
+            fenceAnim.play();
+        }
+    }
+
+    getRayDirection(ndcX, ndcY) {
+        const projectionMatrixInverse = getProjectionMatrix(this.camera).invert();
+        const viewMatrixInverse = getGlobalViewMatrix(this.camera).invert();
+    
+        const clipCoords = [ndcX, ndcY, -1.0, 1.0];
+    
+        const eyeCoords = vec4.transformMat4(
+            [],
+            clipCoords,
+            projectionMatrixInverse
+        );
+        eyeCoords[2] = -1.0;
+        eyeCoords[3] = 0.0;
+    
+        const rayWorld = vec4.transformMat4([], eyeCoords, viewMatrixInverse);
+        return vec3.normalize([], rayWorld.slice(0, 3));
+    }
+
+    checkRayButtonCollision(rayOrigin, rayDirection) {
+
+        const paabb = getTransformedAABB(this.button);
+        const aabbMin = Object.values(paabb.min), aabbMax = Object.values(paabb.max);
+        let tMin = -Infinity;
+        let tMax = Infinity;
+    
+        for (let i = 0; i < 3; i++) {
+            if (rayDirection[i] !== 0) {
+                // Calculate intersection distances for the two planes of the AABB on this axis
+                const t1 = (aabbMin[i] - rayOrigin[i]) / rayDirection[i];
+                const t2 = (aabbMax[i] - rayOrigin[i]) / rayDirection[i];
+    
+                // Swap t1 and t2 if needed to ensure t1 is the entry point and t2 is the exit point
+                const tEntry = Math.min(t1, t2);
+                const tExit = Math.max(t1, t2);
+    
+                // Update the global tMin and tMax
+                tMin = Math.max(tMin, tEntry);
+                tMax = Math.min(tMax, tExit);
+            } else {
+                // Ray is parallel to this axis; check if the origin is outside the slab
+                if (rayOrigin[i] < aabbMin[i] || rayOrigin[i] > aabbMax[i]) {
+                    // console.log("miss1");
+                    // return false; // Ray misses the box
+                }
+            }
+        }
+    
+        return tMax >= tMin && tMax >= 0;
+        // if (tMax >= tMin && tMax >= 0) {
+        //     this.fence.addComponent()
+        // }
+    }
 
     update(t, dt) {
         if (this.doorAnimation) {
