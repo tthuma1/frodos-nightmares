@@ -172,7 +172,9 @@ export class ThirdPersonController {
     animateFence() {
         const fenceTransform = this.fence.getComponentOfType(Transform);
         const fenceTranslation = fenceTransform.translation;
+        const buttonTranslation = this.button.getComponentOfType(Transform).translation;
         if (this.fence.clicked) {
+            buttonTranslation[2] += 0.1;
             this.fence.removeComponentsOfType(LinearAnimator);
             const fenceAnim = new LinearAnimator(this.fence, {
                 startPosition: fenceTranslation.slice(),
@@ -185,6 +187,7 @@ export class ThirdPersonController {
             this.fence.addComponent(fenceAnim);
             fenceAnim.play();
         } else {
+            buttonTranslation[2] -= 0.1;
             this.fence.removeComponentsOfType(LinearAnimator);
             const fenceAnim = new LinearAnimator(this.fence, {
                 startPosition: fenceTranslation.slice(),
