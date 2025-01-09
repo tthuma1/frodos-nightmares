@@ -117,6 +117,9 @@ export class ThirdPersonController {
         const ndcX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         const ndcY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
+        const unprojectionMatrix = mat4.invert(mat4.create(), getProjectionMatrix(this.camera));
+        if (!unprojectionMatrix) return;
+
         const direction = this.getRayDirection(ndcX, ndcY);
         const rayPoint = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(this.camera));
 
