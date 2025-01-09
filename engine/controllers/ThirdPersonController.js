@@ -91,14 +91,14 @@ export class ThirdPersonController {
     initHandlers() {
         this.keydownHandler = this.keydownHandler.bind(this);
         this.keyupHandler = this.keyupHandler.bind(this);
-        this.clickHandler = this.calculateRayWithButton.bind(this);
+        this.calculateRayWithButton = this.calculateRayWithButton.bind(this);
 
         const element = this.domElement;
         const doc = element.ownerDocument;
 
         doc.addEventListener('keydown', this.keydownHandler);
         doc.addEventListener('keyup', this.keyupHandler);
-        doc.addEventListener("click", this.clickHandler);
+        doc.addEventListener("click", this.calculateRayWithButton);
     }
 
     removeHandlers() {
@@ -107,7 +107,7 @@ export class ThirdPersonController {
 
         doc.removeEventListener('keydown', this.keydownHandler);
         doc.removeEventListener('keyup', this.keyupHandler);
-        doc.removeEventListener("click", this.clickHandler);
+        doc.removeEventListener("click", this.calculateRayWithButton);
     }
 
     calculateRayWithButton(event) {
@@ -117,19 +117,61 @@ export class ThirdPersonController {
         const ndcX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         const ndcY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
+        const direction = this.getRayDirection(ndcX, ndcY);
+        const rayPoint = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(this.camera));
 
-        const rayDirection = this.getRayDirection(ndcX, ndcY);
-        const rayOrigin = mat4.getTranslation(
-            vec3.create(),
-            getGlobalModelMatrix(this.camera)
-        );
-
-        const isClicked = this.checkRayButtonCollision(rayOrigin, rayDirection);
+        const isClicked = this.checkRayButtonCollision(rayPoint, direction);
         console.log(isClicked);
 
         if (isClicked) {
             this.animateFence();
         }
+    }
+
+    getRayDirection(ndcX, ndcY) {
+        const unprojectionMatrix = mat4.invert(mat4.create(), getProjectionMatrix(this.camera));
+        const cameraMatrix = getGlobalModelMatrix(this.camera);
+    
+        const clipPoint = [ndcX, ndcY, -1, 1];
+        const viewPoint = vec4.transformMat4(vec4.create(), clipPoint, unprojectionMatrix);
+    
+        const rayWorld = vec4.transformMat4(vec4.create(), vec4.fromValues(viewPoint[0], viewPoint[1], -1, 0), cameraMatrix);
+        return vec3.normalize(vec3.create(), rayWorld.slice(0, 3));
+    }
+
+    checkRayButtonCollision(rayPoint, direction) {
+
+        const paabb = getTransformedAABB(this.button);
+        const aabbMin = Object.values(paabb.min), aabbMax = Object.values(paabb.max);
+        let tMin = -Infinity;
+        let tMax = Infinity;
+    
+        for (let i = 0; i < 3; i++) {
+            if (direction[i] !== 0) {
+                // Calculate intersection distances for the two planes of the AABB on this axis
+                const t1 = (aabbMin[i] - rayPoint[i]) / direction[i];
+                const t2 = (aabbMax[i] - rayPoint[i]) / direction[i];
+    
+                // Swap t1 and t2 if needed to ensure t1 is the entry point and t2 is the exit point
+                const tEntry = Math.min(t1, t2);
+                const tExit = Math.max(t1, t2);
+    
+                // Update the global tMin and tMax
+                tMin = Math.max(tMin, tEntry);
+                tMax = Math.min(tMax, tExit);
+            } else {
+                // Ray is parallel to this axis; check if the origin is outside the slab
+                if (rayPoint[i] < aabbMin[i] || rayPoint[i] > aabbMax[i]) {
+                    // console.log("miss1");
+                    // return false; // Ray misses the box
+                }
+            }
+        }
+    
+        return tMax >= tMin && tMax >= 0;
+        // if (tMax >= tMin && tMax >= 0) {
+        //     this.fence.addComponent()
+        // }
     }
 
     animateFence() {
@@ -161,59 +203,6 @@ export class ThirdPersonController {
             fenceAnim.play();
         }
         this.fence.clicked = !this.fence.clicked;
-    }
-
-    getRayDirection(ndcX, ndcY) {
-        const projectionMatrixInverse = getProjectionMatrix(this.camera).invert();
-        const viewMatrixInverse = getGlobalViewMatrix(this.camera).invert();
-    
-        const clipCoords = [ndcX, ndcY, -1.0, 1.0];
-    
-        const eyeCoords = vec4.transformMat4(
-            [],
-            clipCoords,
-            projectionMatrixInverse
-        );
-        eyeCoords[2] = -1.0;
-        eyeCoords[3] = 0.0;
-    
-        const rayWorld = vec4.transformMat4([], eyeCoords, viewMatrixInverse);
-        return vec3.normalize([], rayWorld.slice(0, 3));
-    }
-
-    checkRayButtonCollision(rayOrigin, rayDirection) {
-
-        const paabb = getTransformedAABB(this.button);
-        const aabbMin = Object.values(paabb.min), aabbMax = Object.values(paabb.max);
-        let tMin = -Infinity;
-        let tMax = Infinity;
-    
-        for (let i = 0; i < 3; i++) {
-            if (rayDirection[i] !== 0) {
-                // Calculate intersection distances for the two planes of the AABB on this axis
-                const t1 = (aabbMin[i] - rayOrigin[i]) / rayDirection[i];
-                const t2 = (aabbMax[i] - rayOrigin[i]) / rayDirection[i];
-    
-                // Swap t1 and t2 if needed to ensure t1 is the entry point and t2 is the exit point
-                const tEntry = Math.min(t1, t2);
-                const tExit = Math.max(t1, t2);
-    
-                // Update the global tMin and tMax
-                tMin = Math.max(tMin, tEntry);
-                tMax = Math.min(tMax, tExit);
-            } else {
-                // Ray is parallel to this axis; check if the origin is outside the slab
-                if (rayOrigin[i] < aabbMin[i] || rayOrigin[i] > aabbMax[i]) {
-                    // console.log("miss1");
-                    // return false; // Ray misses the box
-                }
-            }
-        }
-    
-        return tMax >= tMin && tMax >= 0;
-        // if (tMax >= tMin && tMax >= 0) {
-        //     this.fence.addComponent()
-        // }
     }
 
     update(t, dt) {
