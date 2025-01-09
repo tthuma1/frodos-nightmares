@@ -180,30 +180,6 @@ export class Physics {
             && this.intervalIntersection(aabb1.min[2], aabb1.max[2], aabb2.min[2], aabb2.max[2]);
     }
 
-    // getTransformedAABB(node) {
-    //     // Transform all vertices of the AABB from local to global space.
-    //     const matrix = getGlobalModelMatrix(node);
-    //     const { min, max } = node.aabb;
-    //     const vertices = [
-    //         [min[0], min[1], min[2]],
-    //         [min[0], min[1], max[2]],
-    //         [min[0], max[1], min[2]],
-    //         [min[0], max[1], max[2]],
-    //         [max[0], min[1], min[2]],
-    //         [max[0], min[1], max[2]],
-    //         [max[0], max[1], min[2]],
-    //         [max[0], max[1], max[2]],
-    //     ].map(v => vec3.transformMat4(v, v, matrix));
-
-    //     // Find new min and max by component.
-    //     const xs = vertices.map(v => v[0]);
-    //     const ys = vertices.map(v => v[1]);
-    //     const zs = vertices.map(v => v[2]);
-    //     const newmin = [Math.min(...xs), Math.min(...ys), Math.min(...zs)];
-    //     const newmax = [Math.max(...xs), Math.max(...ys), Math.max(...zs)];
-    //     return { min: newmin, max: newmax };
-    // }
-
     resolveCollision(a, b) {
         // Get global space AABBs.
         const aBox = getTransformedAABB(a);

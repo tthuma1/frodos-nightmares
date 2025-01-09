@@ -267,30 +267,6 @@ export class LitRenderer extends BaseRenderer {
         return gpuObjects;
     }
 
-    // getTransformedAABB(node) {
-    //     // Transform all vertices of the AABB from local to global space.
-    //     const matrix = getGlobalModelMatrix(node);
-    //     const { min, max } = node.aabb;
-    //     const vertices = [
-    //         [min[0], min[1], min[2]],
-    //         [min[0], min[1], max[2]],
-    //         [min[0], max[1], min[2]],
-    //         [min[0], max[1], max[2]],
-    //         [max[0], min[1], min[2]],
-    //         [max[0], min[1], max[2]],
-    //         [max[0], max[1], min[2]],
-    //         [max[0], max[1], max[2]],
-    //     ].map(v => vec3.transformMat4(v, v, matrix));
-
-    //     // Find new min and max by component.
-    //     const xs = vertices.map(v => v[0]);
-    //     const ys = vertices.map(v => v[1]);
-    //     const zs = vertices.map(v => v[2]);
-    //     const newmin = [Math.min(...xs), Math.min(...ys), Math.min(...zs)];
-    //     const newmax = [Math.max(...xs), Math.max(...ys), Math.max(...zs)];
-    //     return { min: newmin, max: newmax };
-    // }
-
     render(scene, camera) {
         if (this.depthTexture.width !== this.canvas.width || this.depthTexture.height !== this.canvas.height) {
             this.recreateDepthTexture();
