@@ -121,7 +121,6 @@ export class ThirdPersonController {
         const rayPoint = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(this.camera));
 
         const isClicked = this.checkRayButtonCollision(rayPoint, direction);
-        console.log(isClicked);
 
         if (isClicked) {
             this.animateFence();
@@ -134,44 +133,37 @@ export class ThirdPersonController {
     
         const clipPoint = [ndcX, ndcY, -1, 1];
         const viewPoint = vec4.transformMat4(vec4.create(), clipPoint, unprojectionMatrix);
+        const viewDirection = vec4.fromValues(viewPoint[0], viewPoint[1], -1, 0);
     
-        const rayWorld = vec4.transformMat4(vec4.create(), vec4.fromValues(viewPoint[0], viewPoint[1], -1, 0), cameraMatrix);
-        return vec3.normalize(vec3.create(), rayWorld.slice(0, 3));
+        const worldDirection = vec4.transformMat4(vec4.create(), viewDirection, cameraMatrix);
+        return vec3.normalize(vec3.create(), worldDirection.slice(0, 3));
     }
 
     checkRayButtonCollision(rayPoint, direction) {
-
-        const paabb = getTransformedAABB(this.button);
-        const aabbMin = Object.values(paabb.min), aabbMax = Object.values(paabb.max);
+        const aabb = getTransformedAABB(this.button);
+        const aabbMin = Object.values(aabb.min), aabbMax = Object.values(aabb.max);
         let tMin = -Infinity;
         let tMax = Infinity;
     
         for (let i = 0; i < 3; i++) {
             if (direction[i] !== 0) {
-                // Calculate intersection distances for the two planes of the AABB on this axis
                 const t1 = (aabbMin[i] - rayPoint[i]) / direction[i];
                 const t2 = (aabbMax[i] - rayPoint[i]) / direction[i];
     
-                // Swap t1 and t2 if needed to ensure t1 is the entry point and t2 is the exit point
                 const tEntry = Math.min(t1, t2);
                 const tExit = Math.max(t1, t2);
     
-                // Update the global tMin and tMax
                 tMin = Math.max(tMin, tEntry);
                 tMax = Math.min(tMax, tExit);
             } else {
-                // Ray is parallel to this axis; check if the origin is outside the slab
+                // parallel ray
                 if (rayPoint[i] < aabbMin[i] || rayPoint[i] > aabbMax[i]) {
-                    // console.log("miss1");
-                    // return false; // Ray misses the box
+                    return false;
                 }
             }
         }
     
         return tMax >= tMin && tMax >= 0;
-        // if (tMax >= tMin && tMax >= 0) {
-        //     this.fence.addComponent()
-        // }
     }
 
     animateFence() {
