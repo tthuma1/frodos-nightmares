@@ -197,9 +197,6 @@ async function startGame(instantStart) {
     const controller = new ThirdPersonController(player, canvas, gltfLoader, camera);
     controller.initHandlers();
     player.addComponent(controller);
-    renderer.fence = gltfLoader.loadNode("fence");
-    renderer.button = gltfLoader.loadNode("button");
-    renderer.controller = controller;
 
     const draggableObjects =[
         'Cube.010',
