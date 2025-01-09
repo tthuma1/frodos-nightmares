@@ -1,6 +1,7 @@
 import { vec3, quat } from 'glm';
 
 import { Transform } from '../core/Transform.js';
+import * as EasingFunctions from 'engine/animators/EasingFunctions.js';
 
 export class RotateAnimator {
 
@@ -11,6 +12,7 @@ export class RotateAnimator {
         duration = 1,
         loop = true,
         transform = null,
+        easeFunction = EasingFunctions.linear
     } = {}) {
         this.node = node;
 
@@ -22,6 +24,8 @@ export class RotateAnimator {
         this.startTime = startTime;
         this.duration = duration;
         this.loop = loop;
+
+        this.easeFunction = easeFunction;
 
         this.playing = false;
         if (transform) {
@@ -52,9 +56,9 @@ export class RotateAnimator {
             return;
         }
 
-
         const linearInterpolation = (t - this.startTime) / this.duration;
-        const clampedInterpolation = Math.min(Math.max(linearInterpolation, 0), 2);
+        let clampedInterpolation = Math.min(Math.max(linearInterpolation, 0), 2);
+        clampedInterpolation = Math.min(clampedInterpolation, 1);
         const loopedInterpolation = this.getLoopedInterpolation(linearInterpolation);
         this.updateNode(this.loop ? loopedInterpolation : clampedInterpolation);
     }
@@ -77,6 +81,6 @@ export class RotateAnimator {
             return;
         }
 
-        quat.slerp(transform.rotation, this.startRotation, this.endRotation, interpolation);
+        quat.slerp(transform.rotation, this.startRotation, this.endRotation, this.easeFunction(interpolation));
     }
 }

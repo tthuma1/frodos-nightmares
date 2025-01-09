@@ -12,7 +12,7 @@ import {
 import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
 import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
 import { UpdateSystem } from 'engine/systems/UpdateSystem.js';
-import { UnlitRenderer } from 'engine/renderers/UnlitRenderer.js';
+import { LitRenderer } from 'engine/renderers/LitRenderer.js';
 import { ThirdPersonController } from "./engine/controllers/ThirdPersonController.js";
 import { Physics } from './Physics.js';
 import {
@@ -25,10 +25,12 @@ import { TouchController } from './engine/controllers/TouchController.js'
 import { quat, vec3, vec4, mat3, mat4 } from './lib/glm.js';
 import { RotateAnimator } from './engine/animators/RotateAnimator.js';
 import { ImageLoader } from './engine/loaders/ImageLoader.js';
+import * as EasingFunctions from 'engine/animators/EasingFunctions.js';
+import { Sound } from 'engine/core/Sound.js';
 
 const gltfLoader = new GLTFLoader();
 const canvas = document.querySelector('canvas');
-const renderer = new UnlitRenderer(canvas);
+const renderer = new LitRenderer(canvas);
 await renderer.initialize();
 
 const imageLoader = new ImageLoader();
@@ -42,15 +44,16 @@ const environmentImages = await Promise.all([
 ].map(url => imageLoader.load(url)));
 renderer.setEnvironment(environmentImages);
 
-
 async function startGame(instantStart) {
     await gltfLoader.load(new URL('./frodomap/frodomap.gltf', import.meta.url));
 
     const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
     const player = gltfLoader.loadNode("Player");
     player.isPlayer = true;
-    const key = gltfLoader.loadNode('key');
-    key.addComponent(new Key())
+    const firstKey = gltfLoader.loadNode('key1');
+    const finalKey = gltfLoader.loadNode('key2');
+    firstKey.addComponent(new Key());
+    finalKey.addComponent(new Key());
     const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 
     // BOXES
@@ -71,6 +74,7 @@ async function startGame(instantStart) {
     // doors
     const finalDoor = gltfLoader.loadNode("doors");
     const firstDoor = gltfLoader.loadNode("doors.001")
+    const keyDoor = gltfLoader.loadNode("doors.002")
 
     // camera.addComponent(new TouchController(camera, canvas));
     player.addComponent(camera)
@@ -78,22 +82,42 @@ async function startGame(instantStart) {
     lanternLight.addComponent(new Light({
         color: [0.01, 0.01, 0.01],
         type: 0,
-        isActive: true,
+        isActive: false,
         intensity: 2,
     }));
     const flashLight = new Node();
     flashLight.addComponent(new Light({
         color: [0.5, 0.5, 0.5],
         type: 1,
-        isActive: false,
-        intensity: 3,
+        isActive: true,
+        intensity: 2,
     }));
 
     player.addChild(lanternLight);
     player.addChild(flashLight);
 
+    const light1 = gltfLoader.loadNode("light1");
+    light1.addComponent(new Light({
+        color: [0.01, 0.01, 0.01],
+        type: 0,
+        isActive: false,
+        intensity: 1,
+    }));
+    const light2 = gltfLoader.loadNode("light2");
+    light2.addComponent(new Light({
+        color: [0.01, 0.01, 0.01],
+        type: 0,
+        isActive: false,
+        intensity: 1,
+    }));
+
     player.currentLight = 0;
+    player.canSwitchLight = false;
     player.switchLight = () => {
+        if (!player.canSwitchLight) {
+            return;
+        }
+
         const lights = [lanternLight.getComponentOfType(Light), flashLight.getComponentOfType(Light)];
         const nextLight = !player.currentLight ? 1 : 0;
         lights[player.currentLight].isActive = false;
@@ -142,21 +166,25 @@ async function startGame(instantStart) {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, -60],
         duration: 0.3,
+        easeFunction: EasingFunctions.polyEaseInOut,
     }));
     armLeft.addComponent(new RotateAnimator(armLeft, {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, 60],
         duration: 0.3,
+        easeFunction: EasingFunctions.polyEaseInOut,
     }));
     legRight.addComponent(new RotateAnimator(legRight, {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, 20],
         duration: 0.3,
+        easeFunction: EasingFunctions.polyEaseInOut,
     }));
     legLeft.addComponent(new RotateAnimator(legLeft, {
         startRotation: [0, 0, 0],
         endRotation: [0, 0, -20],
         duration: 0.3,
+        easeFunction: EasingFunctions.polyEaseInOut,
     }));
     /*** end jump animators ***/
 
@@ -165,7 +193,8 @@ async function startGame(instantStart) {
     movingPlatform.isStatic = true;
     movingPlatform.addComponent(new MovingPlatform(movingPlatform));
 
-    player.addComponent(new ThirdPersonController(player, canvas, gltfLoader));
+    const controller = new ThirdPersonController(player, canvas, gltfLoader);
+    player.addComponent(controller);
 
     const draggableObjects =[
         'Cube.010',
@@ -176,20 +205,46 @@ async function startGame(instantStart) {
 
     const staticObject = [
         'Trampoline',
-        'Floor',
+        'floor',
         'Cube.005',
         'Cube.006',
         'Cube.008',
-        'wall2',
-        'wall3.001',
         'Cube.001',
         'Cube.009',
         'doors',
-        'wall3.003',
         'doors.001',
+        'doors.002',
+        'wall1',
+        'wall2',
+        'wall3',
         'wall4',
-        'wall3.002',
-        'wall3.004',
+        'wall5',
+        'wall6',
+        'wall7',
+        'wall8',
+        'wall10',
+        'wall11',
+        'wall13',
+        'wall14',
+        'wall15',
+        'wall16',
+        'wall17',
+        'wall18',
+        'wall19',
+        'wall20',
+        'wall21',
+        'wall22',
+        'FloorOutside',
+        'vase1',
+        'vase2',
+        'vase3',
+        'vase4',
+        'chest_upper1',
+        'chest_upper2',
+        'chest_upper3',
+        'chest_upper4',
+        'chest_upper5',
+        'globe',
     ];
 
     const searchableObjects = [
@@ -198,7 +253,6 @@ async function startGame(instantStart) {
         'chest.03',
         'chest.04',
         'chest.05',
-        'chest.06',
     ]
 
     for (const obj of staticObject) {
@@ -209,6 +263,12 @@ async function startGame(instantStart) {
         gltfLoader.loadNode(obj).isStatic = true;
         gltfLoader.loadNode(obj).isDraggable = true;
     }
+
+    gltfLoader.loadNode("BreakingFloor").isBreakable = true;
+    gltfLoader.loadNode("BreakingFloor").isStatic = true;
+
+    gltfLoader.loadNode("Ladder").isClimbable = true;
+    gltfLoader.loadNode("Ladder").isStatic = true;
 
     const lanternIndex = Math.floor(Math.random() * searchableObjects.length);
 
@@ -222,6 +282,18 @@ async function startGame(instantStart) {
 
     gltfLoader.loadNode('Trampoline').isTrampoline = true;
 
+    gltfLoader.loadNode('FloorOutside').isFloorOutside = true;
+    gltfLoader.loadNode('floor').isFloorInside = true;
+
+    const mirrorBall = gltfLoader.loadNode("MirrorBall")
+    const mirrorMaterial = mirrorBall.getComponentOfType(Model).primitives[0].material;
+    mirrorMaterial.isMirror = true;
+
+    const lantern = gltfLoader.loadNode("Lantern");
+
+    const externalLights = [light1, light2];
+    const physics = new Physics(scene, player, firstKey, finalKey, blockToCircleDict, movingPlatform, finalDoor, firstDoor, keyDoor, lantern, flashLight, gltfLoader, lanternLight, externalLights);
+
     scene.traverse(node => {
         const model = node.getComponentOfType(Model);
         if (!model) {
@@ -230,15 +302,14 @@ async function startGame(instantStart) {
 
         const boxes = model.primitives.map(primitive => calculateAxisAlignedBoundingBox(primitive.mesh));
         node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
+
+        if (node.isFloorInside) {
+            controller.maxZ = physics.getTransformedAABB(node).max[2] - 0.5;
+        }
     });
 
-    const mirrorBall = gltfLoader.loadNode("MirrorBall")
-    const mirrorMaterial = mirrorBall.getComponentOfType(Model).primitives[0].material;
-    mirrorMaterial.isMirror = true;
-
-    const lantern = gltfLoader.loadNode("Lantern");
-
-    const physics = new Physics(scene, player, key, blockToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, gltfLoader, lanternLight);
+    gltfLoader.loadNode("wall8").aabb.max[2] += 0.5;
+    gltfLoader.loadNode("wall1").aabb.max[2] += 0.5;
 
     function update(t, dt) {
         scene.traverse(node => {
@@ -272,6 +343,11 @@ async function startGame(instantStart) {
         document.getElementById("start-btn").addEventListener("click", () => {
             document.getElementById("game").style.display = "block";
             document.getElementById("menu").style.display = "none";
+            const sound = new Sound({
+                bgMusic: { src: './sounds/bgMusic.mp3', volume : 0.5 },
+            });
+            sound.play("bgMusic");
+
             updateSystem.start();
         }, { once: true });
     }

@@ -36,9 +36,11 @@ export class ThirdPersonController {
         this.jumpForce = 7;
         this.isJumping = true;
         this.gravity = -20;
+        this.ladderGravity = -10;
 
         this.draggedNode = null;
         this.lastDragTime = 0;
+        this.doorAnimation = false;
 
         this.movingPlatform = null;
         this.jumpOffVelocity = null; // velocity that moving platform had when you jumped off it
@@ -50,12 +52,25 @@ export class ThirdPersonController {
         this.walkAnimators = this.getWalkAnimators();
         this.jumpAnimators = this.getJumpAnimators();
 
+        this.isPlayerOnLadder = false;
+        this.isPlayerOnFloor = false;
+
+        this.maxZ = null;
+
         this.sound = new Sound({
             walk: { src: './sounds/walk.mp3', volume : 0.15 },
             jump: { src: './sounds/jump.mp3', volume : 0.3 },
             bounce: { src: './sounds/bounce.mp3', volume : 0.4} ,
             drag: {src: './sounds/drag.mp3', volume : 0.25 },
         });
+
+        const cameraTranslation = this.node.components[2].getComponentOfType(Transform).translation;
+        const playerTranslation = this.node.getComponentOfType(Transform).translation;
+        this.zDiffCameraPlayer = cameraTranslation[2] - playerTranslation[2];
+
+        this.armRight = this.gltfLoader.loadNode("armRight");
+        this.armLeft = this.gltfLoader.loadNode("armLeft");
+        this.hasLantern = false;
     }
 
     initHandlers() {
@@ -71,6 +86,14 @@ export class ThirdPersonController {
     }
 
     update(t, dt) {
+        if (this.doorAnimation) {
+            return;
+        }
+
+        if (this.jumpVelocity < -1) {
+            this.isJumping = true;
+        }
+
         // Calculate forward and right vectors.
         const cos = Math.cos(0);
         const sin = Math.sin(0);
@@ -80,21 +103,33 @@ export class ThirdPersonController {
         // Map user input to the acceleration vector.
         const acc = vec3.create();
         if (this.keys['KeyW']) {
-            if (!this.isJumping)
-                this.sound.play('walk');
-            if (this.draggedNode)
-                this.sound.play('drag');
-            vec3.add(acc, acc, forward);
-            this.startWalkAnimation();
+            if (this.isPlayerOnLadder) {
+                this.jumpVelocity = 3;
+                this.stopWalkAnimation();
+            } else {
+                if (!this.isJumping)
+                    this.sound.play('walk');
+                if (this.draggedNode)
+                    this.sound.play('drag');
+                vec3.add(acc, acc, forward);
+                this.startWalkAnimation();
+            }
         }
+
         if (this.keys['KeyS']) {
-            if (!this.isJumping)
-                this.sound.play('walk');
-            if (this.draggedNode)
-                this.sound.play('drag');
-            vec3.sub(acc, acc, forward);
-            this.startWalkAnimation();
+            if (this.isPlayerOnLadder && !this.isPlayerOnFloor) {
+                this.jumpVelocity = -3;
+                this.stopWalkAnimation();
+            } else {
+                if (!this.isJumping)
+                    this.sound.play('walk');
+                if (this.draggedNode)
+                    this.sound.play('drag');
+                vec3.sub(acc, acc, forward);
+                this.startWalkAnimation();
+            }
         }
+
         if (this.keys['KeyD']) {
             if (!this.isJumping)
                 this.sound.play('walk');
@@ -103,6 +138,7 @@ export class ThirdPersonController {
             vec3.add(acc, acc, right);
             this.startWalkAnimation();
         }
+
         if (this.keys['KeyA']) {
             if (!this.isJumping)
                 this.sound.play('walk');
@@ -111,6 +147,7 @@ export class ThirdPersonController {
             vec3.sub(acc, acc, right);
             this.startWalkAnimation();
         }
+
         if (this.keys['Space'] && !this.isJumping && !this.draggedNode) {
             this.sound.play('jump');
             this.isJumping = true;
@@ -135,11 +172,10 @@ export class ThirdPersonController {
             this.stopWalkAnimation();
         }
 
-        // prevent switching tabs from breaking game
-        if (dt * this.gravity < -0.2) {
-            this.jumpVelocity = this.jumpVelocity - 0.2;
-        } else {
-            this.jumpVelocity = this.jumpVelocity + dt * this.gravity;
+        if (!this.isPlayerOnLadder) {
+            this.jumpVelocity += dt * this.gravity;
+        } else if (dt * this.gravity < -0.2) {
+            this.jumpVelocity += -0.2; // prevent gravity bug when switching tabs
         }
 
         // Update velocity based on acceleration.
@@ -153,6 +189,10 @@ export class ThirdPersonController {
         {
             const decay = Math.exp(dt * Math.log(1 - this.decay));
             vec3.scale(this.velocity, this.velocity, decay);
+
+            if (this.isPlayerOnLadder) {
+                this.jumpVelocity *= decay;
+            }
         }
 
         // Limit speed to prevent accelerating to infinity and beyond.
@@ -165,7 +205,6 @@ export class ThirdPersonController {
 
         const transform = this.node.getComponentOfType(Transform);
         if (transform) {
-
             this.translateWithVelocity(transform.translation, dt);
 
             // translate camera with player
@@ -182,10 +221,23 @@ export class ThirdPersonController {
 
             // Update rotation based on the Euler angles.
             const rotation = quat.create();
-            this.updateYaw();
-            quat.rotateY(rotation, rotation, this.yaw);
-            quat.rotateX(rotation, rotation, this.pitch);
-            transform.rotation = rotation;
+            if (vec3.length(this.velocity) > 1e-3) {
+                this.updateYaw();
+                quat.rotateY(rotation, rotation, this.yaw);
+                quat.rotateX(rotation, rotation, this.pitch);
+                transform.rotation = rotation;
+            }
+
+            if (this.maxZ !== null && transform.translation[2] > this.maxZ) {
+                transform.translation[2] = this.maxZ;
+                cameraTranslation[2] = this.maxZ + this.zDiffCameraPlayer;
+            }
+        }
+
+        if (this.isPlayerOnLadder) {
+            this.transformLadderHands();
+        } else {
+            this.transformNormalHands();
         }
     }
 
@@ -219,11 +271,18 @@ export class ThirdPersonController {
 
     finishJump(node)
     {
+        if (node.isBreakable) {
+            return;
+        }
+
+        this.isPlayerOnFloor = true;
+
         if (node.isTrampoline) {
             this.jumpVelocity = 10;
+            this.isJumping = true;
             this.movingPlatform = null;
             this.sound.play('bounce');
-
+            this.startJumpAnimation(performance.now() / 1000);
         } else {
             this.jumpVelocity = 0;
             this.isJumping = false;
@@ -260,16 +319,22 @@ export class ThirdPersonController {
     }
 
     updateYaw() {
-        const velX = this.velocity[0];
-        const velZ = this.velocity[2];
-        this.yaw = Math.atan2(velX, velZ);
+        if (!this.isPlayerOnLadder) {
+            const velX = this.velocity[0];
+            const velZ = this.velocity[2];
+            this.yaw = Math.atan2(velX, velZ);
+        } else {
+            this.yaw = Math.PI;
+        }
     }
 
     updateFlashlightDirection() {
         const lights = this.node.children.filter(x => x.getComponentOfType(Light))
         const flashLight = lights.find(x => x.getComponentOfType(Light).type === 1);
         const flashLightComponent = flashLight.getComponentOfType(Light);
-        if (vec3.length(this.velocity) > 0.1) {
+        if (this.isPlayerOnLadder) {
+            flashLightComponent.direction = [0, 0, -1];
+        } else if (vec3.length(this.velocity) > 0.1) {
             flashLightComponent.direction = this.velocity.slice();
         }
     }
@@ -294,7 +359,7 @@ export class ThirdPersonController {
     }
 
     startWalkAnimation() {
-        if (!this.isJumping) {
+        if (!this.isJumping && !this.isPlayerOnLadder) {
             for (const animation of this.walkAnimators) {
                 animation.play();
             }
@@ -330,6 +395,8 @@ export class ThirdPersonController {
     }
 
     startJumpAnimation(time) {
+        if (this.isPlayerOnLadder) return;
+
         for (const animation of this.getJumpAnimators()) {
             animation.startTime = time;
             animation.play();
@@ -340,6 +407,27 @@ export class ThirdPersonController {
         for (const animation of this.getJumpAnimators()) {
             animation.startTime = time;
             animation.stop();
+        }
+    }
+
+    transformLadderHands() {
+        const rightTransform = this.armLeft.getComponentOfType(Transform);
+        const leftTransform = this.armRight.getComponentOfType(Transform);
+
+        rightTransform.rotation = quat.rotateX(quat.create(), quat.create(), Math.PI)
+        leftTransform.rotation = quat.rotateX(quat.create(), quat.create(), Math.PI);
+    }
+
+    transformNormalHands() {
+        const rightTransform = this.armLeft.getComponentOfType(Transform);
+        const leftTransform = this.armRight.getComponentOfType(Transform);
+
+        if (this.hasLantern) {
+            rightTransform.rotation = quat.rotateX(quat.create(), quat.create(), -Math.PI / 2);
+            leftTransform.rotation = quat.rotateX(quat.create(), quat.create(), 0)
+        } else {
+            rightTransform.rotation = quat.rotateX(quat.create(), quat.create(), 0)
+            leftTransform.rotation = quat.rotateX(quat.create(), quat.create(), 0);
         }
     }
 }

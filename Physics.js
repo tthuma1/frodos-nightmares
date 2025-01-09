@@ -1,6 +1,6 @@
 import { vec3, mat4, quat } from 'glm';
 import { getGlobalModelMatrix } from 'engine/core/SceneUtils.js';
-import {Light, Transform} from 'engine/core.js';
+import {Camera, Light, Transform} from 'engine/core.js';
 import {Key} from "./engine/core/Key.js";
 import { ThirdPersonController } from './engine/controllers/ThirdPersonController.js';
 import { MovingPlatform } from './engine/core/MovingPlatform.js';
@@ -9,27 +9,40 @@ import { RotateAnimator } from './engine/animators/RotateAnimator.js';
 import { LinearAnimator } from './engine/animators/LinearAnimator.js';
 
 export class Physics {
-    constructor(scene, player, key, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, lantern, gltfLoader, lanternLight) {
+    constructor(scene, player, firstKey, finalKey, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, keyDoor, lantern, flashlight, gltfLoader, lanternLight, externalLights) {
         this.scene = scene;
         this.player = player;
-        this.key = key;
+        this.firstKey = firstKey;
+        this.finalKey = finalKey;
         this.controller = this.player.getComponentOfType(ThirdPersonController);
         this.blocksToCircleDict = blocksToCircleDict;
         this.solvedPuzzle = false;
         this.movingPlatform = movingPlatform;
         this.finalDoor = finalDoor;
         this.firstDoor = firstDoor;
+        this.keyDoor = keyDoor;
         this.lantern = lantern;
+        this.flashlight = flashlight;
         this.sound = new Sound({
             collect: { src: './sounds/collect.mp3', volume : 0.6 },
+            floorBreak: {src: './sounds/floorBreak.mp3', volume: 0.2 },
+            doorCreek: {src: './sounds/doorCreek.mp3', volume: 0.4 },
         });
 
         this.gltfLoader = gltfLoader;
         this.leftArm = gltfLoader.loadNode("armLeft");
         this.lanternLight = lanternLight;
+
+        this.isDragColliding = false;
+
+        this.externalLights = externalLights;
+        this.doorsOpened = -1;
     }
 
     update(t, dt) {
+        this.isDragColliding = false;
+        this.controller.isPlayerOnLadder = false;
+        this.controller.isPlayerOnFloor = false;
         this.scene.traverse(node => {
             if (node !== this.player && node.isStatic && node !== this.controller.draggedNode) {
                 this.resolveCollision(this.player, node)
@@ -40,30 +53,121 @@ export class Physics {
             }
         })
 
-        if (this.key.getComponentOfType(Key).isCollected === false) {
-            this.keyCollision(this.player, this.key)
+        const firstKeyRotation = this.firstKey.getComponentOfType(Transform).rotation;
+        quat.rotateX(firstKeyRotation, firstKeyRotation, dt * 2);
+        const finalKeyRotation = this.finalKey.getComponentOfType(Transform).rotation;
+        quat.rotateX(finalKeyRotation, finalKeyRotation, dt * 2);
+
+        if (!this.firstKey.getComponentOfType(Key).isCollected) {
+            this.keyCollision(this.player, this.firstKey, this.keyDoor)
         }
-        
+
+        if (!this.finalKey.getComponentOfType(Key).isCollected) {
+            this.keyCollision(this.player, this.finalKey, this.finalDoor)
+        }
+
         if (!this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle){
-            let counter = 0;
-            for (const [block, circle] of this.blocksToCircleDict){
-                if (this.blocksCircleCollision(block, circle))
-                    counter++;
-            }
-
-            if (counter === 3) { // set to 3 when not testing
-                this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle = true;
-
-                const transform = this.finalDoor.getComponentOfType(Transform);
-                const rotation = quat.create();
-                quat.rotateY(rotation, rotation, Math.PI/2);
-                transform.rotation = rotation;
-
-                const boundingBox = this.getTransformedAABB(this.finalDoor);
-                const width = boundingBox.max[0] - boundingBox.min[0];
-                const offPosition = [width/2, 0, -width/2];
-            }
+            this.checkBlockPuzzle()
         }
+
+        const startDragText = document.getElementById("startDrag");
+        if (this.isDragColliding) {
+            startDragText.style.display = 'block';
+        } else {
+            startDragText.style.display = 'none';
+        }
+    }
+
+    checkBlockPuzzle() {
+        let counter = 0;
+        for (const [block, circle] of this.blocksToCircleDict){
+            if (this.blocksCircleCollision(block, circle))
+                counter++;
+        }
+
+        if (counter === 3) {
+            this.movingPlatform.getComponentOfType(MovingPlatform).solvedPuzzle = true;
+        }
+    }
+
+    openDoor(door) {
+        if (this.doorsOpened !== -1) {
+            const externalLightComponent = this.externalLights[this.doorsOpened].getComponentOfType(Light);
+            externalLightComponent.isActive = true;
+        }
+        console.log(this.externalLights)
+        this.doorsOpened += 1;
+
+        this.controller.doorAnimation = true;
+        this.controller.stopWalkAnimation();
+        const camera = this.scene.find(node => node.getComponentOfType(Camera));
+
+        const doorTransform = door.getComponentOfType(Transform);
+        const cameraTransform = camera.getComponentOfType(Transform)
+
+        const initialCameraTranslation = cameraTransform.translation.slice()
+
+        const moveToDoorAnimator = new LinearAnimator(camera, {
+            startPosition: cameraTransform.translation.slice(),
+            endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-2, 4, 10]),
+            loop: false,
+            duration: 1,
+            startTime: performance.now() / 1000,
+            transform: cameraTransform,
+        });
+        camera.addComponent(moveToDoorAnimator)
+        moveToDoorAnimator.play()
+
+        setTimeout(() => {
+            console.log(cameraTransform.translation)
+        }, 1000);
+
+        setTimeout(() => {
+            const doorLinearAnimator = new LinearAnimator(door, {
+                startPosition: doorTransform.translation.slice(),
+                endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.5, 0, -0.5]),
+                loop: false,
+                duration: 1,
+                startTime: performance.now() / 1000,
+                transform: doorTransform,
+            });
+            door.addComponent(doorLinearAnimator);
+            doorLinearAnimator.play();
+
+            const doorAnimator = new RotateAnimator(door, {
+                endRotation: [0, -90, 0],
+                loop: false,
+                duration: 1,
+                startTime: performance.now() / 1000,
+                transform: doorTransform,
+            });
+            door.addComponent(doorAnimator);
+            doorAnimator.play();
+
+            this.sound.play("doorCreek");
+        }, 1000);
+
+        let moveCameraToPlayerAnimator = null
+
+        setTimeout(() => {
+           moveCameraToPlayerAnimator = new LinearAnimator(door, {
+               startPosition: cameraTransform.translation.slice(),
+               endPosition: initialCameraTranslation,
+               loop: false,
+               duration: 1,
+               startTime: performance.now() / 1000,
+               transform: cameraTransform,
+           })
+
+            camera.addComponent(moveCameraToPlayerAnimator);
+           moveCameraToPlayerAnimator.play()
+        }, 2300);
+
+        setTimeout(() => {
+            camera.removeComponent(moveToDoorAnimator);
+            camera.removeComponent(moveCameraToPlayerAnimator);
+            this.controller.doorAnimation = false;
+        }, 3300);
     }
 
     intervalIntersection(min1, max1, min2, max2) {
@@ -106,17 +210,51 @@ export class Physics {
         const bBox = this.getTransformedAABB(b);
 
         const bDragBox = this.toDragBox(bBox);
-
         // Check if there is collision.
-        const isColliding = this.aabbIntersection(aBox, bBox);
-        const isDragColliding = this.aabbIntersection(aBox, bDragBox);
+        let isColliding = this.aabbIntersection(aBox, bBox);
+        if (b.isBreakable) {
+            const bBreakBox = this.toBreakBox(bBox);
+            isColliding = this.aabbIntersection(aBox, bBreakBox);
+        }
 
-        if(isDragColliding) {
+        const isDragColliding = this.aabbIntersection(aBox, bDragBox);
+        if (isDragColliding) {
             this.displayDragText(aBox, bDragBox, b);
+
+            if (b.isClimbable) {
+                this.controller.isPlayerOnLadder = true;
+            }
         }
 
         if (!isColliding) {
             return;
+        }
+
+        //Handles breaking floor logic
+        if (b.isBreakable) {
+            this.sound.play("floorBreak");
+            this.flashlight.getComponentOfType(Light).isActive = false;
+
+            const floorTransform = b.getComponentOfType(Transform)
+            floorTransform.translation = [-100, -100, -100];
+
+            const lantern = this.lanternLight.getComponentOfType(Light)
+
+            setTimeout(() => {
+                const lightAnimator = new LinearAnimator(lantern, {
+                    startPosition: vec3.clone([0, 0, 0]),
+                    endPosition: vec3.clone([0.01, 0.01, 0.01]),
+                    loop: false,
+                    duration: 1,
+                    startTime: performance.now() / 1000,
+                    transform: lantern.color,
+                });
+                this.player.addComponent(lightAnimator);
+                lightAnimator.play();
+                this.lanternLight.getComponentOfType(Light).isActive = true;
+            }, 4000)
+        } else if (b.isFloorOutside) {
+            this.endFunction();
         }
 
         const minDirection = this.getMinDirection(aBox, bBox);
@@ -159,61 +297,41 @@ export class Physics {
             this.controller.jumpVelocity < 1e-4
         ) {
             if (b.isDraggable) {
-                startDragText.style.display = "block";
                 startDragText.innerText = "Press E to start dragging."
                 if (this.controller.keys['KeyE']) {
                     this.controller.startDragging(b);
                 }
+                this.isDragColliding = true;
             } else if (b.isSearchable) {
-                startDragText.style.display = "block";
                 startDragText.innerText = "Press E to search chest."
                 if (this.controller.keys['KeyE']) {
                     this.searchChest(b)
                 }
-            } else {
-                startDragText.style.display = "none";
+                this.isDragColliding = true;
             }
-        } else {
-            startDragText.style.display = "none";
         }
     }
 
     searchChest(chest) {
         chest.isSearchable = false;
+        const chestAnim = new RotateAnimator(chest.children[0], {
+            endRotation: [0, 0, -55],
+            loop: false,
+            duration: 0.7,
+            startTime: performance.now() / 1000,
+            transform: chest.children[0].getComponentOfType(Transform),
+        });
+        chest.children[0].addComponent(chestAnim);
+        chestAnim.play();
+
         if (chest.hasLantern) {
             const lanternComponent = this.player.children.find(x => x.getComponentOfType(Light)).getComponentOfType(Light);
-            lanternComponent.color = [0.2, 0.07, 0.0];
+            lanternComponent.color = [0.2, 0.07, 0.01];
 
-            const doorTransform = this.firstDoor.getComponentOfType(Transform);
-            console.log(vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.5, 0, -0.5]));
-            const doorLinearAnimator = new LinearAnimator(this.firstDoor, {
-                startPosition: doorTransform.translation.slice(),
-                endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.25, 0, -0.25]),
-                loop: false,
-                duration: 1,
-                startTime: performance.now() / 1000,
-                transform: doorTransform,
-            });
-            this.firstDoor.addComponent(doorLinearAnimator);
-            doorLinearAnimator.play();
-
-
-            const doorAnimator = new RotateAnimator(this.firstDoor, {
-                endRotation: [0, -45, 0],
-                loop: false,
-                duration: 1,
-                startTime: performance.now() / 1000,
-                transform: doorTransform,
-            });
-            this.firstDoor.addComponent(doorAnimator);
-            doorAnimator.play();
+            this.openDoor(this.firstDoor)
 
             const lanternTransform = this.lantern.getComponentOfType(Transform)
-            console.log(lanternTransform.translation)
-            const playerTransform = this.player.getComponentOfType(Transform)
-            console.log(playerTransform.translation)
             vec3.add(lanternTransform.translation, lanternTransform.translation, [0, 29*6.02 - 1.3, 0]);
-            console.log(lanternTransform.translation)
 
             const armRotation = this.leftArm.getComponentOfType(Transform).rotation;
             quat.rotateX(armRotation, armRotation, -Math.PI/2);
@@ -225,10 +343,12 @@ export class Physics {
             }));
 
             this.updatePlayerAABB();
+            this.player.canSwitchLight = true;
+            this.controller.hasLantern = true;
         }
     }
 
-    keyCollision(player, key) {
+    keyCollision(player, key, door) {
         const playerBox = this.getTransformedAABB(player);
         const keyBox = this.getTransformedAABB(key);
 
@@ -237,16 +357,17 @@ export class Physics {
         if (!isColliding) {
             return;
         }
-        this.key.getComponentOfType(Key).collectKey()
-        this.scene.removeChild(this.key)
+
+        key.getComponentOfType(Key).collectKey()
+        this.openDoor(door)
+        this.scene.removeChild(key)
         this.sound.play('collect');
-        //this.endFunction();
     }
 
     blocksCircleCollision(block, circle) {
         const blockBox = this.getTransformedAABB(block);
         const circleBox = this.getTransformedAABB(circle);
-        
+
         const isColliding = this.aabbIntersection(blockBox, circleBox);
         if (!isColliding) {
             return false;
@@ -259,7 +380,7 @@ export class Physics {
         // Move node A minimally to avoid collision.
         const diffa = vec3.sub(vec3.create(), bBox.max, aBox.min);
         const diffb = vec3.sub(vec3.create(), aBox.max, bBox.min);
-        
+
 
         let minDiff = Infinity;
         let minDirection = [0, 0, 0];
@@ -295,6 +416,13 @@ export class Physics {
         return {
             min: [box.min[0] - 0.5, box.min[1] - 0.5, box.min[2] - 0.5],
             max: [box.max[0] + 0.5, box.max[1] + 0.5, box.max[2] + 0.5],
+        }
+    }
+
+    toBreakBox(box) {
+        return {
+            min: [box.min[0] + 0.5, box.min[1] + 0.5, box.min[2] + 0.5],
+            max: [box.max[0] - 0.5, box.max[1] - 0.5, box.max[2] - 0.5],
         }
     }
 
