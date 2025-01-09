@@ -52,8 +52,8 @@ async function startGame(instantStart) {
     player.isPlayer = true;
     const firstKey = gltfLoader.loadNode('key1');
     const finalKey = gltfLoader.loadNode('key2');
-    firstKey.addComponent(new Key())
-    finalKey.addComponent(new Key())
+    firstKey.addComponent(new Key());
+    finalKey.addComponent(new Key());
     const camera = scene.find(node => node.getComponentOfType(Camera)); // najdemo kamero v sceni
 
     // BOXES
@@ -90,7 +90,7 @@ async function startGame(instantStart) {
         color: [0.5, 0.5, 0.5],
         type: 1,
         isActive: true,
-        intensity: 3,
+        intensity: 2,
     }));
 
     player.addChild(lanternLight);

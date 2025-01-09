@@ -53,6 +53,11 @@ export class Physics {
             }
         })
 
+        const firstKeyRotation = this.firstKey.getComponentOfType(Transform).rotation;
+        quat.rotateX(firstKeyRotation, firstKeyRotation, dt * 2);
+        const finalKeyRotation = this.finalKey.getComponentOfType(Transform).rotation;
+        quat.rotateX(finalKeyRotation, finalKeyRotation, dt * 2);
+
         if (!this.firstKey.getComponentOfType(Key).isCollected) {
             this.keyCollision(this.player, this.firstKey, this.keyDoor)
         }

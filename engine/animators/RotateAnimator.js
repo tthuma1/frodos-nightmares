@@ -58,9 +58,7 @@ export class RotateAnimator {
 
         const linearInterpolation = (t - this.startTime) / this.duration;
         let clampedInterpolation = Math.min(Math.max(linearInterpolation, 0), 2);
-        if (!this.loop) {
-            clampedInterpolation = Math.min(clampedInterpolation, 1);
-        }
+        clampedInterpolation = Math.min(clampedInterpolation, 1);
         const loopedInterpolation = this.getLoopedInterpolation(linearInterpolation);
         this.updateNode(this.loop ? loopedInterpolation : clampedInterpolation);
     }
