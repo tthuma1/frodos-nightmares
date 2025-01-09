@@ -83,7 +83,43 @@ export class ThirdPersonController {
 
         doc.addEventListener('keydown', this.keydownHandler);
         doc.addEventListener('keyup', this.keyupHandler);
+        doc.addEventListener("click", (event) => {
+            const canvas = document.querySelector('canvas');
+            const rect = canvas.getBoundingClientRect();
+        
+            // Map mouse position to normalized device coordinates (-1 to 1)
+            const ndcX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            const ndcY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        
+            // Store NDC coordinates for raycasting
+            console.log("NDC Coordinates:", { ndcX, ndcY });
+            this.ndcX = ndcX;
+            this.ndcY = ndcY;
+        });
+        
     }
+
+createRayFromCamera(ndcX, ndcY, camera, projectionMatrix) {
+    // Inverse of the projection * view matrix
+    const invProjView = mat4.create();
+    mat4.multiply(invProjView, projectionMatrix, camera.viewMatrix);
+    mat4.invert(invProjView, invProjView);
+
+    // Start and end points in NDC space (z = -1 for near plane, +1 for far plane)
+    const nearPoint = vec3.fromValues(ndcX, ndcY, -1);
+    const farPoint = vec3.fromValues(ndcX, ndcY, 1);
+
+    // Transform to world space
+    vec3.transformMat4(nearPoint, nearPoint, invProjView);
+    vec3.transformMat4(farPoint, farPoint, invProjView);
+
+    // Create ray
+    const direction = vec3.sub(vec3.create(), farPoint, nearPoint);
+    vec3.normalize(direction, direction);
+
+    return { origin: nearPoint, direction };
+}
+
 
     update(t, dt) {
         if (this.doorAnimation) {

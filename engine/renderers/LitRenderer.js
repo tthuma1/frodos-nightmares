@@ -1,4 +1,4 @@
-import { mat4, vec3 } from 'glm';
+import { mat4, vec3, vec4 } from 'glm';
 
 import * as WebGPU from '../WebGPU.js';
 
@@ -267,6 +267,30 @@ export class LitRenderer extends BaseRenderer {
         return gpuObjects;
     }
 
+    getTransformedAABB(node) {
+        // Transform all vertices of the AABB from local to global space.
+        const matrix = getGlobalModelMatrix(node);
+        const { min, max } = node.aabb;
+        const vertices = [
+            [min[0], min[1], min[2]],
+            [min[0], min[1], max[2]],
+            [min[0], max[1], min[2]],
+            [min[0], max[1], max[2]],
+            [max[0], min[1], min[2]],
+            [max[0], min[1], max[2]],
+            [max[0], max[1], min[2]],
+            [max[0], max[1], max[2]],
+        ].map(v => vec3.transformMat4(v, v, matrix));
+
+        // Find new min and max by component.
+        const xs = vertices.map(v => v[0]);
+        const ys = vertices.map(v => v[1]);
+        const zs = vertices.map(v => v[2]);
+        const newmin = [Math.min(...xs), Math.min(...ys), Math.min(...zs)];
+        const newmax = [Math.max(...xs), Math.max(...ys), Math.max(...zs)];
+        return { min: newmin, max: newmax };
+    }
+
     render(scene, camera) {
         if (this.depthTexture.width !== this.canvas.width || this.depthTexture.height !== this.canvas.height) {
             this.recreateDepthTexture();
@@ -309,6 +333,139 @@ export class LitRenderer extends BaseRenderer {
         this.device.queue.writeBuffer(cameraUniformBuffer, 128, cameraPosition);
         this.device.queue.writeBuffer(unprojectUniformBuffer, 0, unprojectMatrix);
         this.renderPass.setBindGroup(0, cameraBindGroup);
+
+        if (this.controller?.ndcX) {
+            const ndcX = this.controller.ndcX;
+            const ndcY = this.controller.ndcY;
+
+            // ----------------------
+
+            const projectionMatrixInverse = getProjectionMatrix(camera).invert();
+            const viewMatrixInverse = getGlobalViewMatrix(camera).invert();
+        
+            const clipCoords = [ndcX, ndcY, -1.0, 1.0];
+        
+            const eyeCoords = vec4.transformMat4(
+                [],
+                clipCoords,
+                projectionMatrixInverse
+            );
+            eyeCoords[2] = -1.0;
+            eyeCoords[3] = 0.0;
+        
+            const rayWorld = vec4.transformMat4([], eyeCoords, viewMatrixInverse);
+            const rayDirection = vec3.normalize([], rayWorld.slice(0, 3));
+
+
+
+            const rayOrigin = mat4.getTranslation(
+                vec3.create(),
+                getGlobalModelMatrix(camera)
+            );
+
+            // console.log(rayOrigin, rayDirection)
+
+
+    const paabb = this.getTransformedAABB(this.player);
+    const aabbMin = Object.values(paabb.min), aabbMax = Object.values(paabb.max);
+    let tMin = -Infinity;
+    let tMax = Infinity;
+
+    for (let i = 0; i < 3; i++) {
+        if (rayDirection[i] !== 0) {
+            // Calculate intersection distances for the two planes of the AABB on this axis
+            const t1 = (aabbMin[i] - rayOrigin[i]) / rayDirection[i];
+            const t2 = (aabbMax[i] - rayOrigin[i]) / rayDirection[i];
+
+            // Swap t1 and t2 if needed to ensure t1 is the entry point and t2 is the exit point
+            const tEntry = Math.min(t1, t2);
+            const tExit = Math.max(t1, t2);
+
+            // Update the global tMin and tMax
+            tMin = Math.max(tMin, tEntry);
+            tMax = Math.min(tMax, tExit);
+        } else {
+            // Ray is parallel to this axis; check if the origin is outside the slab
+            if (rayOrigin[i] < aabbMin[i] || rayOrigin[i] > aabbMax[i]) {
+                // console.log("miss1");
+                // return false; // Ray misses the box
+            }
+        }
+    }
+
+    // console.log(tMax >= tMin && tMax >= 0);
+
+            // ----------------------
+
+            /*
+            const invProjection = unprojectMatrix;
+            const invCameraMatrix = viewMatrix;
+
+    // Start point in NDC (near clipping plane)
+    const nearPointNDC = vec3.fromValues(ndcX, ndcY, -1); // z = -1 for near plane
+    const farPointNDC = vec3.fromValues(ndcX, ndcY, 1);   // z = +1 for far plane
+
+    // Transform points to world space
+    const nearPointWorld = vec3.create();
+    vec3.transformMat4(nearPointWorld, nearPointNDC, invProjection);
+    vec3.transformMat4(nearPointWorld, nearPointWorld, invCameraMatrix);
+
+    const farPointWorld = vec3.create();
+    vec3.transformMat4(farPointWorld, farPointNDC, invProjection);
+    vec3.transformMat4(farPointWorld, farPointWorld, invCameraMatrix);
+
+    // Homogenize (divide by w if needed)
+    for (let p of [nearPointWorld, farPointWorld]) {
+        if (p[3] && p[3] !== 0) {
+            vec3.scale(p, p, 1 / p[3]);
+        }
+    }
+
+    // Calculate the ray direction (normalize the vector)
+    const direction = vec3.sub(vec3.create(), farPointWorld, nearPointWorld);
+    vec3.normalize(direction, direction);
+
+    // Return the ray
+    const origin = vec3.fromValues(cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]); // Camera position
+    // console.log(origin);
+    // console.log(this.getTransformedAABB(this.player));
+    // console.log( {
+    //     origin,
+    //     direction,
+    // });
+
+    const paabb = this.getTransformedAABB(this.player);
+    const rayOrigin = nearPointWorld, rayDirection = direction, aabbMin = Object.values(paabb.min), aabbMax = Object.values(paabb.max);
+
+    let tMin = -Infinity;
+    let tMax = Infinity;
+
+    for (let i = 0; i < 3; i++) {
+        if (rayDirection[i] !== 0) {
+            // Calculate intersection distances for the two planes of the AABB on this axis
+            const t1 = (aabbMin[i] - rayOrigin[i]) / rayDirection[i];
+            const t2 = (aabbMax[i] - rayOrigin[i]) / rayDirection[i];
+
+            // Swap t1 and t2 if needed to ensure t1 is the entry point and t2 is the exit point
+            const tEntry = Math.min(t1, t2);
+            const tExit = Math.max(t1, t2);
+
+            // Update the global tMin and tMax
+            tMin = Math.max(tMin, tEntry);
+            tMax = Math.min(tMax, tExit);
+        } else {
+            // Ray is parallel to this axis; check if the origin is outside the slab
+            if (rayOrigin[i] < aabbMin[i] || rayOrigin[i] > aabbMax[i]) {
+                console.log("miss1");
+                // return false; // Ray misses the box
+            }
+        }
+    }
+
+    console.log(tMax >= tMin && tMax >= 0);
+*/
+
+        }
 
         const lights = scene.filter(node => node.getComponentOfType(Light));
         const lightComponents = lights.map(x => x.getComponentOfType(Light));

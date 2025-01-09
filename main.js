@@ -195,6 +195,8 @@ async function startGame(instantStart) {
 
     const controller = new ThirdPersonController(player, canvas, gltfLoader);
     player.addComponent(controller);
+    renderer.player = player;
+    renderer.controller = controller;
 
     const draggableObjects =[
         'Cube.010',
@@ -245,6 +247,7 @@ async function startGame(instantStart) {
         'chest_upper4',
         'chest_upper5',
         'globe',
+        'fence',
     ];
 
     const searchableObjects = [
