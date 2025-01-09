@@ -1,4 +1,4 @@
-import { quat, vec2, vec3, mat4 } from 'glm';
+import { quat, vec2, vec3, vec4, mat4 } from 'glm';
 
 import { Transform } from '../core/Transform.js';
 import {Camera} from "../core/Camera.js";
@@ -6,10 +6,18 @@ import { MovingPlatform } from '../core/MovingPlatform.js';
 import { Light } from '../core/Light.js';
 import { Sound } from '../core/Sound.js';
 import { RotateAnimator } from '../animators/RotateAnimator.js';
+import {
+    getGlobalViewMatrix,
+    getProjectionMatrix,
+    getGlobalModelMatrix,
+} from '../core/SceneUtils.js';
+import { getTransformedAABB } from '../../Physics.js';
+import { LinearAnimator } from '../animators/LinearAnimator.js';
+
 
 export class ThirdPersonController {
 
-    constructor(node, domElement, gltfLoader, {
+    constructor(node, domElement, gltfLoader, camera, {
         pitch = 0,
         yaw = 0,
         velocity = [0, 0, 0],
@@ -47,8 +55,6 @@ export class ThirdPersonController {
 
         this.lastLightSwitchTime = 0;
 
-        this.initHandlers();
-
         this.walkAnimators = this.getWalkAnimators();
         this.jumpAnimators = this.getJumpAnimators();
 
@@ -71,18 +77,130 @@ export class ThirdPersonController {
         this.armRight = this.gltfLoader.loadNode("armRight");
         this.armLeft = this.gltfLoader.loadNode("armLeft");
         this.hasLantern = false;
+
+        this.camera = camera;
+        this.button = this.gltfLoader.loadNode("button");
+        this.fence = this.gltfLoader.loadNode("fence");
+        this.fence.clicked = false;
+        const fenceTransform = this.fence.getComponentOfType(Transform);
+        this.fenceStartPosition = fenceTransform.translation.slice();
+        this.fenceEndPosition = vec3.add(vec3.create(), this.fenceStartPosition, [0, -2.5, 0]);
     }
 
-    initHandlers() {
 
+    initHandlers() {
         this.keydownHandler = this.keydownHandler.bind(this);
         this.keyupHandler = this.keyupHandler.bind(this);
+        this.calculateRayWithButton = this.calculateRayWithButton.bind(this);
 
         const element = this.domElement;
         const doc = element.ownerDocument;
 
         doc.addEventListener('keydown', this.keydownHandler);
         doc.addEventListener('keyup', this.keyupHandler);
+        doc.addEventListener("click", this.calculateRayWithButton);
+    }
+
+    removeHandlers() {
+        const element = this.domElement;
+        const doc = element.ownerDocument;
+
+        doc.removeEventListener('keydown', this.keydownHandler);
+        doc.removeEventListener('keyup', this.keyupHandler);
+        doc.removeEventListener("click", this.calculateRayWithButton);
+    }
+
+    calculateRayWithButton(event) {
+        const canvas = document.querySelector('canvas');
+        const rect = canvas.getBoundingClientRect();
+    
+        const ndcX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        const ndcY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        const unprojectionMatrix = mat4.invert(mat4.create(), getProjectionMatrix(this.camera));
+        if (!unprojectionMatrix) return;
+
+        const direction = this.getRayDirection(ndcX, ndcY);
+        const rayPoint = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(this.camera));
+
+        const isClicked = this.checkRayButtonCollision(rayPoint, direction);
+
+        if (isClicked) {
+            this.animateFence();
+        }
+    }
+
+    getRayDirection(ndcX, ndcY) {
+        const unprojectionMatrix = mat4.invert(mat4.create(), getProjectionMatrix(this.camera));
+        const cameraMatrix = getGlobalModelMatrix(this.camera);
+    
+        const clipPoint = [ndcX, ndcY, -1, 1];
+        const viewPoint = vec4.transformMat4(vec4.create(), clipPoint, unprojectionMatrix);
+        const viewDirection = vec4.fromValues(viewPoint[0], viewPoint[1], -1, 0);
+    
+        const worldDirection = vec4.transformMat4(vec4.create(), viewDirection, cameraMatrix);
+        return vec3.normalize(vec3.create(), worldDirection.slice(0, 3));
+    }
+
+    checkRayButtonCollision(rayPoint, direction) {
+        const aabb = getTransformedAABB(this.button);
+        const aabbMin = Object.values(aabb.min), aabbMax = Object.values(aabb.max);
+        let tMin = -Infinity;
+        let tMax = Infinity;
+    
+        for (let i = 0; i < 3; i++) {
+            if (direction[i] !== 0) {
+                const t1 = (aabbMin[i] - rayPoint[i]) / direction[i];
+                const t2 = (aabbMax[i] - rayPoint[i]) / direction[i];
+    
+                const tEntry = Math.min(t1, t2);
+                const tExit = Math.max(t1, t2);
+    
+                tMin = Math.max(tMin, tEntry);
+                tMax = Math.min(tMax, tExit);
+            } else {
+                // parallel ray
+                if (rayPoint[i] < aabbMin[i] || rayPoint[i] > aabbMax[i]) {
+                    return false;
+                }
+            }
+        }
+    
+        return tMax >= tMin && tMax >= 0;
+    }
+
+    animateFence() {
+        const fenceTransform = this.fence.getComponentOfType(Transform);
+        const fenceTranslation = fenceTransform.translation;
+        const buttonTranslation = this.button.getComponentOfType(Transform).translation;
+        if (this.fence.clicked) {
+            buttonTranslation[2] += 0.1;
+            this.fence.removeComponentsOfType(LinearAnimator);
+            const fenceAnim = new LinearAnimator(this.fence, {
+                startPosition: fenceTranslation.slice(),
+                endPosition: this.fenceStartPosition.slice(),
+                loop: false,
+                duration: 2,
+                startTime: performance.now() / 1000,
+                transform: fenceTransform,
+            });
+            this.fence.addComponent(fenceAnim);
+            fenceAnim.play();
+        } else {
+            buttonTranslation[2] -= 0.1;
+            this.fence.removeComponentsOfType(LinearAnimator);
+            const fenceAnim = new LinearAnimator(this.fence, {
+                startPosition: fenceTranslation.slice(),
+                endPosition: this.fenceEndPosition.slice(),
+                loop: false,
+                duration: 2,
+                startTime: performance.now() / 1000,
+                transform: fenceTransform,
+            });
+            this.fence.addComponent(fenceAnim);
+            fenceAnim.play();
+        }
+        this.fence.clicked = !this.fence.clicked;
     }
 
     update(t, dt) {

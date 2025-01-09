@@ -27,6 +27,7 @@ import { RotateAnimator } from './engine/animators/RotateAnimator.js';
 import { ImageLoader } from './engine/loaders/ImageLoader.js';
 import * as EasingFunctions from 'engine/animators/EasingFunctions.js';
 import { Sound } from 'engine/core/Sound.js';
+import { getTransformedAABB } from './Physics.js';
 
 const gltfLoader = new GLTFLoader();
 const canvas = document.querySelector('canvas');
@@ -193,7 +194,8 @@ async function startGame(instantStart) {
     movingPlatform.isStatic = true;
     movingPlatform.addComponent(new MovingPlatform(movingPlatform));
 
-    const controller = new ThirdPersonController(player, canvas, gltfLoader);
+    const controller = new ThirdPersonController(player, canvas, gltfLoader, camera);
+    controller.initHandlers();
     player.addComponent(controller);
 
     const draggableObjects =[
@@ -245,6 +247,7 @@ async function startGame(instantStart) {
         'chest_upper4',
         'chest_upper5',
         'globe',
+        'fence',
     ];
 
     const searchableObjects = [
@@ -304,7 +307,7 @@ async function startGame(instantStart) {
         node.aabb = mergeAxisAlignedBoundingBoxes(boxes);
 
         if (node.isFloorInside) {
-            controller.maxZ = physics.getTransformedAABB(node).max[2] - 0.5;
+            controller.maxZ = getTransformedAABB(node).max[2] - 0.5;
         }
     });
 
@@ -334,7 +337,7 @@ async function startGame(instantStart) {
 
     const startGameTime = Date.now();
     physics.endFunction = () => {
-        winGame(updateSystem, startGameTime);
+        winGame(updateSystem, startGameTime, controller);
     }
 
     if (instantStart) {
@@ -353,8 +356,9 @@ async function startGame(instantStart) {
     }
 }
 
-function winGame(updateSystem, startTime) {
+function winGame(updateSystem, startTime, controller) {
     updateSystem.stop();
+    controller.removeHandlers();
     document.getElementById("startDrag").style.display = "none";
     document.getElementById("stopDrag").style.display = "none";
     document.getElementById("end").style.display = "block";
