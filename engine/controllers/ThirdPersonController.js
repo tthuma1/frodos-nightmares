@@ -81,6 +81,10 @@ export class ThirdPersonController {
         this.camera = camera;
         this.button = this.gltfLoader.loadNode("button");
         this.fence = this.gltfLoader.loadNode("fence");
+        this.fence.clicked = false;
+        const fenceTransform = this.fence.getComponentOfType(Transform);
+        this.fenceStartPosition = fenceTransform.translation.slice();
+        this.fenceEndPosition = vec3.add(vec3.create(), this.fenceStartPosition, [0, -2.5, 0]);
     }
 
 
@@ -123,13 +127,31 @@ export class ThirdPersonController {
         const isClicked = this.checkRayButtonCollision(rayOrigin, rayDirection);
         console.log(isClicked);
 
-        // todo: handle multiple clicks
         if (isClicked) {
-            const fenceTransform = this.fence.getComponentOfType(Transform);
-            const fenceTranslation = fenceTransform.translation;
+            this.animateFence();
+        }
+    }
+
+    animateFence() {
+        const fenceTransform = this.fence.getComponentOfType(Transform);
+        const fenceTranslation = fenceTransform.translation;
+        if (this.fence.clicked) {
+            this.fence.removeComponentsOfType(LinearAnimator);
             const fenceAnim = new LinearAnimator(this.fence, {
                 startPosition: fenceTranslation.slice(),
-                endPosition: vec3.add(vec3.create(), fenceTranslation.slice(), [0, -2.5, 0]),
+                endPosition: this.fenceStartPosition.slice(),
+                loop: false,
+                duration: 2,
+                startTime: performance.now() / 1000,
+                transform: fenceTransform,
+            });
+            this.fence.addComponent(fenceAnim);
+            fenceAnim.play();
+        } else {
+            this.fence.removeComponentsOfType(LinearAnimator);
+            const fenceAnim = new LinearAnimator(this.fence, {
+                startPosition: fenceTranslation.slice(),
+                endPosition: this.fenceEndPosition.slice(),
                 loop: false,
                 duration: 2,
                 startTime: performance.now() / 1000,
@@ -138,6 +160,7 @@ export class ThirdPersonController {
             this.fence.addComponent(fenceAnim);
             fenceAnim.play();
         }
+        this.fence.clicked = !this.fence.clicked;
     }
 
     getRayDirection(ndcX, ndcY) {
