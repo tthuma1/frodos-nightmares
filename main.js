@@ -340,7 +340,9 @@ async function startGame(instantStart) {
         winGame(updateSystem, startGameTime, controller);
     }
 
+    document.getElementById("loader-container").style.display = "none";
     if (instantStart) {
+        document.getElementById("loader-container").style.display = "flex";
         setTimeout(() => {
             document.getElementById("loader-container").style.display = "none";
             updateSystem.start();
