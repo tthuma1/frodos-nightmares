@@ -3,7 +3,6 @@ import { mat4 } from 'glm';
 import { Camera } from './Camera.js';
 import { Model } from './Model.js';
 import { Transform } from './Transform.js';
-import { getTransformedAABB } from '../../Physics.js';
 
 export function getLocalModelMatrix(node) {
     const matrix = mat4.create();
