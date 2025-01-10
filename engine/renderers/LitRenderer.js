@@ -11,10 +11,10 @@ import {
     getGlobalModelMatrix,
     extractFrustumPlanes,
     isAABBInsideFrustum,
-    cullModels,
 } from '../core/SceneUtils.js';
 
 import { BaseRenderer } from './BaseRenderer.js';
+import { getTransformedAABB } from '../../Physics.js';
 
 const vertexBufferLayout = {
     arrayStride: 32,
@@ -343,9 +343,9 @@ export class LitRenderer extends BaseRenderer {
         }
         this.renderPass.setBindGroup(3, lightBindGroup);
 
-        this.tmpCounter = 0;
-        this.renderNode(scene, mat4.create(), camera);
-        // console.log(this.tmpCounter);
+        const viewProjectionMatrix = mat4.multiply(mat4.create(), projectionMatrix, viewMatrix);
+        const frustumPlanes = extractFrustumPlanes(viewProjectionMatrix);
+        this.renderNode(scene, mat4.create(), frustumPlanes);
 
         this.renderPass.setPipeline(this.skyboxPipeline);
         this.renderPass.setVertexBuffer(0, this.clipQuadBuffer);
@@ -357,21 +357,12 @@ export class LitRenderer extends BaseRenderer {
         this.device.queue.submit([encoder.finish()]);
     }
 
-    renderNode(node, modelMatrix = mat4.create(), camera = null) {
-        if (node.aabb && camera) {
-            const cameraComponent = camera.getComponentOfType(Camera);
-            const viewMatrix = getGlobalModelMatrix(camera).invert();
-            const visibleModels = cullModels(cameraComponent, viewMatrix, [node]);
-
-            // console.log(visibleModels.length);
-            if(visibleModels.length > 0) {
-                this.tmpCounter++;
-            } else {
+    renderNode(node, modelMatrix = mat4.create(), planes = null) {
+        if (node.aabb && planes) {
+            if (!isAABBInsideFrustum(getTransformedAABB(node), planes)) {
                 return;
             }
         }
-
-
 
         const localMatrix = getLocalModelMatrix(node);
         modelMatrix = mat4.multiply(mat4.create(), modelMatrix, localMatrix);
@@ -387,7 +378,7 @@ export class LitRenderer extends BaseRenderer {
         }
 
         for (const child of node.children) {
-            this.renderNode(child, modelMatrix, camera);
+            this.renderNode(child, modelMatrix, planes);
         }
     }
 
