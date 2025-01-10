@@ -39,6 +39,9 @@ export class UpdateSystem {
         const dt = time - this._time;
         this._time = time;
 
+        // frame rate is too slow and will break physics
+        if (dt > 0.1) return;
+
         this.application.update?.(time, dt);
     }
 

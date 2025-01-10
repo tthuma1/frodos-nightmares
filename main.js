@@ -341,7 +341,10 @@ async function startGame(instantStart) {
     }
 
     if (instantStart) {
-        updateSystem.start();
+        setTimeout(() => {
+            document.getElementById("loader-container").style.display = "none";
+            updateSystem.start();
+        }, 300);
     } else {
         document.getElementById("start-btn").addEventListener("click", () => {
             document.getElementById("game").style.display = "block";
@@ -351,7 +354,12 @@ async function startGame(instantStart) {
             });
             sound.play("bgMusic");
 
-            updateSystem.start();
+            // throttle start to prevent bug on slow computers
+            document.getElementById("loader-container").style.display = "flex";
+            setTimeout(() => {
+                document.getElementById("loader-container").style.display = "none";
+                updateSystem.start();
+            }, 300);
         }, { once: true });
     }
 }
@@ -369,6 +377,7 @@ function winGame(updateSystem, startTime, controller) {
     document.getElementById("time").innerText = minutes + ":" + seconds;
 
     document.getElementById("restart-btn").addEventListener("click", async () => {
+        document.getElementById("loader-container").style.display = "flex";
         await startGame(true);
         document.getElementById("end").style.display = "none";
     }, { once: true });
