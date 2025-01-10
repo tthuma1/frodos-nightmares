@@ -9,9 +9,12 @@ import {
     getGlobalViewMatrix,
     getProjectionMatrix,
     getGlobalModelMatrix,
+    extractFrustumPlanes,
+    isAABBInsideFrustum,
 } from '../core/SceneUtils.js';
 
 import { BaseRenderer } from './BaseRenderer.js';
+import { getTransformedAABB } from '../../Physics.js';
 
 const vertexBufferLayout = {
     arrayStride: 32,
@@ -340,7 +343,9 @@ export class LitRenderer extends BaseRenderer {
         }
         this.renderPass.setBindGroup(3, lightBindGroup);
 
-        this.renderNode(scene);
+        const viewProjectionMatrix = mat4.multiply(mat4.create(), projectionMatrix, viewMatrix);
+        const frustumPlanes = extractFrustumPlanes(viewProjectionMatrix);
+        this.renderNode(scene, mat4.create(), frustumPlanes);
 
         this.renderPass.setPipeline(this.skyboxPipeline);
         this.renderPass.setVertexBuffer(0, this.clipQuadBuffer);
@@ -352,7 +357,13 @@ export class LitRenderer extends BaseRenderer {
         this.device.queue.submit([encoder.finish()]);
     }
 
-    renderNode(node, modelMatrix = mat4.create()) {
+    renderNode(node, modelMatrix = mat4.create(), planes = null) {
+        if (node.aabb && planes) {
+            if (!isAABBInsideFrustum(getTransformedAABB(node), planes)) {
+                return;
+            }
+        }
+
         const localMatrix = getLocalModelMatrix(node);
         modelMatrix = mat4.multiply(mat4.create(), modelMatrix, localMatrix);
         const normalMatrix = mat4.normalFromMat4(mat4.create(), modelMatrix);
@@ -367,7 +378,7 @@ export class LitRenderer extends BaseRenderer {
         }
 
         for (const child of node.children) {
-            this.renderNode(child, modelMatrix);
+            this.renderNode(child, modelMatrix, planes);
         }
     }
 
