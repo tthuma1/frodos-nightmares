@@ -9,6 +9,9 @@ import {
     getGlobalViewMatrix,
     getProjectionMatrix,
     getGlobalModelMatrix,
+    extractFrustumPlanes,
+    isAABBInsideFrustum,
+    cullModels,
 } from '../core/SceneUtils.js';
 
 import { BaseRenderer } from './BaseRenderer.js';
@@ -340,7 +343,9 @@ export class LitRenderer extends BaseRenderer {
         }
         this.renderPass.setBindGroup(3, lightBindGroup);
 
-        this.renderNode(scene);
+        this.tmpCounter = 0;
+        this.renderNode(scene, mat4.create(), camera);
+        // console.log(this.tmpCounter);
 
         this.renderPass.setPipeline(this.skyboxPipeline);
         this.renderPass.setVertexBuffer(0, this.clipQuadBuffer);
@@ -352,7 +357,22 @@ export class LitRenderer extends BaseRenderer {
         this.device.queue.submit([encoder.finish()]);
     }
 
-    renderNode(node, modelMatrix = mat4.create()) {
+    renderNode(node, modelMatrix = mat4.create(), camera = null) {
+        if (node.aabb && camera) {
+            const cameraComponent = camera.getComponentOfType(Camera);
+            const viewMatrix = getGlobalModelMatrix(camera).invert();
+            const visibleModels = cullModels(cameraComponent, viewMatrix, [node]);
+
+            // console.log(visibleModels.length);
+            if(visibleModels.length > 0) {
+                this.tmpCounter++;
+            } else {
+                return;
+            }
+        }
+
+
+
         const localMatrix = getLocalModelMatrix(node);
         modelMatrix = mat4.multiply(mat4.create(), modelMatrix, localMatrix);
         const normalMatrix = mat4.normalFromMat4(mat4.create(), modelMatrix);
@@ -367,7 +387,7 @@ export class LitRenderer extends BaseRenderer {
         }
 
         for (const child of node.children) {
-            this.renderNode(child, modelMatrix);
+            this.renderNode(child, modelMatrix, camera);
         }
     }
 
