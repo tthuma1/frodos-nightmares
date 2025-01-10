@@ -91,7 +91,7 @@ async function startGame(instantStart) {
         color: [0.5, 0.5, 0.5],
         type: 1,
         isActive: true,
-        intensity: 2,
+        intensity: 0.8,
     }));
 
     player.addChild(lanternLight);
