@@ -51,6 +51,7 @@ async function startGame(instantStart) {
     const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
     const player = gltfLoader.loadNode("Player");
     player.isPlayer = true;
+    player.canOpenChest = false;
     const firstKey = gltfLoader.loadNode('key1');
     const finalKey = gltfLoader.loadNode('key2');
     firstKey.addComponent(new Key());

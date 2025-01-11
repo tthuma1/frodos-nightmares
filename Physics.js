@@ -28,6 +28,7 @@ export class Physics {
             floorBreak: {src: './sounds/floorBreak.mp3', volume: 0.2 },
             doorCreek: {src: './sounds/doorCreek.mp3', volume: 0.4 },
             keyUnlock: {src: './sounds/unlock.mp3', volume: 0.6 },
+            chestOpen: {src: './sounds/chest.mp3', volume: 0.3 },
         });
 
         this.gltfLoader = gltfLoader;
@@ -266,6 +267,7 @@ export class Physics {
                 this.player.addComponent(lightAnimator);
                 lightAnimator.play();
                 this.lanternLight.getComponentOfType(Light).isActive = true;
+                this.player.canOpenChest = true
             }, 4000)
         } else if (b.isFloorOutside) {
             this.endFunction();
@@ -316,7 +318,7 @@ export class Physics {
                     this.controller.startDragging(b);
                 }
                 this.isDragColliding = true;
-            } else if (b.isSearchable) {
+            } else if (b.isSearchable && this.player.canOpenChest) {
                 startDragText.innerText = "Press E to search chest."
                 if (this.controller.keys['KeyE']) {
                     this.searchChest(b)
@@ -328,6 +330,7 @@ export class Physics {
 
     searchChest(chest) {
         chest.isSearchable = false;
+        this.sound.play("chestOpen")
         const chestAnim = new RotateAnimator(chest.children[0], {
             endRotation: [0, 0, -55],
             loop: false,
@@ -382,12 +385,7 @@ export class Physics {
         const blockBox = getTransformedAABB(block);
         const circleBox = getTransformedAABB(circle);
 
-        const isColliding = this.aabbIntersection(blockBox, circleBox);
-        if (!isColliding) {
-            return false;
-        }
-        return true;
-
+        return this.aabbIntersection(blockBox, circleBox);
     }
 
     getMinDirection(aBox, bBox) {
