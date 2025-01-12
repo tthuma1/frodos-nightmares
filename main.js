@@ -77,6 +77,7 @@ async function startGame(instantStart) {
     const finalDoor = gltfLoader.loadNode("doors");
     const firstDoor = gltfLoader.loadNode("doors.001")
     const keyDoor = gltfLoader.loadNode("doors.002")
+    keyDoor.isDoorToLeft = true;
 
     // camera.addComponent(new TouchController(camera, canvas));
     player.addComponent(camera)

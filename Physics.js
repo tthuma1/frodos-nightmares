@@ -123,20 +123,17 @@ export class Physics {
         camera.addComponent(moveToDoorAnimator)
         moveToDoorAnimator.play()
 
+        const isDoorToLeft = door.isDoorToLeft;
         if (key != null) {
-            const doorPosition = doorTransform.translation.slice();
-            const keyPosition = keyTransform.translation.slice();
-
-            const isDoorToLeft = doorPosition[0] < keyPosition[0];
             keyTransform.rotation = isDoorToLeft ? [-0.5, -0.5, -0.5, -0.5] : [0.5, 0.5, -0.5, -0.5];
 
             const endPosition = vec3.create();
             if (isDoorToLeft) {
                 keyTransform.rotation = [-0.5, -0.5, -0.5, -0.5];
-                vec3.sub(endPosition, doorTransform.translation.slice(), [-0.4, 0, -0.5])
+                vec3.sub(endPosition, doorTransform.translation.slice(), [-0.4, 0.1, -0.4])
             }else {
                 keyTransform.rotation = [0.5, 0.5, -0.5, -0.5];
-                vec3.sub(endPosition, doorTransform.translation.slice(), [+0.4, 0, -0.4])
+                vec3.sub(endPosition, doorTransform.translation.slice(), [+0.4, 0.1, -0.4])
             }
             const moveKeyToDoorAnimator = new LinearAnimator(key, {
                 startPosition: keyTransform.translation.slice(),
@@ -163,8 +160,8 @@ export class Physics {
 
         setTimeout(() => {
             const doorAnimator = new RotateAnimator(door, {
-                startRotation: [0, 180, 0],
-                endRotation: [0, 90, 0],
+                startRotation: isDoorToLeft ? [0, 0, 0] : [0, 180, 0],
+                endRotation: isDoorToLeft ? [0, -90, 0] : [0, 90, 0],
                 loop: false,
                 duration: 1,
                 startTime: performance.now() / 1000,
@@ -174,7 +171,7 @@ export class Physics {
             doorAnimator.play();
 
             this.sound.play("doorCreek");
-        }, 3000);
+        }, key === null ? 2300 : 3000);
 
         let moveCameraToPlayerAnimator = null
 
@@ -190,13 +187,13 @@ export class Physics {
 
             camera.addComponent(moveCameraToPlayerAnimator);
             moveCameraToPlayerAnimator.play()
-        }, 4300);
+        }, key === null ? 3600 : 4300);
 
         setTimeout(() => {
             camera.removeComponent(moveToDoorAnimator);
             camera.removeComponent(moveCameraToPlayerAnimator);
             this.controller.doorAnimation = false;
-        }, 5300);
+        }, key === null ? 4600 : 5300);
     }
 
     intervalIntersection(min1, max1, min2, max2) {
