@@ -250,6 +250,7 @@ async function startGame(instantStart) {
         'chest_upper5',
         'globe',
         'fence',
+        'MirrorBall',
     ];
 
     const searchableObjects = [
