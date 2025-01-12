@@ -1,4 +1,3 @@
-//Maybe naumo rabl
 export class Key {
 
     constructor() {
@@ -7,7 +6,5 @@ export class Key {
 
     collectKey() {
         this.isCollected = true;
-        console.log("Key was collected")
     }
-
 }

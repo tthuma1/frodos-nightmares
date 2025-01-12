@@ -1,12 +1,12 @@
-import { vec3, mat4, quat } from 'glm';
-import { getGlobalModelMatrix } from 'engine/core/SceneUtils.js';
+import {quat, vec3} from 'glm';
+import {getGlobalModelMatrix} from 'engine/core/SceneUtils.js';
 import {Camera, Light, Transform} from 'engine/core.js';
 import {Key} from "./engine/core/Key.js";
-import { ThirdPersonController } from './engine/controllers/ThirdPersonController.js';
-import { MovingPlatform } from './engine/core/MovingPlatform.js';
-import { Sound } from './engine/core/Sound.js';
-import { RotateAnimator } from './engine/animators/RotateAnimator.js';
-import { LinearAnimator } from './engine/animators/LinearAnimator.js';
+import {ThirdPersonController} from './engine/controllers/ThirdPersonController.js';
+import {MovingPlatform} from './engine/core/MovingPlatform.js';
+import {Sound} from './engine/core/Sound.js';
+import {RotateAnimator} from './engine/animators/RotateAnimator.js';
+import {LinearAnimator} from './engine/animators/LinearAnimator.js';
 
 export class Physics {
     constructor(scene, player, firstKey, finalKey, blocksToCircleDict, movingPlatform, finalDoor, firstDoor, keyDoor, lantern, flashlight, gltfLoader, lanternLight, externalLights) {
@@ -27,6 +27,8 @@ export class Physics {
             collect: { src: './sounds/collect.mp3', volume : 0.6 },
             floorBreak: {src: './sounds/floorBreak.mp3', volume: 0.2 },
             doorCreek: {src: './sounds/doorCreek.mp3', volume: 0.4 },
+            keyUnlock: {src: './sounds/unlock.mp3', volume: 0.6 },
+            chestOpen: {src: './sounds/chest.mp3', volume: 0.3 },
         });
 
         this.gltfLoader = gltfLoader;
@@ -53,16 +55,17 @@ export class Physics {
             }
         })
 
-        const firstKeyRotation = this.firstKey.getComponentOfType(Transform).rotation;
-        quat.rotateX(firstKeyRotation, firstKeyRotation, dt * 2);
-        const finalKeyRotation = this.finalKey.getComponentOfType(Transform).rotation;
-        quat.rotateX(finalKeyRotation, finalKeyRotation, dt * 2);
-
         if (!this.firstKey.getComponentOfType(Key).isCollected) {
+            const firstKeyRotation = this.firstKey.getComponentOfType(Transform).rotation;
+            quat.rotateX(firstKeyRotation, firstKeyRotation, dt * 2);
+
             this.keyCollision(this.player, this.firstKey, this.keyDoor)
         }
 
         if (!this.finalKey.getComponentOfType(Key).isCollected) {
+            const finalKeyRotation = this.finalKey.getComponentOfType(Transform).rotation;
+            quat.rotateX(finalKeyRotation, finalKeyRotation, dt * 2);
+
             this.keyCollision(this.player, this.finalKey, this.finalDoor)
         }
 
@@ -90,12 +93,12 @@ export class Physics {
         }
     }
 
-    openDoor(door) {
+    openDoor(key, door) {
         if (this.doorsOpened !== -1) {
             const externalLightComponent = this.externalLights[this.doorsOpened].getComponentOfType(Light);
             externalLightComponent.isActive = true;
         }
-        console.log(this.externalLights)
+
         this.doorsOpened += 1;
 
         this.controller.doorAnimation = true;
@@ -103,7 +106,8 @@ export class Physics {
         const camera = this.scene.find(node => node.getComponentOfType(Camera));
 
         const doorTransform = door.getComponentOfType(Transform);
-        const cameraTransform = camera.getComponentOfType(Transform)
+        const cameraTransform = camera.getComponentOfType(Transform);
+        const keyTransform = key != null ? key.getComponentOfType(Transform) : null;
 
         const initialCameraTranslation = cameraTransform.translation.slice()
 
@@ -111,31 +115,53 @@ export class Physics {
             startPosition: cameraTransform.translation.slice(),
             endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-2, 4, 10]),
             loop: false,
-            duration: 1,
+            duration: 2,
             startTime: performance.now() / 1000,
             transform: cameraTransform,
         });
+
         camera.addComponent(moveToDoorAnimator)
         moveToDoorAnimator.play()
 
-        setTimeout(() => {
-            console.log(cameraTransform.translation)
-        }, 1000);
+        const isDoorToLeft = door.isDoorToLeft;
+        if (key != null) {
+            keyTransform.rotation = isDoorToLeft ? [-0.5, -0.5, -0.5, -0.5] : [0.5, 0.5, -0.5, -0.5];
 
-        setTimeout(() => {
-            const doorLinearAnimator = new LinearAnimator(door, {
-                startPosition: doorTransform.translation.slice(),
-                endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.5, 0, -0.5]),
+            const endPosition = vec3.create();
+            if (isDoorToLeft) {
+                keyTransform.rotation = [-0.5, -0.5, -0.5, -0.5];
+                vec3.sub(endPosition, doorTransform.translation.slice(), [-0.4, 0, -0.9])
+            }else {
+                keyTransform.rotation = [0.5, 0.5, -0.5, -0.5];
+                vec3.sub(endPosition, doorTransform.translation.slice(), [+0.4, 0, -0.9])
+            }
+            const moveKeyToDoorAnimator = new LinearAnimator(key, {
+                startPosition: keyTransform.translation.slice(),
+                endPosition: endPosition,
                 loop: false,
-                duration: 1,
+                duration: 2,
                 startTime: performance.now() / 1000,
-                transform: doorTransform,
+                transform: keyTransform,
             });
-            door.addComponent(doorLinearAnimator);
-            doorLinearAnimator.play();
 
+            key.addComponent(moveKeyToDoorAnimator)
+            moveKeyToDoorAnimator.play()
+
+            setTimeout(() => {
+                this.sound.play("keyUnlock")
+                keyTransform.rotation = isDoorToLeft ? [-0.025, -0.706, -0.025, -0.706] : [0.025, -0.706, -0.025, 0.706]
+
+            }, 2300)
+
+            setTimeout(() => {
+                this.scene.removeChild(key)
+            }, 2600)
+        }
+
+        setTimeout(() => {
             const doorAnimator = new RotateAnimator(door, {
-                endRotation: [0, -90, 0],
+                startRotation: isDoorToLeft ? [0, 0, 0] : [0, 180, 0],
+                endRotation: isDoorToLeft ? [0, -90, 0] : [0, 90, 0],
                 loop: false,
                 duration: 1,
                 startTime: performance.now() / 1000,
@@ -145,29 +171,29 @@ export class Physics {
             doorAnimator.play();
 
             this.sound.play("doorCreek");
-        }, 1000);
+        }, key === null ? 2300 : 3000);
 
         let moveCameraToPlayerAnimator = null
 
         setTimeout(() => {
-           moveCameraToPlayerAnimator = new LinearAnimator(door, {
+            moveCameraToPlayerAnimator = new LinearAnimator(door, {
                startPosition: cameraTransform.translation.slice(),
                endPosition: initialCameraTranslation,
                loop: false,
                duration: 1,
                startTime: performance.now() / 1000,
                transform: cameraTransform,
-           })
+            })
 
             camera.addComponent(moveCameraToPlayerAnimator);
-           moveCameraToPlayerAnimator.play()
-        }, 2300);
+            moveCameraToPlayerAnimator.play()
+        }, key === null ? 3600 : 4300);
 
         setTimeout(() => {
             camera.removeComponent(moveToDoorAnimator);
             camera.removeComponent(moveCameraToPlayerAnimator);
             this.controller.doorAnimation = false;
-        }, 3300);
+        }, key === null ? 4600 : 5300);
     }
 
     intervalIntersection(min1, max1, min2, max2) {
@@ -228,6 +254,7 @@ export class Physics {
                 this.player.addComponent(lightAnimator);
                 lightAnimator.play();
                 this.lanternLight.getComponentOfType(Light).isActive = true;
+                this.player.canOpenChest = true
             }, 4000)
         } else if (b.isFloorOutside) {
             this.endFunction();
@@ -278,7 +305,7 @@ export class Physics {
                     this.controller.startDragging(b);
                 }
                 this.isDragColliding = true;
-            } else if (b.isSearchable) {
+            } else if (b.isSearchable && this.player.canOpenChest) {
                 startDragText.innerText = "Press E to search chest."
                 if (this.controller.keys['KeyE']) {
                     this.searchChest(b)
@@ -290,6 +317,7 @@ export class Physics {
 
     searchChest(chest) {
         chest.isSearchable = false;
+        this.sound.play("chestOpen")
         const chestAnim = new RotateAnimator(chest.children[0], {
             endRotation: [0, 0, -55],
             loop: false,
@@ -304,7 +332,7 @@ export class Physics {
             const lanternComponent = this.player.children.find(x => x.getComponentOfType(Light)).getComponentOfType(Light);
             lanternComponent.color = [0.2, 0.07, 0.01];
 
-            this.openDoor(this.firstDoor)
+            this.openDoor(null, this.firstDoor)
 
             const lanternTransform = this.lantern.getComponentOfType(Transform)
             vec3.add(lanternTransform.translation, lanternTransform.translation, [0, 29*6.02 - 1.3, 0]);
@@ -334,9 +362,9 @@ export class Physics {
             return;
         }
 
+
         key.getComponentOfType(Key).collectKey()
-        this.openDoor(door)
-        this.scene.removeChild(key)
+        this.openDoor(key, door)
         this.sound.play('collect');
     }
 
@@ -344,12 +372,7 @@ export class Physics {
         const blockBox = getTransformedAABB(block);
         const circleBox = getTransformedAABB(circle);
 
-        const isColliding = this.aabbIntersection(blockBox, circleBox);
-        if (!isColliding) {
-            return false;
-        }
-        return true;
-
+        return this.aabbIntersection(blockBox, circleBox);
     }
 
     getMinDirection(aBox, bBox) {
@@ -410,7 +433,7 @@ export class Physics {
 export function getTransformedAABB(node) {
     // Transform all vertices of the AABB from local to global space.
     const matrix = getGlobalModelMatrix(node);
-    const { min, max } = node.aabb;
+    const {min, max} = node.aabb;
     const vertices = [
         [min[0], min[1], min[2]],
         [min[0], min[1], max[2]],
@@ -428,5 +451,5 @@ export function getTransformedAABB(node) {
     const zs = vertices.map(v => v[2]);
     const newmin = [Math.min(...xs), Math.min(...ys), Math.min(...zs)];
     const newmax = [Math.max(...xs), Math.max(...ys), Math.max(...zs)];
-    return { min: newmin, max: newmax };
+    return {min: newmin, max: newmax};
 }

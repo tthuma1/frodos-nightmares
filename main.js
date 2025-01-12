@@ -51,6 +51,7 @@ async function startGame(instantStart) {
     const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
     const player = gltfLoader.loadNode("Player");
     player.isPlayer = true;
+    player.canOpenChest = false;
     const firstKey = gltfLoader.loadNode('key1');
     const finalKey = gltfLoader.loadNode('key2');
     firstKey.addComponent(new Key());
@@ -76,6 +77,7 @@ async function startGame(instantStart) {
     const finalDoor = gltfLoader.loadNode("doors");
     const firstDoor = gltfLoader.loadNode("doors.001")
     const keyDoor = gltfLoader.loadNode("doors.002")
+    keyDoor.isDoorToLeft = true;
 
     // camera.addComponent(new TouchController(camera, canvas));
     player.addComponent(camera)
@@ -248,6 +250,7 @@ async function startGame(instantStart) {
         'chest_upper5',
         'globe',
         'fence',
+        'MirrorBall',
     ];
 
     const searchableObjects = [
