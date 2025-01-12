@@ -130,10 +130,10 @@ export class Physics {
             const endPosition = vec3.create();
             if (isDoorToLeft) {
                 keyTransform.rotation = [-0.5, -0.5, -0.5, -0.5];
-                vec3.sub(endPosition, doorTransform.translation.slice(), [-0.4, 0.1, -0.4])
+                vec3.sub(endPosition, doorTransform.translation.slice(), [-0.4, 0, -0.9])
             }else {
                 keyTransform.rotation = [0.5, 0.5, -0.5, -0.5];
-                vec3.sub(endPosition, doorTransform.translation.slice(), [+0.4, 0.1, -0.4])
+                vec3.sub(endPosition, doorTransform.translation.slice(), [+0.4, 0, -0.9])
             }
             const moveKeyToDoorAnimator = new LinearAnimator(key, {
                 startPosition: keyTransform.translation.slice(),
