@@ -162,19 +162,9 @@ export class Physics {
         }
 
         setTimeout(() => {
-            const doorLinearAnimator = new LinearAnimator(door, {
-                startPosition: doorTransform.translation.slice(),
-                endPosition: vec3.add(vec3.create(), doorTransform.translation.slice(), [-0.5, 0, -0.5]),
-                loop: false,
-                duration: 1,
-                startTime: performance.now() / 1000,
-                transform: doorTransform,
-            });
-            door.addComponent(doorLinearAnimator);
-            doorLinearAnimator.play();
-
             const doorAnimator = new RotateAnimator(door, {
-                endRotation: [0, -90, 0],
+                startRotation: [0, 180, 0],
+                endRotation: [0, 90, 0],
                 loop: false,
                 duration: 1,
                 startTime: performance.now() / 1000,
