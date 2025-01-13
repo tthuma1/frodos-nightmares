@@ -5551,10 +5551,6 @@
 		},
 		{
 			"sampler":1,
-			"source":17
-		},
-		{
-			"sampler":1,
 			"source":19
 		},
 		{
@@ -5567,7 +5563,11 @@
 		},
 		{
 			"sampler":1,
-			"source":19
+			"source":22
+		},
+		{
+			"sampler":1,
+			"source":20
 		},
 		{
 			"sampler":1,
@@ -5591,15 +5591,15 @@
 		},
 		{
 			"sampler":1,
-			"source":22
-		},
-		{
-			"sampler":0,
 			"source":23
 		},
 		{
-			"sampler":1,
+			"sampler":0,
 			"source":24
+		},
+		{
+			"sampler":1,
+			"source":25
 		},
 		{
 			"sampler":0,
@@ -5615,7 +5615,7 @@
 		},
 		{
 			"sampler":1,
-			"source":25
+			"source":26
 		},
 		{
 			"sampler":1,
@@ -5631,10 +5631,6 @@
 		},
 		{
 			"sampler":0,
-			"source":26
-		},
-		{
-			"sampler":0,
 			"source":27
 		},
 		{
@@ -5642,7 +5638,7 @@
 			"source":28
 		},
 		{
-			"sampler":1,
+			"sampler":0,
 			"source":29
 		},
 		{
@@ -5651,15 +5647,19 @@
 		},
 		{
 			"sampler":1,
-			"source":11
-		},
-		{
-			"sampler":1,
-			"source":11
-		},
-		{
-			"sampler":1,
 			"source":31
+		},
+		{
+			"sampler":1,
+			"source":11
+		},
+		{
+			"sampler":1,
+			"source":11
+		},
+		{
+			"sampler":1,
+			"source":32
 		},
 		{
 			"sampler":1,
@@ -5667,22 +5667,6 @@
 		},
 		{
 			"sampler":1,
-			"source":32
-		},
-		{
-			"sampler":1,
-			"source":33
-		},
-		{
-			"sampler":1,
-			"source":32
-		},
-		{
-			"sampler":1,
-			"source":32
-		},
-		{
-			"sampler":1,
 			"source":33
 		},
 		{
@@ -5691,15 +5675,11 @@
 		},
 		{
 			"sampler":1,
-			"source":34
+			"source":33
 		},
 		{
 			"sampler":1,
-			"source":34
-		},
-		{
-			"sampler":1,
-			"source":34
+			"source":33
 		},
 		{
 			"sampler":1,
@@ -5711,19 +5691,39 @@
 		},
 		{
 			"sampler":1,
-			"source":36
-		},
-		{
-			"sampler":0,
-			"source":37
+			"source":35
 		},
 		{
 			"sampler":1,
+			"source":35
+		},
+		{
+			"sampler":1,
+			"source":35
+		},
+		{
+			"sampler":1,
+			"source":35
+		},
+		{
+			"sampler":1,
+			"source":36
+		},
+		{
+			"sampler":1,
+			"source":37
+		},
+		{
+			"sampler":0,
 			"source":38
 		},
 		{
 			"sampler":1,
 			"source":39
+		},
+		{
+			"sampler":1,
+			"source":40
 		}
 	],
 	"images":[
@@ -5814,13 +5814,18 @@
 		},
 		{
 			"mimeType":"image/png",
-			"name":"CloakGreen",
-			"uri":"CloakGreen.png"
+			"name":"CloakGreen2",
+			"uri":"CloakGreen2.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"PantsBrown",
 			"uri":"PantsBrown.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"CloakGreen",
+			"uri":"CloakGreen.png"
 		},
 		{
 			"mimeType":"image/png",

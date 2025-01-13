@@ -49,7 +49,8 @@ export class Physics {
             if (node !== this.player && node.isStatic && node !== this.controller.draggedNode) {
                 this.resolveCollision(this.player, node)
 
-                if (this.controller.draggedNode && node !== this.controller.draggedNode) { // second part of && is necessarry, is draggedNode is set while scene is updating
+                // if player dragging box, check box collision
+                if (this.controller.draggedNode && node !== this.controller.draggedNode) {
                     this.resolveCollision(this.controller.draggedNode, node);
                 }
             }
@@ -420,8 +421,8 @@ export class Physics {
 
     toBreakBox(box) {
         return {
-            min: [box.min[0] + 0.5, box.min[1] + 0.5, box.min[2] + 0.5],
-            max: [box.max[0] - 0.5, box.max[1] - 0.5, box.max[2] - 0.5],
+            min: [box.min[0] + 0.45, box.min[1], box.min[2] + 0.5],
+            max: [box.max[0] - 0.45, box.max[1], box.max[2] - 0.5],
         }
     }
 

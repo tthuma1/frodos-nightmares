@@ -300,10 +300,10 @@ export class ThirdPersonController {
         vec3.scaleAndAdd(this.velocity, this.velocity, acc, dt * this.acceleration);
 
         // If there is no user input, apply decay.
-        if (!this.keys['KeyW'] &&
+        if ((!this.keys['KeyW'] &&
             !this.keys['KeyS'] &&
             !this.keys['KeyD'] &&
-            !this.keys['KeyA'])
+            !this.keys['KeyA']) || (this.isPlayerOnLadder && !this.keys['KeyA'] && !this.keys['KeyD']))
         {
             const decay = Math.exp(dt * Math.log(1 - this.decay));
             vec3.scale(this.velocity, this.velocity, decay);

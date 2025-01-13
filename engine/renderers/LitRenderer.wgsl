@@ -149,7 +149,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     }
 
     if (numLightsActive > 0) {
-        let ambient = 0.08;
+        let ambient = 0.1;
         output.color += vec4f(baseColor.rgb * ambient, output.color.a);
     }
 
