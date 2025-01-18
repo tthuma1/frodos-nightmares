@@ -1,4 +1,4 @@
-import {quat, vec3} from 'glm';
+import {quat, vec3} from './lib/glm.js';
 import {getGlobalModelMatrix} from './engine/core/SceneUtils.js';
 import {Camera, Light, Transform} from './engine/core.js';
 import {Key} from "./engine/core/Key.js";
