@@ -80,7 +80,7 @@ export function extractFrustumPlanes(viewProjectionMatrix) {
 }
 
 export function isAABBInsideFrustum(aabb, planes) {
-    const { min, max } = aabb;
+    const { min, max } = scaleAABB(aabb);
 
     for (const plane of planes) {
         const { normal, constant } = plane;
@@ -98,5 +98,12 @@ export function isAABBInsideFrustum(aabb, planes) {
     }
 
     return true;
+}
+
+function scaleAABB(box) {
+    return {
+        min: [box.min[0] - 0.5, box.min[1] - 0.5, box.min[2] - 0.5],
+        max: [box.max[0] + 0.5, box.max[1] + 0.5, box.max[2] + 0.5],
+    }
 }
 
