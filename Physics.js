@@ -1,6 +1,6 @@
 import {quat, vec3} from 'glm';
-import {getGlobalModelMatrix} from 'engine/core/SceneUtils.js';
-import {Camera, Light, Transform} from 'engine/core.js';
+import {getGlobalModelMatrix} from './engine/core/SceneUtils.js';
+import {Camera, Light, Transform} from './engine/core.js';
 import {Key} from "./engine/core/Key.js";
 import {ThirdPersonController} from './engine/controllers/ThirdPersonController.js';
 import {MovingPlatform} from './engine/core/MovingPlatform.js';

@@ -8,25 +8,25 @@ import {
     Texture,
     Transform,
     Light,
-} from 'engine/core.js';
-import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
-import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
-import { UpdateSystem } from 'engine/systems/UpdateSystem.js';
-import { LitRenderer } from 'engine/renderers/LitRenderer.js';
+} from './engine/core.js';
+import { GLTFLoader } from './engine/loaders/GLTFLoader.js';
+import { ResizeSystem } from './engine/systems/ResizeSystem.js';
+import { UpdateSystem } from './engine/systems/UpdateSystem.js';
+import { LitRenderer } from './engine/renderers/LitRenderer.js';
 import { ThirdPersonController } from "./engine/controllers/ThirdPersonController.js";
 import { Physics } from './Physics.js';
 import {
     calculateAxisAlignedBoundingBox,
     mergeAxisAlignedBoundingBoxes,
-} from 'engine/core/MeshUtils.js';
+} from './engine/core/MeshUtils.js';
 import {Key} from "./engine/core/Key.js";
 import { MovingPlatform } from './engine/core/MovingPlatform.js';
 import { TouchController } from './engine/controllers/TouchController.js'
 import { quat, vec3, vec4, mat3, mat4 } from './lib/glm.js';
 import { RotateAnimator } from './engine/animators/RotateAnimator.js';
 import { ImageLoader } from './engine/loaders/ImageLoader.js';
-import * as EasingFunctions from 'engine/animators/EasingFunctions.js';
-import { Sound } from 'engine/core/Sound.js';
+import * as EasingFunctions from './engine/animators/EasingFunctions.js';
+import { Sound } from './engine/core/Sound.js';
 import { getTransformedAABB } from './Physics.js';
 
 const gltfLoader = new GLTFLoader();

@@ -1,7 +1,7 @@
 import { vec3, quat } from 'glm';
 
 import { Transform } from '../core/Transform.js';
-import * as EasingFunctions from 'engine/animators/EasingFunctions.js';
+import * as EasingFunctions from './EasingFunctions.js';
 
 export class RotateAnimator {
 
